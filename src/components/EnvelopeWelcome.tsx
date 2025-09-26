@@ -45,11 +45,10 @@ export default function EnvelopeWelcome({
 
   return (
     <main
-      className={`min-h-screen bg-violet-50 text-violet-900 transition-opacity duration-500 ${className}`}
+      className={`min-h-screen bg-[color:var(--color-dusty-50)] text-[color:var(--color-dusty-900)] overflow-hidden transition-opacity duration-500 ${className}`}
       style={{
         minHeight: "100dvh",
-        paddingBottom: "calc(32px + env(safe-area-inset-bottom))",
-        paddingTop: "calc(16px + env(safe-area-inset-top))",
+        paddingTop: "calc(13px + env(safe-area-inset-top))",
       }}
     >
       <div id="sobre-boda" className={`${ew.envelope} ${ew.envelopeFull} ${isOpening ? ew.opening : ""}`}>
@@ -59,10 +58,15 @@ export default function EnvelopeWelcome({
           {sealSlot ? sealSlot : <span className={ew.sealText}>{sealText}</span>}
         </div>
         <div className={ew.overlay} aria-hidden={false}>
-          <div className="flex flex-col items-center gap-3">
-            <p className="text-xl text-violet-700/90 font-serif drop-shadow-[0_1px_1px_rgba(255,255,255,0.6)]">{sender}</p>
-            <p className="text-sm text-violet-600/80 drop-shadow-[0_1px_1px_rgba(255,255,255,0.6)]">{subtitle}</p>
+          <div className="flex flex-col justify-between items-center gap-6 min-h-[40vh] py-6 px-4">
+            <div className="text-center">
+              <p className="display-font text-2xl md:text-3xl tracking-wide" style={{ color: "var(--color-dusty-900)" }}>{sender}</p>
+              <p className="sans-font text-sm opacity-80 mt-1" style={{ color: "var(--color-dusty-700)" }}>{subtitle}</p>
+            </div>
             <div className={ew.swipeWrap}>
+              <p className="display-font text-base md:text-lg mb-1 text-center opacity-70" style={{ color: "var(--color-dusty-700)" }}>
+                Desliza para abrir
+              </p>
               <SwipeableButton
                 name="invite-swipe"
                 onSuccess={handleOpen}
@@ -79,6 +83,14 @@ export default function EnvelopeWelcome({
                 disabled={isOpening}
               />
             </div>
+          <div className="text-center mt-4">
+            <p className="max-w-md mx-auto italic text-[13px]" style={{ color: "var(--color-dusty-800)" }}>
+              Reconócelo en todos tus caminos, y él enderezará tus veredas.
+              <span className="block not-italic mt-1 text-[12px]" style={{ color: "var(--color-dusty-700)" }}>
+                — Proverbios 3:6 (RVR1960)
+              </span>
+            </p>
+          </div>
           </div>
         </div>
       </div>

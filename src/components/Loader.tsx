@@ -47,15 +47,13 @@ export default function Loader({ className = "", onComplete }: LoaderProps) {
   return (
     <div className={`loader-overlay ${className}`} role="status" aria-live="polite">
       <span className="sr-only">Cargando invitación</span>
-      <div className="loader-card" aria-hidden>
-        <DotLottieReact
-          src="https://lottie.host/e4b8e419-dcda-4cb2-b36b-c2510d7f9c7a/26Hso0MUE2.lottie"
-          loop={false}
-          autoplay
-          className="loader-animation"
-          dotLottieRefCallback={handleDotInstance}
-        />
-      </div>
+      <DotLottieReact
+        src="https://lottie.host/e4b8e419-dcda-4cb2-b36b-c2510d7f9c7a/26Hso0MUE2.lottie"
+        loop={false}
+        autoplay
+        className="loader-animation"
+        dotLottieRefCallback={handleDotInstance}
+      />
     </div>
   );
 }

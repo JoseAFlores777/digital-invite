@@ -19,7 +19,7 @@ export default function MapEmbed() {
 
   return (
     <section id="mapa" ref={root} className="bg-white">
-      <div className="max-w-5xl mx-auto px-6 py-20">
+      <div className="max-w-5xl mx-auto px-6 py-16 md:py-20 lg:py-28">
         <h2 className="display-font text-3xl md:text-4xl text-center mb-6">Cómo llegar</h2>
         <div className="rounded-2xl overflow-hidden border border-neutral-200 shadow-sm">
           <iframe

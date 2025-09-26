@@ -67,16 +67,28 @@ export default function Home() {
     }
   }, [animationFinished, minimumDelayPassed, showLoaderOverlay]);
 
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    if (envelopeVisible) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = prev || "";
+    }
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [envelopeVisible]);
+
   return (
     <MusicRoot>
-      <div className="bg-violet-50 text-violet-900" style={{ minHeight: "100dvh" }}>
+      <div className="bg-[color:var(--color-dusty-50)] text-[color:var(--color-dusty-900)]" style={{ minHeight: "100dvh" }}>
         {envelopeVisible ? (
           <EnvelopeWelcome
             className={envelopeFading ? "opacity-0 pointer-events-none" : "opacity-100"}
             sealSlot={<img src="/wedding_seal.png" alt="Sello de cera" className="seal-img" />}
-            sender="De: Clari & José"
+            sender="Invitación especial para Familia Izaguirre Vallejo"
             subtitle="Con mucho amor"
-            buttonText="Abrir Invitación"
+            buttonText="Abrir invitación"
             onOpenComplete={handleOpenComplete}
           />
         ) : null}

@@ -7,24 +7,24 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 
 export const metadata: Metadata = {
-  title: "Invitación de boda – José & Clarisa",
+  title: "Invitación de boda – Clarisa & José",
   description: "Invitación de boda con animaciones sutiles GSAP, detalles del evento y RSVP.",
   metadataBase: new URL("https://example.com"),
   openGraph: {
-    title: "José & Clarisa — Invitación de boda",
+    title: "Clarisa & José — Invitación de boda",
     description:
       "Acompáñanos en nuestra celebración. Detalles, itinerario, RSVP y más.",
     url: "/",
-    siteName: "Invitación José & Clarisa",
+    siteName: "Invitación Clarisa & José",
     images: [
-      { url: "/assets/og-cover.svg", width: 1200, height: 630, alt: "Invitación José & Clarisa" },
+      { url: "/assets/og-cover.svg", width: 1200, height: 630, alt: "Invitación Clarisa & José" },
     ],
     locale: "es_ES",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "José & Clarisa — Invitación de boda",
+    title: "Clarisa & José — Invitación de boda",
     description:
       "Acompáñanos en nuestra celebración. Detalles, itinerario, RSVP y más.",
     images: ["/assets/og-cover.svg"],

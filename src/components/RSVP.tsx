@@ -21,7 +21,7 @@ export default function RSVP() {
 
   return (
     <section id="rsvp" ref={root} className="bg-white">
-      <div className="max-w-3xl mx-auto px-6 py-20 text-center">
+      <div className="max-w-3xl mx-auto px-6 py-16 md:py-20 lg:py-28 text-center">
         <h2 className="display-font text-3xl md:text-4xl mb-3">RSVP</h2>
         <p className="text-neutral-700 mb-6">Nos encantará contar contigo. Por favor confirma tu asistencia.</p>
         <button className="btn btn-primary" onClick={() => setOpen(true)} data-anim="rsvp-btn">Confirmar asistencia</button>

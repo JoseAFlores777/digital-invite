@@ -25,7 +25,7 @@ export default function MainDetails() {
 
   return (
     <section id="detalles" ref={root} className="bg-white">
-      <div className="max-w-5xl mx-auto px-6 py-20">
+      <div className="max-w-5xl mx-auto px-6 py-16 md:py-20 lg:py-28">
         <h2 className="display-font text-3xl md:text-4xl text-center mb-10">Detalles principales</h2>
         <div className="grid md:grid-cols-2 gap-6">
           <div data-anim="card" className="rounded-2xl border border-neutral-200 p-6 bg-white/80">

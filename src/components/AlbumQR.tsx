@@ -23,7 +23,7 @@ export default function AlbumQR() {
 
   return (
     <section id="album" ref={root} className="bg-white">
-      <div className="max-w-5xl mx-auto px-6 py-20">
+      <div className="max-w-5xl mx-auto px-6 py-16 md:py-20 lg:py-28">
         <h2 className="display-font text-3xl md:text-4xl text-center mb-10">Álbum</h2>
         <div className="grid md:grid-cols-[320px,1fr] gap-8 items-start">
           <div className="rounded-2xl border border-neutral-200 p-6 bg-white/80 text-center">

@@ -33,7 +33,7 @@ export default function Itinerary() {
 
   return (
     <section id="itinerario" ref={root} className="bg-white">
-      <div className="max-w-4xl mx-auto px-6 py-20">
+      <div className="max-w-4xl mx-auto px-6 py-16 md:py-20 lg:py-28">
         <h2 className="display-font text-3xl md:text-4xl text-center mb-10">Programa</h2>
         <ul className="grid md:grid-cols-4 gap-6">
           {steps.map((s) => (

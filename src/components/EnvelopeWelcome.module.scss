@@ -8,9 +8,9 @@
 
 .envelopeFull {
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   max-width: 100vw;
-  max-height: 100vh;
+  max-height: 100dvh;
 }
 
 .paperTexture {
@@ -123,8 +123,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: max(14vh, calc(80px + env(safe-area-inset-top)));
-  padding-bottom: calc(32px + env(safe-area-inset-bottom));
+  /* Ensure content starts below the seal (seal center ~28vh, radius ~125px, plus margin) */
+  padding-top: calc(13vh + 140px + env(safe-area-inset-top));
   padding-left: clamp(16px, 6vw, 32px);
   padding-right: clamp(16px, 6vw, 32px);
   z-index: 4;
@@ -262,4 +262,36 @@
     transform: translateX(100%);
     opacity: 0.0;
   }
+}
+
+.swipeHint {
+  width: min(86vw, 360px);
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+}
+
+.swipeHintIcon {
+  font-size: 22px;
+  color: var(--color-dusty-700);
+  opacity: 0.8;
+  animation: hintSlide 1.6s ease-in-out infinite;
+}
+
+@keyframes hintSlide {
+  0% { transform: translateX(0); opacity: 0.6; }
+  50% { transform: translateX(8px); opacity: 1; }
+  100% { transform: translateX(0); opacity: 0.6; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swipeHintIcon { animation: none; }
+}
+
+
+/* Ensure the internal arrow is visible inside the swiper handle */
+:global(.ReactSwipeButton .rsbcSliderArrow) {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
 }

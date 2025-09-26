@@ -39,7 +39,7 @@ export default function DressCode() {
       <div className="absolute inset-0 pointer-events-none" data-anim="parallax" aria-hidden="true">
         <div className="w-full h-full" style={{ background: "radial-gradient(1200px 400px at 80% -10%, #eef3f9, transparent)" }} />
       </div>
-      <div className="relative max-w-4xl mx-auto px-6 py-20">
+      <div className="relative max-w-4xl mx-auto px-6 py-16 md:py-20 lg:py-28">
         <h2 className="display-font text-3xl md:text-4xl text-center mb-6">Dress code</h2>
         <p className="text-neutral-700 text-center max-w-2xl mx-auto">
           Formal — tonos neutros y terrosos. El blanco está reservado para la novia.

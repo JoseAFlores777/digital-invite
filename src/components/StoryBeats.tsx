@@ -41,7 +41,7 @@ export default function StoryBeats() {
 
   return (
     <section id="historia" ref={root} className="bg-white">
-      <div className="max-w-4xl mx-auto px-6 py-20">
+      <div className="max-w-4xl mx-auto px-6 py-16 md:py-20 lg:py-28">
         <h2 className="display-font text-3xl md:text-4xl text-center mb-10">Nuestra historia</h2>
         <div className="grid md:grid-cols-3 gap-8">
           <article className="text-center space-y-2" data-anim="beat">

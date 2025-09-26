@@ -48,7 +48,7 @@ export default function Lodging() {
 
   return (
     <section id="alojamiento" ref={root} className="bg-white">
-      <div className="max-w-5xl mx-auto px-6 py-20">
+      <div className="max-w-5xl mx-auto px-6 py-16 md:py-20 lg:py-28">
         <h2 className="display-font text-3xl md:text-4xl text-center mb-10">Alojamientos & Transporte</h2>
         <div className="overflow-hidden">
           <div ref={track} className="flex gap-4 will-change-transform">

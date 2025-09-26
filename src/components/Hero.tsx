@@ -66,7 +66,7 @@ export default function Hero() {
       <div className="absolute inset-0" aria-hidden="true" data-anim="hero-bg">
         <img src="/assets/hero.svg" alt="" className="w-full h-full object-cover" />
       </div>
-      <div className="relative max-w-5xl mx-auto px-6 pt-[20dvh] pb-[18dvh] grid md:grid-cols-[1fr,1fr] items-center gap-10">
+      <div className="relative max-w-5xl mx-auto px-6 pt-[18dvh] pb-[16dvh] md:pt-[22dvh] md:pb-[20dvh] grid md:grid-cols-[1fr,1fr] items-center gap-10">
         <div className="order-2 md:order-1 text-center md:text-left">
           <h1 className="display-font text-4xl md:text-6xl tracking-tight" data-anim="hero-item">
             José <span className="opacity-60">&</span> Clarisa

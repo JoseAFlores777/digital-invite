@@ -62,7 +62,7 @@ export default function Countdown() {
 
   return (
     <section id="cuenta" ref={root} className="bg-[color:var(--color-dusty-50)]">
-      <div className="max-w-5xl mx-auto px-6 py-20 text-center">
+      <div className="max-w-5xl mx-auto px-6 py-16 md:py-20 lg:py-28 text-center">
         <h2 className="display-font text-3xl md:text-4xl mb-8">Cuenta regresiva</h2>
         {finished ? (
           <p className="text-neutral-700">¡Es hoy! Nos vemos muy pronto.</p>
