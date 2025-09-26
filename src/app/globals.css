@@ -8,21 +8,33 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  /* Custom violet palette */
-  --color-violet-50: #ebf1f9;
-  --color-violet-100: #dbe6f5;
-  --color-violet-200: #b5cfeb;
-  --color-violet-300: #8db8e1;
-  --color-violet-400: #6a9dca;
-  --color-violet-500: #5a86ad;
-  --color-violet-600: #466988;
-  --color-violet-700: #345069;
-  --color-violet-800: #223749;
-  --color-violet-900: #111f2b;
-  --color-violet-950: #08121a;
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-playfair);
+  /* Dusty blue inspired palette */
+  --color-dusty-50: #f6f8fb;
+  --color-dusty-100: #eef3f9;
+  --color-dusty-200: #dee8f2;
+  --color-dusty-300: #c9d8e7;
+  --color-dusty-400: #b3c7db;
+  --color-dusty-500: #9cb3c7; /* accent */
+  --color-dusty-600: #7c95ab;
+  --color-dusty-700: #5f788d;
+  --color-dusty-800: #465b6c;
+  --color-dusty-900: #2a3947;
 }
+
+/* Typography helpers */
+.display-font { font-family: var(--font-playfair), ui-serif, Georgia, serif; }
+.sans-font { font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif; }
+
+/* Buttons */
+.btn { @apply inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2; }
+.btn-primary { @apply bg-neutral-900 text-white hover:bg-neutral-800 focus-visible:ring-neutral-900; }
+.btn-ghost { @apply bg-transparent text-neutral-900 hover:bg-neutral-100; }
+
+/* Modal helpers */
+.modal-backdrop { @apply fixed inset-0 bg-black/40; }
+.modal-card { @apply bg-white rounded-2xl shadow-xl; }
 
 @media (prefers-color-scheme: dark) {
   :root {

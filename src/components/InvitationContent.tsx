@@ -1,24 +1,46 @@
 "use client";
 
 import React from "react";
+import Hero from "./Hero";
+import StoryBeats from "./StoryBeats";
+import MainDetails from "./MainDetails";
+import Countdown from "./Countdown";
+import Itinerary from "./Itinerary";
+import DressCode from "./DressCode";
+import RSVP from "./RSVP";
+import Lodging from "./Lodging";
+import Gift from "./Gift";
+import AlbumQR from "./AlbumQR";
+import MapEmbed from "./MapEmbed";
+import Footer from "./Footer";
 
 export default function InvitationContent() {
   return (
-    <main
-      className="w-full bg-violet-50 text-violet-900 flex items-center justify-center p-6"
-      style={{
-        minHeight: "100dvh",
-        paddingBottom: "calc(24px + env(safe-area-inset-bottom))",
-        paddingTop: "calc(24px + env(safe-area-inset-top))",
-      }}
-    >
-      <section className="w-full max-w-2xl text-center space-y-5">
-        <h1 className="text-3xl font-serif tracking-wide">Clarissa &amp; José</h1>
-        <p className="text-base leading-relaxed opacity-85">
-          Aquí irá el contenido de la invitación (detalles del evento, horarios, mapa, RSVP, etc.).
-        </p>
-        <p className="text-xs opacity-60">Ruta especial eliminada – todo vive en esta página.</p>
-      </section>
+    <main className="bg-[color:var(--color-dusty-50)] text-neutral-900">
+      {/* 1. Hero */}
+      <Hero />
+      {/* 2. Nuestra historia */}
+      <StoryBeats />
+      {/* 3. Detalles principales */}
+      <MainDetails />
+      {/* 4. Cuenta regresiva */}
+      <Countdown />
+      {/* 5. Programa */}
+      <Itinerary />
+      {/* 6. Dress code */}
+      <DressCode />
+      {/* 7. RSVP */}
+      <RSVP />
+      {/* 8. Alojamientos / Transporte */}
+      <Lodging />
+      {/* 9. Regalo */}
+      <Gift />
+      {/* 10. Álbum / QR */}
+      <AlbumQR />
+      {/* 11. Mapa embebido */}
+      <MapEmbed />
+      {/* 12. Cierre */}
+      <Footer />
     </main>
   );
 }

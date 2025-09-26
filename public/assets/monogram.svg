@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <style>
+      .stroke { fill: none; stroke: #2a3947; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+      .fill { fill: #2a3947; fill-opacity: 0; }
+    </style>
+  </defs>
+  <circle cx="100" cy="100" r="88" class="stroke" />
+  <path id="j" class="stroke" d="M80 40 v80 a20 20 0 0 0 20 20 h10"/>
+  <path id="c" class="stroke" d="M135 60 a40 40 0 1 0 0 80"/>
+  <text x="50%" y="54%" text-anchor="middle" font-family="Georgia,serif" font-size="42" class="fill">J  C</text>
+</svg>

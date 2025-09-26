@@ -6,6 +6,8 @@ import EnvelopeWelcome from "@/components/EnvelopeWelcome";
 import InvitationContent from "@/components/InvitationContent";
 import MusicControls from "@/components/MusicControls";
 
+import MusicRoot from "@/components/MusicRoot";
+
 export default function Home() {
   const [minimumDelayPassed, setMinimumDelayPassed] = useState(false);
   const [animationFinished, setAnimationFinished] = useState(false);
@@ -66,29 +68,31 @@ export default function Home() {
   }, [animationFinished, minimumDelayPassed, showLoaderOverlay]);
 
   return (
-    <div className="bg-violet-50 text-violet-900" style={{ minHeight: "100dvh" }}>
-      {envelopeVisible ? (
-        <EnvelopeWelcome
-          className={envelopeFading ? "opacity-0 pointer-events-none" : "opacity-100"}
-          sealSlot={<img src="/wedding_seal.png" alt="Sello de cera" className="seal-img" />}
-          sender="De: Clari & José"
-          subtitle="Con mucho amor"
-          buttonText="Abrir Invitación"
-          onOpenComplete={handleOpenComplete}
-        />
-      ) : null}
-      {invitationMounted ? (
-        <div className={`transition-opacity duration-700 ${invitationVisible ? "opacity-100" : "opacity-0"}`}>
-          <InvitationContent />
-          {invitationVisible ? <MusicControls /> : null}
-        </div>
-      ) : null}
-      {showLoaderOverlay ? (
-        <Loader
-          onComplete={handleLoaderComplete}
-          className={fadeOutLoader ? "fade-out" : ""}
-        />
-      ) : null}
-    </div>
+    <MusicRoot>
+      <div className="bg-violet-50 text-violet-900" style={{ minHeight: "100dvh" }}>
+        {envelopeVisible ? (
+          <EnvelopeWelcome
+            className={envelopeFading ? "opacity-0 pointer-events-none" : "opacity-100"}
+            sealSlot={<img src="/wedding_seal.png" alt="Sello de cera" className="seal-img" />}
+            sender="De: Clari & José"
+            subtitle="Con mucho amor"
+            buttonText="Abrir Invitación"
+            onOpenComplete={handleOpenComplete}
+          />
+        ) : null}
+        {invitationMounted ? (
+          <div className={`transition-opacity duration-700 ${invitationVisible ? "opacity-100" : "opacity-0"}`}>
+            <InvitationContent />
+            {invitationVisible ? <MusicControls /> : null}
+          </div>
+        ) : null}
+        {showLoaderOverlay ? (
+          <Loader
+            onComplete={handleLoaderComplete}
+            className={fadeOutLoader ? "fade-out" : ""}
+          />
+        ) : null}
+      </div>
+    </MusicRoot>
   );
 }

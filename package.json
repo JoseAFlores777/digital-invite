@@ -11,15 +11,16 @@
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
-    "@directus/sdk": "^20.0.3",
-    "@iconify/react": "^6.0.2",
-    "@lottiefiles/dotlottie-react": "^0.17.1",
-    "next": "15.5.2",
-    "next-view-transitions": "^0.3.4",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "react-swipeable-button": "^1.6.5",
-    "use-sound": "^5.0.0"
+  "@directus/sdk": "^20.0.3",
+  "@iconify/react": "^6.0.2",
+  "@lottiefiles/dotlottie-react": "^0.17.1",
+  "gsap": "^3.12.5",
+  "next": "15.5.2",
+  "next-view-transitions": "^0.3.4",
+  "react": "^19.1.1",
+  "react-dom": "^19.1.1",
+  "react-swipeable-button": "^1.6.5",
+  "use-sound": "^5.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
