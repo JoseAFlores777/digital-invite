@@ -1,4 +1,4 @@
-import { createDirectus, rest, readItems, authentication, staticToken } from "@directus/sdk";
+import { createDirectus, rest, readItems, staticToken } from "@directus/sdk";
 
 export type InvitationContent = {
   id?: string | number;
@@ -18,7 +18,7 @@ export function getDirectusClient() {
   let client = createDirectus(url).with(rest());
   const token = process.env.DIRECTUS_STATIC_TOKEN;
   if (token) {
-    client = client.with(authentication(staticToken(token)));
+    client = client.with(staticToken(token));
   }
   return client;
 }
@@ -30,7 +30,7 @@ export async function getInvitationContent(): Promise<InvitationContent> {
     const collection: string = process.env.DIRECTUS_COLLECTION || "invitation";
 
     const items = (await client.request(
-      readItems<InvitationContent>(collection, {
+      readItems(collection, {
         limit: 1,
         sort: ["-date"],
       })

@@ -17,8 +17,8 @@ export default function Home() {
   const [envelopeFading, setEnvelopeFading] = useState(false);
   const [invitationMounted, setInvitationMounted] = useState(false);
   const [invitationVisible, setInvitationVisible] = useState(false);
-  const loaderFadeTimeoutRef = useRef<number>();
-  const envelopeTimeoutRef = useRef<number>();
+  const loaderFadeTimeoutRef = useRef<number | undefined>(undefined);
+  const envelopeTimeoutRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setMinimumDelayPassed(true), 1500);

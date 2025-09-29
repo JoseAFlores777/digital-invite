@@ -208,3 +208,33 @@ body {
   transform: translateY(0);
   box-shadow: 0 6px 12px rgba(139, 107, 74, 0.2);
 }
+
+
+/* Hero to next section fade utility */
+@utility bg-hero-fade-card {
+  /* Fallback for browsers without color-mix support */
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.32) 20%,
+    rgba(255, 255, 255, 0.5) 45%,
+    rgba(255, 255, 255, 0.74) 75%,
+    rgba(255, 255, 255, 1) 100%
+  );
+  /* If supported, use perceptual color mixing for a smoother fade */
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--fade-to, #ffffff) 20%, transparent) 0%,
+    color-mix(in oklab, var(--fade-to, #ffffff) 40%, transparent) 30%,
+    color-mix(in oklab, var(--fade-to, #ffffff) 70%, transparent) 65%,
+    var(--fade-to, #ffffff) 100%
+  );
+}
+
+
+/* Override utility: map .md:pt-[22dvh] to 63dvh on md screens per ticket 06 */
+@layer utilities {
+  @media (min-width: 768px) {
+    .md\:pt-\[22dvh\] { padding-top: 63dvh !important; }
+  }
+}

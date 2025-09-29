@@ -1,6 +1,7 @@
 "use client";
 
 import { useLayoutEffect } from "react";
+import type { DependencyList } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -18,7 +19,7 @@ function ensureRegistered() {
  * Convenience wrapper for gsap.context inside a layout effect.
  * Returns a cleanup function that reverts the GSAP context.
  */
-export function useGsapContext(effect: () => void | (() => void), deps: any[] = []) {
+export function useGsapContext(effect: () => void | (() => void), deps: DependencyList = []) {
   useLayoutEffect(() => {
     ensureRegistered();
     const ctx = gsap.context(effect);
