@@ -1,94 +1,74 @@
 "use client";
 
-import React, { useRef } from "react";
-import { useIsReducedMotion } from "@/hooks/useIsReducedMotion";
-import { useGsapContext, gsap, ScrollTrigger } from "@/hooks/useGsapContext";
+import React from "react";
+import { useGsapContext, gsap } from "../hooks/useGsapContext";
 
-export default function Hero() {
-  const root = useRef<HTMLDivElement>(null);
-  const reduced = useIsReducedMotion();
+export default function Hero({ fadeTo = "#ffffff" }: { fadeTo?: string }) {
+  const fadeVars: React.CSSProperties = { "--fade-to": fadeTo } as React.CSSProperties;
+  const sectionRef = React.useRef<HTMLElement | null>(null);
 
   useGsapContext(() => {
-    if (!root.current) return;
-    const q = gsap.utils.selector(root);
+    const section = sectionRef.current;
+    if (!section) return;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    // Initial stagger for headline elements
-    gsap.from(q('[data-anim="hero-item"]'), {
-      y: 24,
-      opacity: 0,
-      duration: 0.9,
-      ease: "power2.out",
-      stagger: 0.1,
-    });
+    const zoomEl = section.querySelector<HTMLElement>("[data-hero-zoom]");
+    if (!zoomEl) return;
 
-    // SVG stroke draw for monogram
-    const paths = q('svg [data-stroke]');
-    paths.forEach((p: Element) => {
-      const el = p as SVGPathElement;
-      const len = el.getTotalLength?.() ?? 300;
-      el.style.strokeDasharray = String(len);
-      el.style.strokeDashoffset = String(len);
-    });
-    gsap.to(paths, {
-      strokeDashoffset: 0,
-      duration: 1.6,
-      ease: "power2.out",
-      delay: 0.15,
-      onComplete: () => {
-        gsap.to(q('[data-anim="mono-fill"]'), { opacity: 1, duration: 0.8, ease: "power1.out" });
-      },
-    });
-
-    // Parallax background
-    if (!reduced) {
-      const bg = q('[data-anim="hero-bg"]')[0];
-      if (bg) {
-        gsap.fromTo(
-          bg,
-          { yPercent: -10 },
-          {
-            yPercent: 0,
-            ease: "none",
-            scrollTrigger: {
-              trigger: root.current,
-              start: "top top",
-              end: "+=60%",
-              scrub: true,
-            },
-          }
-        );
+    gsap.fromTo(
+      zoomEl,
+      { scale: 1 },
+      {
+        scale: 1.15,
+        ease: "none",
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        },
       }
-    }
-  }, [reduced]);
+    );
+  }, []);
 
   return (
-    <section id="inicio" ref={root} className="relative overflow-hidden bg-white">
+    <section ref={sectionRef} id="inicio" className="relative overflow-hidden bg-white min-h-[100dvh]">
       <div className="absolute inset-0" aria-hidden="true" data-anim="hero-bg">
-        <img src="/assets/hero.svg" alt="" className="w-full h-full object-cover" />
+        <img
+          data-hero-zoom
+          src="/images/IMG_0150.JPG"
+          alt=""
+          className="w-full h-full object-cover origin-center"
+          style={{ willChange: "transform" }}
+          loading="eager"
+          decoding="async"
+          onError={(e) => {
+            const img = e.currentTarget as HTMLImageElement;
+            if (img.src.endsWith("IMG_0150.JPG")) img.src = "/images/IMG_0049.JPG";
+          }}
+        />
+        {/* Dusty blue tint overlay for better legibility */}
+        <div className="absolute inset-0 pointer-events-none bg-[color:var(--color-dusty-900)]/35" />
       </div>
-      <div className="relative max-w-5xl mx-auto px-6 pt-[18dvh] pb-[16dvh] md:pt-[22dvh] md:pb-[20dvh] grid md:grid-cols-[1fr,1fr] items-center gap-10">
-        <div className="order-2 md:order-1 text-center md:text-left">
-          <h1 className="display-font text-4xl md:text-6xl tracking-tight" data-anim="hero-item">
-            José <span className="opacity-60">&</span> Clarisa
+      <div className="z-20 max-w-5xl mx-auto px-6 absolute inset-x-0 bottom-0 pt-[62dvh] pb-[calc(10dvh+env(safe-area-inset-bottom))] md:relative md:inset-auto md:bottom-auto md:pt-[22dvh] md:pb-[calc(12dvh+env(safe-area-inset-bottom))]">
+        <div className="text-center">
+          <h1 className="display-font text-4xl md:text-6xl tracking-tight text-[color:var(--color-dusty-80)] drop-shadow-md" data-anim="hero-item">
+            Clarisa <span className="text-[color:var(--color-dusty-200)]/90">&</span> José
           </h1>
-          <p className="mt-3 text-neutral-600" data-anim="hero-item">
+          <p className="mt-3 text-[color:var(--color-dusty-100)]/90" data-anim="hero-item">
             Sábado 21 de diciembre de 2025 — 4:30 PM
           </p>
-          <a href="#detalles" className="btn btn-primary mt-6 inline-block" data-anim="hero-item" aria-label="Ver detalles principales">
-            Ver detalles
-          </a>
         </div>
-        <div className="order-1 md:order-2 flex items-center justify-center">
-          {/* Inline SVG monogram for stroke-draw animation */}
-          <svg width="220" height="220" viewBox="0 0 220 220" role="img" aria-label="Monograma">
-            <circle cx="110" cy="110" r="96" fill="none" stroke="#9cb3c7" strokeWidth="1.5" data-stroke="1" />
-            <path d="M80 150c18-12 28-32 28-58 0-12-2-24-6-34" fill="none" stroke="#2a3947" strokeWidth="2.4" strokeLinecap="round" data-stroke="1" />
-            <path d="M140 70c-12 6-20 18-20 32 0 22 16 40 36 40 6 0 12-2 16-4" fill="none" stroke="#2a3947" strokeWidth="2.4" strokeLinecap="round" data-stroke="1" />
-            <g data-anim="mono-fill" style={{ opacity: 0 }}>
-              <circle cx="110" cy="110" r="6" fill="#b3c7db" />
-            </g>
-          </svg>
-        </div>
+      </div>
+
+      {/* Bottom fade divider to smooth the transition into the next section */}
+      <div
+        id="hero-fade"
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 -bottom-px z-10 h-full"
+        style={fadeVars}
+      >
+        <div className="h-full w-full bg-hero-fade-card" />
       </div>
     </section>
   );

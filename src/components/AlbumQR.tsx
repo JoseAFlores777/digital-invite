@@ -3,7 +3,14 @@
 import React, { useRef } from "react";
 import { useGsapContext, gsap } from "@/hooks/useGsapContext";
 
-const images = [1,2,3,4,5,6].map((i) => `/assets/gallery-${i}.svg`);
+const images = [
+  "/images/IMG_0049.JPG",
+  "/images/IMG_0051.JPG",
+  "/images/IMG_0097.JPG",
+  "/images/IMG_0136.JPG",
+  "/images/IMG_0146.JPG",
+  "/images/IMG_0049.JPG",
+];
 
 export default function AlbumQR() {
   const root = useRef<HTMLDivElement>(null);
@@ -32,7 +39,7 @@ export default function AlbumQR() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {images.map((src, i) => (
-              <img key={src} src={src} alt="Foto de la galería" data-anim="thumb" className="rounded-xl border border-neutral-200" />
+              <img key={`${src}-${i}`} src={src} alt="Foto de la galería" data-anim="thumb" className="rounded-xl border border-neutral-200" />
             ))}
           </div>
         </div>

@@ -1,7 +1,14 @@
 "use client";
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import type { Howl } from "howler";
+type Howl = {
+  playing(): boolean;
+  stop(): void;
+  volume(v?: number): number;
+  fade(from: number, to: number, duration: number): void;
+  on(event: "fade", handler: () => void): void;
+  off(event: "fade", handler: () => void): void;
+};
 import useSound from "use-sound";
 
 type MusicContextValue = {
@@ -19,7 +26,7 @@ export function MusicProvider({ children, src = "/audio/invite-theme.mp3" }: { c
   const [isPlaying, setIsPlaying] = useState(false);
   const baseVolumeRef = useRef(0.7);
   const soundRef = useRef<Howl | null>(null);
-  const fadeTimeoutRef = useRef<number>();
+  const fadeTimeoutRef = useRef<number>(0);
 
   const [play, { sound, stop: stopImmediate }] = useSound(src, {
     volume: baseVolumeRef.current,
