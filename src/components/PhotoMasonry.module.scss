@@ -1,0 +1,31 @@
+.pinWrapper {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.gridWrapper {
+  will-change: transform;
+  contain: layout paint;
+}
+
+.box {
+  background: #222;
+  color: #fff;
+  font-size: 150%;
+  line-height: 1;
+}
+
+.feather {
+  -webkit-mask-image:
+    radial-gradient(120% 120% at 50% 50%, #000 70%, transparent 100%),
+    linear-gradient(#000, #000);
+  -webkit-mask-composite: source-in;
+
+  mask-image:
+    radial-gradient(120% 120% at 50% 50%, #000 70%, transparent 100%),
+    linear-gradient(#000, #000);
+  mask-composite: intersect;
+
+  transform: translateZ(0) scale(1.002);
+}

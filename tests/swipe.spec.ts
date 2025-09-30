@@ -1,11 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 
-async function waitForSwipeReady(page) {
+async function waitForSwipeReady(page: Page) {
   await page.goto('/');
   await page.waitForSelector('.ReactSwipeButton', { state: 'visible' });
 }
 
-async function dragSlider(page, dx: number) {
+async function dragSlider(page: Page, dx: number) {
   const handle = page.locator('.ReactSwipeButton .rsbcSlider');
   const box = await handle.boundingBox();
   if (!box) throw new Error('Slider handle no visible');
