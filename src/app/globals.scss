@@ -1,456 +1,169 @@
-@import "tailwindcss";
+/* globals.css — Tailwind v4 */
+@import url("tailwindcss");
 
-:root {
-  --background: var(--color-violet-50);
-  --foreground: var(--color-violet-900);
+/* Plugins oficiales (v4) */
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/aspect-ratio";
+
+/* -----------------------------
+   THEME: tokens (v4 @theme)
+   ----------------------------- */
+@theme {
+  /* Breakpoints (puedes añadir los tuyos) */
+  --breakpoint-xs: 360px;
+  --breakpoint-3xl: 1920px;
+
+  /* Colores escala wedgewood */
+  --color-wedgewood-50:  #f6fcff;
+  --color-wedgewood-100: #dceafd;
+  --color-wedgewood-200: #b3d2f4;
+  --color-wedgewood-300: #8fc1ef;
+  --color-wedgewood-400: #7cafdc;
+  --color-wedgewood-500: #709dc5;
+  --color-wedgewood-600: #6d98be;
+  --color-wedgewood-700: #678eb1;
+  --color-wedgewood-800: #5f83a3;
+  --color-wedgewood-900: #577793;
+  --color-wedgewood-1000:#52708a;
+  --color-wedgewood-1100:#4c6881;
+  --color-wedgewood-1200:#466076;
+  --color-wedgewood-1300:#3f566b;
+  --color-wedgewood-1400:#374c5f;
+  --color-wedgewood-1500:#2f4252;
+  --color-wedgewood-1600:#273746;
+  --color-wedgewood-1700:#1f2c3a;
+  --color-wedgewood-1800:#16212d;
+  --color-wedgewood-1900:#0f1922;
+
+  /* Alias semánticos (crean utilidades: bg-primary, text-foreground, etc.) */
+  --color-primary: var(--color-wedgewood-800);
+  --color-primary-soft: var(--color-wedgewood-300);
+  --color-primary-deep: var(--color-wedgewood-1400);
+  --color-background: #ffffff;
+  --color-foreground: var(--color-wedgewood-1900);
+  --color-card: #ffffff;
+  --color-card-foreground: var(--color-wedgewood-1700);
+  --color-border: var(--color-wedgewood-100);
+  --color-ring: var(--color-wedgewood-300);
+
+  /* Tipografías (con next/font en variables CSS) */
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), ui-serif, serif;
+  --font-script: var(--font-script), cursive;
+
+  /* Radios y sombras */
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.75rem;
+
+  --shadow-soft: 0 10px 30px -10px rgba(20,30,45,.15);
+  --shadow-ring: 0 0 0 6px color-mix(in oklab, var(--color-ring) 60%, transparent);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  /* Custom violet palette */
-  --color-violet-50: #ebf1f9;
-  --color-violet-100: #dbe6f5;
-  --color-violet-200: #b5cfeb;
-  --color-violet-300: #8db8e1;
-  --color-violet-400: #6a9dca;
-  --color-violet-500: #5a86ad;
-  --color-violet-600: #466988;
-  --color-violet-700: #345069;
-  --color-violet-800: #223749;
-  --color-violet-900: #111f2b;
-  --color-violet-950: #08121a;
+/* Dark suave (actívalo con class="dark") */
+:root.dark {
+  --color-background: var(--color-wedgewood-1900);
+  --color-foreground: var(--color-wedgewood-50);
+  --color-card: var(--color-wedgewood-1800);
+  --color-card-foreground: var(--color-wedgewood-50);
+  --color-border: var(--color-wedgewood-1100);
+  --color-primary: var(--color-wedgewood-300);
+  --color-primary-deep: var(--color-wedgewood-50);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: var(--color-violet-950);
-    --foreground: var(--color-violet-100);
-  }
-}
-
+/* Base */
+html { scroll-behavior: smooth; }
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply antialiased bg-background text-foreground;
+  font-family: var(--font-sans);
 }
 
-/* Loader styles */
+/* Componentes */
+.btn-primary {
+  @apply inline-flex items-center justify-center px-5 py-3 rounded-2xl transition focus:outline-none focus:ring-2;
+  background: var(--color-primary);
+  color: white;
+  border: 1px solid color-mix(in oklab, var(--color-primary) 85%, black);
+  box-shadow: var(--shadow-soft);
+}
+.btn-primary:hover { background: var(--color-primary-deep); }
+.btn-primary:focus { box-shadow: var(--shadow-ring); }
+
+.card {
+  @apply rounded-3xl border p-6 md:p-10;
+  background: var(--color-card);
+  color: var(--color-card-foreground);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-soft);
+}
+
+/* Prosa elegante para “Nuestra historia”, invitación, etc. */
+.prose-wedding {
+  @apply prose prose-lg md:prose-xl;
+  color: var(--color-foreground);
+}
+.prose-wedding a {
+  color: var(--color-primary); text-decoration: none; font-weight: 600;
+}
+.prose-wedding a:hover { color: var(--color-primary-deep); text-decoration: underline; }
+.prose-wedding h1, .prose-wedding h2, .prose-wedding h3, .prose-wedding h4 { letter-spacing: -0.01em; }
+.prose-wedding blockquote {
+  border-left: 4px solid var(--color-primary-soft);
+  color: var(--color-wedgewood-1100);
+}
+
+/* Utilidades personalizadas (v4: defines en CSS) */
+.fade-divider {
+  /* separador súper difuminado hero → historia */
+  background: linear-gradient(
+                  to bottom,
+                  color-mix(in oklab, var(--color-primary-soft) 100%, transparent) 0%,
+                  color-mix(in oklab, var(--color-primary-soft) 25%, transparent) 40%,
+                  var(--color-background) 100%
+  );
+}
+.hero-title { @apply font-display text-white drop-shadow; }
+@media (min-width: 768px) { /* md */
+  .hero-title { font-size: clamp(3rem, 2rem + 3vw, 4rem); }
+}
+
+/* Accessibility utility: screen-reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Loader overlay styles (uses theme tokens) */
 .loader-overlay {
   position: fixed;
   inset: 0;
-  background: var(--color-violet-50);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 24px;
+  background: var(--color-background);
   z-index: 50;
-}
-.logo-initials {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.logo-ring {
-  width: 120px;
-  height: 120px;
-  border-radius: 9999px;
-  border: 2px solid var(--color-violet-600);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 0 0 var(--color-violet-400);
-  animation: ringPulse 1.8s ease-out infinite;
-}
-.logo-text {
-  font-family: Georgia, "Times New Roman", serif;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: var(--color-violet-700);
-  font-size: 28px;
-}
-@keyframes ringPulse {
-  0% {
-    box-shadow: 0 0 0 0 var(--color-violet-400);
-  }
-  70% {
-    box-shadow: 0 0 0 16px var(--color-violet-400);
-  }
-  100% {
-    box-shadow: 0 0 0 0 var(--color-violet-400);
-  }
+  opacity: 1;
+  transition: opacity 420ms ease;
+  min-height: 100dvh;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  padding-top: calc(24px + env(safe-area-inset-top));
 }
 
-/* Envelope styles - Mobile-first full screen */
-.envelope {
-  position: relative;
-  width: 340px;
-  max-width: 86vw;
-  height: 220px;
-  perspective: 1000px;
-}
-
-/* Fullscreen variant for mobile-first design */
-.envelope-full {
-  width: 100vw;
-  height: 100vh;
-  max-width: 100vw;
-  max-height: 100vh;
-}
-
-/* Paper texture helpers */
-@supports (background: paint(worklet)) {
-  /* Placeholder if CSS Houdini is available in future */
-}
-
-.paper-texture {
-  /* Subtle paper texture using layered gradients (dusty pale blue tint) */
-  background-color: #e4edf5; /* base dusty blue */
-  background-image:
-    radial-gradient(circle at 25% 15%, rgba(30,60,90,0.06) 0%, rgba(30,60,90,0) 60%),
-    radial-gradient(circle at 70% 60%, rgba(30,60,90,0.05) 0%, rgba(30,60,90,0) 55%),
-    repeating-linear-gradient(0deg, rgba(255,255,255,0.55) 0 2px, rgba(200,215,230,0.35) 2px 4px);
-}
-
-.envelope-body {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 20px;
-  bottom: 0;
-  margin: 0 auto;
-  background: var(--color-violet-50);
-  border: 1px solid var(--color-violet-200);
-  border-radius: 4px;
-}
-
-/* Fullscreen adjustments */
-.envelope-full .envelope-body {
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: 0;
-  border-radius: 0;
-  border: none;
-  background-color: #e4edf5; /* dusty pale blue */
-}
-.envelope-full .envelope-body.paper-texture, .envelope-full .envelope-flap.paper-texture {
-  background-color: #e4edf5; /* keep texture tinted */
-}
-
-.envelope-flap {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%) rotate(0deg);
-  transform-origin: top center;
-  width: 100%;
-  height: 120px;
-  background: var(--color-violet-100);
-  border: 1px solid var(--color-violet-200);
-  border-bottom: none;
-  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-  transition: transform 600ms ease;
-  z-index: 2;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-}
-
-/* Fullscreen flap taller for dramatic effect */
-.envelope-full .envelope-flap {
-  height: 45vh;
-  border: none;
-  /* subtle dusty blue gradient for dimension */
-  background: linear-gradient(to bottom, #c8d6e4 0%, #b7c8d8 100%);
-}
-
-/* Wax seal */
- .seal {
-  position: absolute;
-  top: 28%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 250px;
-  height: 250px;
-  background:
-    radial-gradient(40% 45% at 35% 30%, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%),
-    radial-gradient(circle at 35% 30%, #7a3b3b, #4a1f1f 70%);
-  border-radius: 9999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fdeeea;
-  font-weight: 800;
-  letter-spacing: 1px;
-  z-index: 3;
-  transition: transform 400ms ease, opacity 400ms ease;
-  box-shadow:
-    inset 0 2px 6px rgba(0,0,0,0.25),
-    inset 0 -3px 8px rgba(0,0,0,0.3),
-    0 8px 18px rgba(0,0,0,0.25);
-}
-
-/* Subtle wax ripples */
-.seal::before {
-  content: "";
-  position: absolute;
-  inset: -8px;
-  border-radius: inherit;
-  background: radial-gradient(circle at 50% 45%, rgba(122,59,59,0.25), rgba(122,59,59,0) 60%);
-  filter: blur(1px);
-  z-index: -1;
-}
-.seal::after {
-  content: none;
-}
-.seal-text {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 22px;
-}
-
-/* Opening division (mouth/slit) */
-.envelope-mouth {
-  position: absolute;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.95),
-    inset 0 -2px 4px rgba(0,0,0,0.14),
-    0 12px 18px -10px rgba(0,0,0,0.45); /* bottom shadow */
-  z-index: 2;
-  height: 250px;
-  width: 100%;
-}
-/* Position for fullscreen envelope (behind the seal) */
-.envelope-full .envelope-mouth {
-  top: 0;
-}
-
-/* Fold lines overlay (diagonals from bottom corners to center) */
-.envelope-folds {
-  position: absolute;
-  inset: 0;
-  z-index: 1; /* under flap/mouth, above body */
-  pointer-events: none;
-  /* Two diagonal hairlines painted into the lower half toward the center */
-  background:
-    linear-gradient(45deg, rgba(0,0,0,0) calc(50% - 0.6px), rgba(0,0,0,0.28) 50%, rgba(0,0,0,0) calc(50% + 0.6px)) bottom left/50% 60% no-repeat,
-    linear-gradient(-45deg, rgba(0,0,0,0) calc(50% - 0.6px), rgba(0,0,0,0.28) 50%, rgba(0,0,0,0) calc(50% + 0.6px)) bottom right/50% 60% no-repeat;
-  opacity: 0.35;
-}
-
-/* Overlay container for buttons over the envelope */
-.envelope-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center; /* move overlay higher */
-  justify-content: center;
-  padding-top: 18vh; /* upper third approx */
-  z-index: 4; /* above seal (3) and flap (2) */
-  pointer-events: none; /* allow clicks to pass except for children */
-}
-.envelope-overlay > * {
-  pointer-events: auto;
-}
-
-/* Open states */
-.envelope.open .envelope-flap {
-  transform: translateX(-50%) rotate(-180deg);
-}
-
-/* Button */
-.abrir-btn {
-  background: var(--color-violet-600);
-  color: var(--color-violet-50);
-  padding: 0.75rem 1.25rem;
-  border-radius: 9999px;
-  border: none;
-  transition: transform 150ms ease, background 150ms ease;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-}
-.abrir-btn:hover {
-  transform: translateY(-1px);
-  background: var(--color-violet-700);
-}
-.abrir-btn:active {
-  transform: translateY(0);
-  background: var(--color-violet-800);
-}
-
-
-/* Seal image overrides: use provided PNG and neutralize simulated wax */
-.seal {
-  background: transparent;
-  box-shadow: none;
-}
-.seal::before {
-  content: none;
-}
-/* Ensure the seal image scales nicely inside the centered container */
-.seal .seal-img, .seal img {
-  width: 110%;
-  height: auto;
-  display: block;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
-}
-
-
-
-/* Swipe to open control */
-.swipe-track {
-  position: relative;
-  width: min(86vw, 360px);
-  height: 56px;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.75), rgba(224,234,244,0.65) 50%, rgba(190,206,223,0.35));
-  border: 1px solid rgba(255,255,255,0.7);
-  border-radius: 9999px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-violet-800);
-  font-weight: 600;
-  letter-spacing: 0.2px;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: pan-x;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.95),
-    inset 0 -8px 16px rgba(0,0,0,0.12),
-    0 10px 24px rgba(0,0,0,0.14);
-}
-.swipe-track::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
-  transform: translateX(-100%);
-  animation: swipeShimmer 2.4s ease-in-out infinite;
+.loader-overlay.fade-out {
+  opacity: 0;
   pointer-events: none;
 }
-@keyframes swipeShimmer {
-  0% { transform: translateX(-100%); opacity: 0.0; }
-  25% { opacity: 1; }
-  60% { transform: translateX(100%); opacity: 0.0; }
-  100% { transform: translateX(100%); opacity: 0.0; }
+
+.loader-animation {
+  width: 190px;
+  height: 190px;
 }
-
-.swipe-handle {
-  position: absolute;
-  left: 4px;
-  top: 4px;
-  width: 48px;
-  height: 48px;
-  border-radius: 9999px;
-  background: linear-gradient(180deg, #4e6984, #3f5972);
-  border: 1px solid rgba(255,255,255,0.18);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow:
-    0 12px 20px rgba(0, 0, 0, 0.25),
-    0 6px 10px rgba(0, 0, 0, 0.20),
-    inset 0 1px 0 rgba(255,255,255,0.25);
-  transition: transform 160ms ease, background 200ms ease, box-shadow 200ms ease;
-  touch-action: none; /* we manage drag */
-  isolation: isolate; /* ensure its contents stay on top in all browsers */
-  z-index: 3;
-}
-.swipe-handle:active { box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
-
-.swipe-text {
-  position: relative;
-  z-index: 0; /* behind handle */
-  font-size: 14px;
-  color: var(--color-violet-700);
-  text-shadow: 0 1px 1px rgba(255,255,255,0.65);
-}
-
-/* Small nudge animation for the arrow inside the handle */
-@keyframes nudgeArrow {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(6px); }
-}
-.arrow-nudge { animation: nudgeArrow 1.2s ease-in-out infinite; }
-
-/* Completed state removes shimmer */
-.swipe-completed::before { display: none; }
-
-
-/* View Transitions: global fade between pages */
-@media (prefers-reduced-motion: no-preference) {
-  ::view-transition-old(root) {
-    animation: vt-fade-out 260ms ease both;
-  }
-  ::view-transition-new(root) {
-    animation: vt-fade-in 260ms ease both;
-  }
-}
-@keyframes vt-fade-out { from { opacity: 1 } to { opacity: 0 } }
-@keyframes vt-fade-in { from { opacity: 0 } to { opacity: 1 } }
-
-
-/* Depth enhancements for swipe control */
-.swipe-handle { z-index: 2; }
-
-.swipe-track { transition: box-shadow 150ms ease, background 150ms ease; }
-
-.swipe-track.is-dragging {
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.95),
-    inset 0 -10px 20px rgba(0,0,0,0.18),
-    0 12px 28px rgba(0,0,0,0.18);
-}
-
-/* Shadow/depression that follows the handle to add depth */
-.swipe-track::after {
-  content: "";
-  position: absolute;
-  top: 6px;
-  left: calc(var(--handle-x, 28px) - 36px);
-  width: 72px;
-  height: 44px;
-  border-radius: 9999px;
-  background: radial-gradient(ellipse at center, rgba(0,0,0,0.20) 0%, rgba(0,0,0,0.14) 50%, rgba(0,0,0,0) 70%);
-  filter: blur(2px);
-  opacity: 0.35;
-  pointer-events: none;
-  z-index: 0; /* below cover */
-  transition: left 60ms linear, opacity 120ms ease;
-  will-change: left, opacity;
-}
-.swipe-track.is-dragging::after { opacity: 0.55; }
-
-/* Ensure shimmer layer is below everything interactive */
-.swipe-track::before { z-index: 0; }
-
-/* Sliding front cover restored: keep it under the button (arrow) but above the track */
-.swipe-handle::before {
-  content: "";
-  position: absolute;
-  /* Make the trail cover the entire track area and sit behind the button's content */
-  width: var(--track-w, 260px);
-  height: var(--track-h, 56px);
-  /* Align the right edge under the handle's center so it moves together */
-  left: calc(-1 * var(--track-w, 260px) + (var(--handle-w, 48px) / 2));
-  top: calc((var(--handle-w, 48px) - var(--track-h, 56px)) / 2);
-  /* Straight right edge; rounded left edge */
-  border-radius: calc(var(--track-h, 56px) / 2) 0 0 calc(var(--track-h, 56px) / 2);
-  /* Opaque fill (no transparency) */
-  background: linear-gradient(to bottom, #d2e0ee, #bccdde 55%, #a8bcd1);
-
-  z-index: 0; /* below arrow/content, above track */
-  pointer-events: none;
-}
-.swipe-track.is-dragging .swipe-handle::before {
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.95),
-    inset 0 -10px 18px rgba(0,0,0,0.16),
-    10px 0 22px -8px rgba(0,0,0,0.3);
-}
-/* Ensure the arrow stays above the cover */
-.swipe-handle svg { position: relative; z-index: 1; }

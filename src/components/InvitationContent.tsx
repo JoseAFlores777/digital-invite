@@ -19,12 +19,12 @@ export default function InvitationContent() {
     <main className="bg-[color:var(--color-dusty-50)] text-neutral-900">
       {/* 1. Hero */}
       <Hero />
-      {/* 2. Nuestra historia */}
-      <StoryBeats />
-      {/* 3. Detalles principales */}
-      <MainDetails />
-      {/* 4. Cuenta regresiva */}
+      {/* 2. Cuenta regresiva */}
       <Countdown />
+      {/* 3. Nuestra historia */}
+      <StoryBeats />
+      {/* 4. Detalles principales */}
+      <MainDetails />
       {/* 5. Programa */}
       <Itinerary />
       {/* 6. Dress code */}

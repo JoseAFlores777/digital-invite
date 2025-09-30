@@ -48,16 +48,25 @@ export default function Hero({ fadeTo = "#ffffff" }: { fadeTo?: string }) {
           }}
         />
         {/* Dusty blue tint overlay for better legibility */}
-        <div className="absolute inset-0 pointer-events-none bg-[color:var(--color-dusty-900)]/35" />
+        <div className="absolute inset-0 pointer-events-none bg-wedgewood-1400/35" />
       </div>
       <div className="z-20 max-w-5xl mx-auto px-6 absolute inset-x-0 bottom-0 pt-[62dvh] pb-[calc(10dvh+env(safe-area-inset-bottom))] md:relative md:inset-auto md:bottom-auto md:pt-[22dvh] md:pb-[calc(12dvh+env(safe-area-inset-bottom))]">
-        <div className="text-center">
-          <h1 className="display-font text-4xl md:text-6xl tracking-tight text-[color:var(--color-dusty-80)] drop-shadow-md" data-anim="hero-item">
-            Clarisa <span className="text-[color:var(--color-dusty-200)]/90">&</span> José
-          </h1>
-          <p className="mt-3 text-[color:var(--color-dusty-100)]/90" data-anim="hero-item">
-            Sábado 21 de diciembre de 2025 — 4:30 PM
-          </p>
+        <div className="relative isolate grid place-items-center py-10 text-center">
+          <span aria-hidden="true" className="pointer-events-none select-none absolute inset-0 grid place-items-center -z-10">
+            <span className="font-display italic leading-none text-[clamp(12rem,30vw,28rem)] text-wedgewood-1100/10">
+              &
+            </span>
+          </span>
+
+          <p className="uppercase tracking-[0.35em] text-[0.8rem] md:text-sm text-wedgewood-1100/90">together</p>
+
+          <h1 className="mt-1 font-display italic text-5xl md:text-6xl lg:text-7xl text-foreground">Clarisa</h1>
+
+          <p className="mt-2 text-[0.85rem] md:text-base tracking-[0.45em] text-wedgewood-1100/90">21 · 12 · 2025</p>
+
+          <h2 className="mt-1 font-display italic text-5xl md:text-6xl lg:text-7xl text-foreground">José</h2>
+
+          <p className="mt-2 uppercase tracking-[0.35em] text-[0.8rem] md:text-sm text-wedgewood-1100/90">forever</p>
         </div>
       </div>
 
@@ -65,10 +74,10 @@ export default function Hero({ fadeTo = "#ffffff" }: { fadeTo?: string }) {
       <div
         id="hero-fade"
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 -bottom-px z-10 h-full"
+        className="pointer-events-none absolute inset-0 z-10"
         style={fadeVars}
       >
-        <div className="h-full w-full bg-hero-fade-card" />
+        <div className="h-full w-full bg-[linear-gradient(to_top,color-mix(in_oklab,var(--fade-to,_#ffffff)_100%,transparent)_0%,color-mix(in_oklab,var(--fade-to,_#ffffff)_70%,transparent)_55%,color-mix(in_oklab,var(--fade-to,_#ffffff)_40%,transparent)_80%,transparent_100%)]" />
       </div>
     </section>
   );
