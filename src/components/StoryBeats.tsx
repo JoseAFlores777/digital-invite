@@ -8,36 +8,36 @@ export default function StoryBeats() {
   const root = useRef<HTMLDivElement>(null);
   const reduced = useIsReducedMotion();
 
-  useGsapContext(() => {
-    if (!root.current) return;
-    const q = gsap.utils.selector(root);
-
-    gsap.from(q('[data-anim="beat"]'), {
-      opacity: 0,
-      y: 30,
-      stagger: 0.2,
-      duration: 0.8,
-      ease: "power2.out",
-      scrollTrigger: {
-        trigger: root.current,
-        start: "top 80%",
-        toggleActions: "play none none reverse",
-      },
-    });
-
-    if (!reduced) {
-      // Soft pin/scrub storytelling
-      gsap.to(root.current, {
-        scrollTrigger: {
-          trigger: root.current,
-          start: "top top+=80",
-          end: "+=120%",
-          pin: true,
-          scrub: 0.4,
-        },
-      });
-    }
-  }, [reduced]);
+  // useGsapContext(() => {
+  //   if (!root.current) return;
+  //   const q = gsap.utils.selector(root);
+  //
+  //   gsap.from(q('[data-anim="beat"]'), {
+  //     opacity: 0,
+  //     y: 30,
+  //     stagger: 0.2,
+  //     duration: 0.8,
+  //     ease: "power2.out",
+  //     scrollTrigger: {
+  //       trigger: root.current,
+  //       start: "top 80%",
+  //       toggleActions: "play none none reverse",
+  //     },
+  //   });
+  //
+  //   if (!reduced) {
+  //     // Soft pin/scrub storytelling
+  //     gsap.to(root.current, {
+  //       scrollTrigger: {
+  //         trigger: root.current,
+  //         start: "top top+=80",
+  //         end: "+=120%",
+  //         pin: true,
+  //         scrub: 0.4,
+  //       },
+  //     });
+  //   }
+  // }, [reduced]);
 
   return (
     <section id="historia" ref={root} className="bg-white">

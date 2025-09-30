@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import Loader from "@/components/Loader";
 import EnvelopeWelcome from "@/components/EnvelopeWelcome";
 import InvitationContent from "@/components/InvitationContent";
 import MusicControls from "@/components/MusicControls";
 
 import MusicRoot from "@/components/MusicRoot";
+import PanelPinStack from "@/components/PanelPinStack";
 
 export default function Home() {
   const [minimumDelayPassed, setMinimumDelayPassed] = useState(false);
@@ -80,6 +81,7 @@ export default function Home() {
   }, [envelopeVisible]);
 
   return (
+
     <MusicRoot>
       <div className="bg-[color:var(--color-dusty-50)] text-[color:var(--color-dusty-900)]" style={{ minHeight: "100dvh" }}>
         {envelopeVisible ? (

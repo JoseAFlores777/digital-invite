@@ -19,7 +19,7 @@ export default function Hero({ fadeTo = "#ffffff" }: { fadeTo?: string }) {
       zoomEl,
       { scale: 1 },
       {
-        scale: 1.15,
+        scale: 3,
         ease: "none",
         scrollTrigger: {
           trigger: section,
@@ -58,7 +58,7 @@ export default function Hero({ fadeTo = "#ffffff" }: { fadeTo?: string }) {
             </span>
           </span>
 
-          <p className="uppercase tracking-[0.35em] text-[0.8rem] md:text-sm text-wedgewood-1100/90">together</p>
+          <p className="uppercase tracking-[0.35em] text-[0.8rem] md:text-sm text-wedgewood-1100/90">Boda</p>
 
           <h1 className="mt-1 font-display italic text-5xl md:text-6xl lg:text-7xl text-foreground">Clarisa</h1>
 
@@ -66,7 +66,7 @@ export default function Hero({ fadeTo = "#ffffff" }: { fadeTo?: string }) {
 
           <h2 className="mt-1 font-display italic text-5xl md:text-6xl lg:text-7xl text-foreground">José</h2>
 
-          <p className="mt-2 uppercase tracking-[0.35em] text-[0.8rem] md:text-sm text-wedgewood-1100/90">forever</p>
+          <p className="mt-2 uppercase tracking-[0.35em] text-[0.8rem] md:text-sm text-wedgewood-1100/90">DIOS ES FIEL</p>
         </div>
       </div>
 
