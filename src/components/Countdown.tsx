@@ -15,12 +15,12 @@ export default function Countdown() {
     const q = gsap.utils.selector(root);
     gsap.from(root.current, {
       opacity: 0,
-      y: 24,
+      y: 100,
       duration: 0.8,
       ease: "power2.out",
       scrollTrigger: {
         trigger: root.current,
-        start: "top 80%",
+        start: "top 100%",
         toggleActions: "play none none reverse",
       },
     });
@@ -61,7 +61,7 @@ export default function Countdown() {
   );
 
   return (
-    <section id="cuenta" ref={root} className="bg-[color:var(--color-dusty-50)]">
+    <section id="cuenta" ref={root} className="bg-[color:var(--color-dusty-50)] bg-amber-500">
       <div className="max-w-5xl mx-auto px-6 py-16 md:py-20 lg:py-28 text-center">
         <h2 className="display-font text-3xl md:text-4xl mb-8">Cuenta regresiva</h2>
         {finished ? (

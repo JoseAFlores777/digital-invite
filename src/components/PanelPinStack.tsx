@@ -47,6 +47,8 @@ export default function PanelPinStack({ markers = false }: Props) {
 
         const totalScroll = `+=${(panels.length - 1) * 100}%`;
         const pinType = hasTransformedAncestor(triggerEl) ? 'transform' : ((ScrollTrigger as any).isTouch ? 'transform' : 'fixed');
+        const start = ((ScrollTrigger as any).isTouch ? '5% top' : 'top top');
+        const end = ((ScrollTrigger as any).isTouch ? totalScroll : totalScroll);
 
         gsap.to(panels.slice(0, -1), {
             yPercent: -100,
@@ -54,8 +56,8 @@ export default function PanelPinStack({ markers = false }: Props) {
             stagger: 0.5,
             scrollTrigger: {
                 trigger: triggerEl,
-                start: 'top top',
-                end: totalScroll,
+                start,
+                end,
                 scrub: true,
                 pin: triggerEl,
                 pinType,
@@ -86,7 +88,7 @@ export default function PanelPinStack({ markers = false }: Props) {
                     <section className={`${s.panel} panel ${s.solid}`}>
                         <h2 className={s.heading}>2</h2>
                     </section>
-                    <section className={`${s.panel} panel ${s.purple}`}>
+                    <section className={`${s.panel} panel ${s.purple} square`}>
                         <h2 className={s.heading}>3</h2>
                     </section>
                 </div>
