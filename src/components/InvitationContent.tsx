@@ -23,7 +23,7 @@ export default function InvitationContent() {
       {/*/!* 2. Cuenta regresiva *!/*/}
       <Countdown />
       {/* Banner 1: Panel pin stack */}
-      <PanelPinStack markers={true} />
+      <PanelPinStack />
       {/*/!* 3. Nuestra historia *!/*/}
       <StoryBeats />
       {/*/!* 4. Detalles principales *!/*/}

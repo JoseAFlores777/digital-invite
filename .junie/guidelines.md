@@ -4,14 +4,6 @@ Este documento define los lineamientos que Junie debe seguir al ejecutar impleme
 
 ---
 
-## 0. Creación de Rama de Trabajo
-**First, before starting any work, create a new git branch. (YOU MUST CREATE NEW BRANCH)**
-- Cada ticket debe desarrollarse en una rama independiente.
-- El nombre de la rama debe seguir el formato:  JUNIE-WIP-<ticketID> SEGUN el requerimiento analizado
-- Ejemplo:  JUNIE-WIP-1234
-
----
-
 ## 1. Revisión de Estándares de Desarrollo
 ⚠️ **Antes de analizar requisitos o crear un plan, SIEMPRE revisar los estándares de desarrollo ubicados en:** ./junie/development-standards.md
 - Estos estándares definen convenciones de código, patrones de arquitectura, estilo y buenas prácticas específicas del proyecto.
