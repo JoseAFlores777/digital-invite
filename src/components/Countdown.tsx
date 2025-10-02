@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { useCountdown } from "@/hooks/useCountdown";
 import { useIsReducedMotion } from "@/hooks/useIsReducedMotion";
 import { useGsapContext, gsap } from "@/hooks/useGsapContext";

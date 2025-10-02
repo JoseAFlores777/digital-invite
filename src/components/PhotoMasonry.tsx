@@ -1,6 +1,6 @@
 'use client';
 
-import { useLayoutEffect, useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import s from './PhotoMasonry.module.scss';
 
 import type { ScrollTrigger as ScrollTriggerType } from 'gsap/ScrollTrigger';
@@ -50,7 +50,7 @@ export default function PhotoMasonry({
             cs.transform !== 'none' ||
             cs.perspective !== 'none' ||
             cs.filter !== 'none' ||
-            (cs as any).backdropFilter && (cs as any).backdropFilter !== 'none' ||
+            (cs as CSSStyleDeclaration & { backdropFilter?: string }).backdropFilter && (cs as CSSStyleDeclaration & { backdropFilter?: string }).backdropFilter !== 'none' ||
             cs.willChange.includes('transform') ||
             cs.willChange.includes('perspective')
           ) {
@@ -82,7 +82,7 @@ export default function PhotoMasonry({
       setX(0);
 
       // Choose pinType: if any ancestor has transform/perspective/filter, use 'transform' to avoid fixed-position bugs
-      const pinType = hasTransformedAncestor(wrap) ? 'transform' : ((ScrollTrigger as any).isTouch ? 'transform' : 'fixed');
+      const pinType = hasTransformedAncestor(wrap) ? 'transform' : ((ScrollTrigger as unknown as { isTouch?: boolean }).isTouch ? 'transform' : 'fixed');
 
       st = ScrollTrigger.create({
         trigger: wrap,
@@ -124,7 +124,7 @@ export default function PhotoMasonry({
         window.removeEventListener('orientationchange', onResizeBatched);
       };
 
-      const RZ: any = (window as any).ResizeObserver;
+      const RZ = (window as Window & { ResizeObserver?: typeof ResizeObserver }).ResizeObserver;
       if (typeof RZ === 'function') {
         ro = new RZ(() => { recalc(); ScrollTrigger.refresh(); });
         if (ro) {
@@ -145,7 +145,7 @@ export default function PhotoMasonry({
       const unsubList = imgs.map((img) => {
         if (img.complete) return () => {};
         const fn = () => { recalc(); ScrollTrigger.refresh(); };
-        img.addEventListener('load', fn, { once: true, passive: true } as any);
+        img.addEventListener('load', fn, { once: true, passive: true });
         return () => img.removeEventListener('load', fn);
       });
       detachImgs = () => unsubList.forEach((fn) => fn());
@@ -156,7 +156,9 @@ export default function PhotoMasonry({
       detachImgs?.();
       ro?.disconnect();
       st?.kill?.();
-      trackRef.current && (trackRef.current.style.willChange = '');
+      if (trackRef.current) {
+        trackRef.current.style.willChange = '';
+      }
     };
   }, [markers, rows, cell, gap, images]);
 

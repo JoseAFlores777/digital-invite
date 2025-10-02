@@ -50,7 +50,7 @@ export async function getInvitationContent(): Promise<InvitationContent> {
         "Nos hace mucha ilusión compartir este día contigo. ¡Acompáñanos a celebrar!",
       cover_image: item.cover_image ?? undefined,
     };
-  } catch (error) {
+  } catch {
     // Fallback when Directus is not configured or request fails
     return {
       title: "Nuestra Boda",

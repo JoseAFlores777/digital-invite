@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 
 export default function Hero({ fadeTo = "#ffffff" }: { fadeTo?: string }) {
     const sectionRef = React.useRef<HTMLElement | null>(null);
@@ -74,22 +75,18 @@ export default function Hero({ fadeTo = "#ffffff" }: { fadeTo?: string }) {
             ref={sectionRef}
             id="inicio"
             className="relative overflow-hidden bg-white min-h-[100dvh]"
-            style={{ ["--fade-to" as any]: fadeTo }}
+            style={{ "--fade-to": fadeTo } as React.CSSProperties}
         >
             <div className="absolute inset-0" aria-hidden="true" data-anim="hero-bg">
-                <img
+                <Image
                     data-hero-zoom
                     src="/images/IMG_0150.JPG"
                     alt=""
-                    className="w-full h-full object-cover origin-center [will-change:transform] [transform:translateZ(0)_scale(var(--hero-zoom,1))]"
-                    loading="eager"
-                    decoding="async"
-                    onError={(e) => {
-                        const img = e.currentTarget as HTMLImageElement;
-                        if (img.src.endsWith("IMG_0150.JPG")) img.src = "/images/IMG_0049.JPG";
-                    }}
+                    fill
+                    sizes="100vw"
+                    priority
+                    className="object-cover origin-center [will-change:transform] [transform:translateZ(0)_scale(var(--hero-zoom,1))]"
                 />
-                {/* Dusty blue tint overlay for legibility */}
                 <div className="absolute inset-0 pointer-events-none bg-wedgewood-1400/35" />
             </div>
 

@@ -1,9 +1,7 @@
 'use client';
 
 import React from 'react';
-import s from './PanelPinStack.module.scss';
-import Hero from "@/components/Hero";
-import PhotoBanner1 from "@/components/photoBanner_1";
+import PhotoBanner1, {PhotoZoomAnchor} from "@/components/photoBanner_1";
 
 
 export default function PanelPinStack() {
@@ -16,6 +14,8 @@ export default function PanelPinStack() {
                     className="sticky top-0 h-screen w-full">
                     <PhotoBanner1
                         src="/images/IMG_0049.JPG"
+                        anchor={PhotoZoomAnchor.TopCenter}
+                        priority
                     />
                 </div>
                 <div

@@ -7,7 +7,6 @@ import InvitationContent from "@/components/InvitationContent";
 import MusicControls from "@/components/MusicControls";
 
 import MusicRoot from "@/components/MusicRoot";
-import PanelPinStack from "@/components/PanelPinStack";
 
 export default function Home() {
   const [minimumDelayPassed, setMinimumDelayPassed] = useState(false);

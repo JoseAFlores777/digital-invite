@@ -66,7 +66,9 @@ export default function RSVPModal({ open, onClose }: Props) {
           onSubmit={(e) => {
             e.preventDefault();
             const btn = e.currentTarget.querySelector("button[type=submit]") as HTMLButtonElement | null;
-            btn && (btn.disabled = true);
+            if (btn) {
+              btn.disabled = true;
+            }
             setTimeout(() => {
               (e.currentTarget.querySelector(".thanks") as HTMLDivElement | null)?.classList.remove("hidden");
             }, 500);

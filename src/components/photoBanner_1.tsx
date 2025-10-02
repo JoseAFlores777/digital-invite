@@ -1,150 +1,123 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-type PhotoBanner1Props = {
-    /** Factor de velocidad del zoom: progreso 0→1 escalará a 1→(1 + speed). Ej: 2 -> escala final 3 */
-    speed?: number;
-    /** Límite superior de la escala final (por seguridad visual) */
-    maxScale?: number;
-    /** Exponente de easing para el progreso del zoom (1 = lineal, 2 = ease-in, 0.5 = ease-out) */
-    easing?: number;
+let ST_CONFIGURED = false;
 
-    /** Ruta de la imagen principal */
-    src?: string;
-    /** Alt de la imagen (accesibilidad) */
-    alt?: string;
+export enum PhotoZoomAnchor {
+    TopLeft = "TopLeft",
+    TopCenter = "TopCenter",
+    TopRight = "TopRight",
+    CenterLeft = "CenterLeft",
+    Center = "Center",
+    CenterRight = "CenterRight",
+    BottomLeft = "BottomLeft",
+    BottomCenter = "BottomCenter",
+    BottomRight = "BottomRight",
+}
 
-    /** Tinte superior opcional para legibilidad. Ej: "rgb(0 0 0 / 0.35)" o "oklch(... / 0.35)" */
-    tint?: string;
-
-    /** Color de difuminado inferior para transición (igual a Hero) */
-    fadeTo?: string;
-
-    /** id del section */
-    id?: string;
+const ORIGIN_CSS: Record<PhotoZoomAnchor, string> = {
+    [PhotoZoomAnchor.TopLeft]: "top left",
+    [PhotoZoomAnchor.TopCenter]: "top center",
+    [PhotoZoomAnchor.TopRight]: "top right",
+    [PhotoZoomAnchor.CenterLeft]: "center left",
+    [PhotoZoomAnchor.Center]: "center",
+    [PhotoZoomAnchor.CenterRight]: "center right",
+    [PhotoZoomAnchor.BottomLeft]: "bottom left",
+    [PhotoZoomAnchor.BottomCenter]: "bottom center",
+    [PhotoZoomAnchor.BottomRight]: "bottom right",
 };
 
-export default function PhotoBanner1({
-                                         speed = 2, // 1 -> escala final 2; 2 -> 3; etc.
-                                         maxScale = 3,
-                                         easing = 1,
-                                         src = "/images/IMG_0150.JPG",
-                                         alt = "",
-                                         tint = "rgb(23 44 60 / 0.35)", // wedgewood-1400/35 aprox
-                                         fadeTo = "#ffffff",
-                                         id = "inicio",
-                                     }: PhotoBanner1Props) {
+ type PhotoBanner1Props = {
+     /** Factor de velocidad del zoom: progreso 0→1 escalará a 1→(1 + speed). Ej: 2 -> escala final 3 */
+     speed?: number;
+     /** Límite superior de la escala final (por seguridad visual) */
+     maxScale?: number;
+     /** Exponente de easing para el progreso del zoom (1 = lineal, 2 = ease-in, 0.5 = ease-out) */
+     easing?: number;
+
+     /** Ruta de la imagen principal */
+     src?: string;
+     /** Alt de la imagen (accesibilidad) */
+     alt?: string;
+
+     /** Tinte superior opcional para legibilidad. Ej: "rgb(0 0 0 / 0.35)" o "oklch(... / 0.35)" */
+     tint?: string;
+
+     /** Color de difuminado inferior para transición (igual a Hero) */
+     fadeTo?: string;
+
+     /** id del section */
+     id?: string;
+
+     /** Prioridad de carga de la imagen (solo usar en el primer slide) */
+     priority?: boolean;
+
+     /** Punto de anclaje del zoom */
+     anchor?: PhotoZoomAnchor;
+ };
+
+ export default function PhotoBanner1({
+                                          speed = 2, // 1 -> escala final 2; 2 -> 3; etc.
+                                          maxScale = 3,
+                                          easing = 1,
+                                          src = "/images/IMG_0150.JPG",
+                                          alt = "",
+                                          tint = "rgb(23 44 60 / 0.35)", // wedgewood-1400/35 aprox
+                                          fadeTo = "#ffffff",
+                                          id = "inicio",
+                                          priority = false,
+                                          anchor = PhotoZoomAnchor.Center,
+                                      }: PhotoBanner1Props) {
     const sectionRef = React.useRef<HTMLElement | null>(null);
-    const isActiveRef = React.useRef(false); // solo animar si 1px es visible
-    const lastKnownScrollY = React.useRef(0);
-    const rafPending = React.useRef(false);
 
     React.useEffect(() => {
         const section = sectionRef.current;
         if (!section) return;
 
-        // Respeta prefers-reduced-motion
-        if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-            const zoomEl = section.querySelector<HTMLElement>("[data-hero-zoom]");
-            if (zoomEl) zoomEl.style.setProperty("--hero-zoom", "1");
-            return;
-        }
-
         const zoomEl = section.querySelector<HTMLElement>("[data-hero-zoom]");
         if (!zoomEl) return;
 
-        // Variables de layout
-        let sectionTop = 0;
-        let sectionHeight = 1;
-        let viewportH = window.innerHeight || 1;
+        // Respeta prefers-reduced-motion
+        if (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) {
+            zoomEl.style.setProperty("--hero-zoom", "1");
+            return;
+        }
 
-        const getDocTop = (el: HTMLElement) => {
-            let top = 0;
-            let node: HTMLElement | null = el;
-            while (node) {
-                top += node.offsetTop || 0;
-                node = node.offsetParent as HTMLElement | null;
-            }
-            return top;
-        };
+        gsap.registerPlugin(ScrollTrigger);
 
-        const recompute = () => {
-            sectionTop = getDocTop(section);
-            sectionHeight = section.offsetHeight || 1;
-            viewportH = window.innerHeight || 1;
-        };
+        if (!ST_CONFIGURED) {
+            ScrollTrigger.config({ ignoreMobileResize: true });
+            ST_CONFIGURED = true;
+        }
 
         const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
-        const easeProgress = (p: number, exp: number) => (exp === 1 ? p : Math.pow(p, exp));
-
-        const update = () => {
-            rafPending.current = false;
-            if (!isActiveRef.current) return;
-
-            const y = lastKnownScrollY.current;
-            const start = sectionTop - viewportH; // comienza cuando el top del section toca el borde inferior del viewport
-            const end = sectionTop + sectionHeight; // termina cuando el bottom del section llega al top del viewport
-            const raw = (y - start) / (end - start);
-            const progress = clamp(raw, 0, 1);
-
-            // Easing controlable
-            const eased = easeProgress(progress, easing);
-
-            // Escala de 1 a (1 + speed), con límite superior
+        const applyFromProgress = (p: number) => {
+            const eased = easing === 1 ? p : Math.pow(p, easing);
             const targetScale = clamp(1 + speed * eased, 1, maxScale);
-
             zoomEl.style.setProperty("--hero-zoom", String(targetScale));
         };
 
-        const onScroll = () => {
-            lastKnownScrollY.current = window.scrollY;
-            if (!rafPending.current) {
-                rafPending.current = true;
-                requestAnimationFrame(update);
-            }
-        };
-
-        // Observer para activar cuando 1px aparezca
-        const io = new IntersectionObserver(
-            (entries) => {
-                for (const entry of entries) {
-                    // isIntersecting ya cubre "aparece ≥1px"
-                    isActiveRef.current = entry.isIntersecting;
-                    if (isActiveRef.current) {
-                        // recompute por si llega desde fuera de viewport
-                        recompute();
-                        // primer cuadro
-                        lastKnownScrollY.current = window.scrollY;
-                        update();
-                    }
-                }
-            },
-            { threshold: 0, rootMargin: "100% 0px 100% 0px" } // pre-activa ~1 viewport antes, simétrico arriba/abajo
-        );
-        io.observe(section);
-
-        const ro = new ResizeObserver(() => {
-            recompute();
-            // Recalcular un frame tras resize
-            lastKnownScrollY.current = window.scrollY;
-            update();
+        const st = ScrollTrigger.create({
+            trigger: section,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 0.2,
+            onEnter: () => zoomEl.style.setProperty("will-change", "transform"),
+            onEnterBack: () => zoomEl.style.setProperty("will-change", "transform"),
+            onLeave: () => zoomEl.style.removeProperty("will-change"),
+            onLeaveBack: () => zoomEl.style.removeProperty("will-change"),
+            onUpdate: (self) => applyFromProgress(self.progress),
         });
-        ro.observe(section);
 
-        window.addEventListener("scroll", onScroll, { passive: true });
-        window.addEventListener("resize", recompute);
-
-        // Primer cálculo
-        recompute();
-        lastKnownScrollY.current = window.scrollY;
-        update();
+        // Estado inicial
+        applyFromProgress(st.progress || 0);
 
         return () => {
-            window.removeEventListener("scroll", onScroll);
-            window.removeEventListener("resize", recompute);
-            ro.disconnect();
-            io.disconnect();
+            st.kill();
         };
     }, [easing, maxScale, speed]);
 
@@ -155,7 +128,7 @@ export default function PhotoBanner1({
             ref={sectionRef}
             id={id}
             className={`relative overflow-hidden bg-white min-h-[100dvh] ${varClasses}`}
-            style={{ ["--fade-to" as any]: fadeTo }}
+            style={{ "--fade-to": fadeTo } as React.CSSProperties}
         >
             {/* Imagen "fill" */}
             <div
@@ -165,18 +138,16 @@ export default function PhotoBanner1({
                 aria-hidden="true"
                 data-anim="hero-bg"
             >
-                <img
+                <Image
                     data-hero-zoom
-                    src={src}
-                    alt={alt}
-                    className="w-full h-full object-cover origin-center [will-change:transform] [transform:translateZ(0)_scale(var(--hero-zoom,1))]"
-                    loading="eager"
-                    decoding="async"
-                    onError={(e) => {
-                        const img = e.currentTarget as HTMLImageElement;
-                        // fallback simple
-                        if (img.src.endsWith("IMG_0150.JPG")) img.src = "/images/IMG_0049.JPG";
-                    }}
+                    src={src || "/images/IMG_0150.JPG"}
+                    alt={alt || ""}
+                    fill
+                    sizes="100vw"
+                    quality={70}
+                    priority={priority}
+                    className="object-cover [transform:translateZ(0)_scale(var(--hero-zoom,1))]"
+                    style={{ transformOrigin: ORIGIN_CSS[anchor] }}
                 />
                 {/* Tinte con gradiente (más opaco abajo, se desvanece hacia arriba) */}
                 <div className="absolute inset-0 pointer-events-none [background:linear-gradient(to_top,var(--tint)_0%,transparent_30%)]" />

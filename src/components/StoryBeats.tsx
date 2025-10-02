@@ -1,12 +1,9 @@
 "use client";
 
 import React, { useRef } from "react";
-import { useIsReducedMotion } from "@/hooks/useIsReducedMotion";
-import { useGsapContext, gsap } from "@/hooks/useGsapContext";
 
 export default function StoryBeats() {
   const root = useRef<HTMLDivElement>(null);
-  const reduced = useIsReducedMotion();
 
   // useGsapContext(() => {
   //   if (!root.current) return;
