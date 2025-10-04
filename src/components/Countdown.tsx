@@ -4,6 +4,7 @@ import React, { useRef } from "react";
 import { useCountdown } from "@/hooks/useCountdown";
 import { useIsReducedMotion } from "@/hooks/useIsReducedMotion";
 import { useGsapContext, gsap } from "@/hooks/useGsapContext";
+import AnilloScrollSequence from "@/components/AnilloScrollSequence";
 
 export default function Countdown() {
   const root = useRef<HTMLDivElement>(null);
@@ -61,7 +62,16 @@ export default function Countdown() {
   );
 
   return (
-    <section id="cuenta" ref={root} className="bg-[color:var(--color-dusty-50)] bg-white">
+    <section id="cuenta" ref={root} className="bg-[color:var(--color-dusty-50)] bg-white h-[100dvh]">
+
+        <AnilloScrollSequence
+            frameCount={79}
+            pixelsPerFrame={15}
+            opacity={0.4}                               // 👈 opacidad
+            containerClassName="w-full max-w-[500px] mx-auto" // 👈 tamaño/posicion
+            canvasClassName="w-full"                    // 👈 el canvas ocupa todo el ancho del contenedor
+        />
+
       <div className="max-w-5xl mx-auto px-6 py-16 md:py-20 lg:py-28 text-center">
         <h2 className="display-font text-3xl md:text-4xl mb-8">Cuenta regresiva</h2>
         {finished ? (
@@ -74,6 +84,7 @@ export default function Countdown() {
             {renderUnit(seconds, "Segundos")}
           </div>
         )}
+
       </div>
     </section>
   );

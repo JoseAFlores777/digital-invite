@@ -78,6 +78,7 @@ const config = {
                 display: ['var(--font-display)', 'serif'],      // Títulos
                 sans: ['var(--font-sans)', 'system-ui', 'sans-serif'], // UI / cuerpo
                 script: ['var(--font-script)', 'cursive'],      // Acentos (nombres, detalles)
+                body: ["var(--font-body)", "ui-sans-serif", "system-ui"],
             },
 
             // ---- RADIUS Y SOMBRAS -------------------------------------------------

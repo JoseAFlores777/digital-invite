@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ViewTransitions } from "next-view-transitions";
 import "./globals.scss";
-import { display, sans, script } from './fonts'
+import {bodySans, display, displaySerif, sans, script} from './fonts'
 
 export const metadata: Metadata = {
   title: "Invitación de boda – Clarisa & José",
@@ -45,7 +45,7 @@ export default function RootLayout({
   return (
     <ViewTransitions>
       <html lang="es">
-        <body className={`${display.variable} ${sans.variable} ${script.variable} bg-background text-foreground`}>
+        <body className={`${display.variable} ${sans.variable} ${script.variable} ${displaySerif.variable} ${bodySans.variable} bg-background text-foreground`}>
           {children}
         </body>
       </html>

@@ -14,8 +14,73 @@ import AlbumQR from "./AlbumQR";
 import MapEmbed from "./MapEmbed";
 import Footer from "./Footer";
 import PanelPinStack from "./PanelPinStack";
+import BiblicalVerse_1 from "@/components/biblical-verse_1";
+import PerspectiveZoom, {ZoomItemConfig} from "@/components/PerspectiveZoom";
 
 export default function InvitationContent() {
+    const DESKTOP_ITEMS: ZoomItemConfig[] = [
+        { src: "https://picsum.photos/seed/800/600/600", layer: 3, x: "12vw", y: "18%", width: "10vw" },
+        { src: "https://picsum.photos/seed/801/600/600", layer: 2, x: "26vw", y: "12%", width: "8.5vw" },
+        { src: "https://picsum.photos/seed/802/600/600", layer: 1, x: "40vw", y: "8%",  width: "7.5vw" },
+        { src: "https://picsum.photos/seed/803/600/600", layer: 2, x: "58vw", y: "10%", width: "9.5vw" },
+        { src: "https://picsum.photos/seed/804/600/600", layer: 3, x: "74vw", y: "16%", width: "11.5vw" },
+
+        { src: "https://picsum.photos/seed/805/600/600", layer: 1, x: "86vw", y: "30%", width: "6.5vw" },
+        { src: "https://picsum.photos/seed/806/600/600", layer: 2, x: "70vw", y: "34%", width: "7.5vw" },
+        { src: "https://picsum.photos/seed/807/600/600", layer: 3, x: "54vw", y: "28%", width: "9vw" },
+        { src: "https://picsum.photos/seed/808/600/600", layer: 1, x: "38vw", y: "26%", width: "6.8vw" },
+        { src: "https://picsum.photos/seed/809/600/600", layer: 2, x: "22vw", y: "30%", width: "8vw" },
+
+        { src: "https://picsum.photos/seed/810/600/600", layer: 3, x: "10vw", y: "50%", width: "12vw" },
+        { src: "https://picsum.photos/seed/811/600/600", layer: 1, x: "26vw", y: "52%", width: "6vw" },
+        { src: "https://picsum.photos/seed/812/600/600", layer: 2, x: "42vw", y: "48%", width: "7.2vw" },
+        { src: "https://picsum.photos/seed/813/600/600", layer: 3, x: "58vw", y: "52%", width: "10vw" },
+        { src: "https://picsum.photos/seed/814/600/600", layer: 1, x: "74vw", y: "50%", width: "6.2vw" },
+
+        { src: "https://picsum.photos/seed/815/600/600", layer: 2, x: "86vw", y: "66%", width: "7.8vw" },
+        { src: "https://picsum.photos/seed/816/600/600", layer: 1, x: "70vw", y: "70%", width: "6.5vw" },
+        { src: "https://picsum.photos/seed/817/600/600", layer: 3, x: "54vw", y: "68%", width: "11vw" },
+        { src: "https://picsum.photos/seed/818/600/600", layer: 2, x: "38vw", y: "72%", width: "8.8vw" },
+        { src: "https://picsum.photos/seed/819/600/600", layer: 1, x: "22vw", y: "68%", width: "6.8vw" },
+
+        { src: "https://picsum.photos/seed/820/600/600", layer: 3, x: "12vw", y: "84%", width: "13.2vw" },
+        { src: "https://picsum.photos/seed/821/600/600", layer: 2, x: "30vw", y: "86%", width: "8.6vw" },
+        { src: "https://picsum.photos/seed/822/600/600", layer: 1, x: "46vw", y: "88%", width: "6.2vw" },
+        { src: "https://picsum.photos/seed/823/600/600", layer: 2, x: "62vw", y: "86%", width: "7.4vw" },
+        { src: "https://picsum.photos/seed/824/600/600", layer: 3, x: "78vw", y: "82%", width: "12.4vw" },
+    ];
+
+    const MOBILE_ITEMS: ZoomItemConfig[] = [
+        // En mobile usamos menos items, mayores anchos y posiciones más centradas
+        { src: "https://picsum.photos/seed/900/600/600", layer: 3, x: "20vw", y: "16%", width: "26vw" },
+        { src: "https://picsum.photos/seed/901/600/600", layer: 2, x: "68vw", y: "18%", width: "24vw" },
+        { src: "https://picsum.photos/seed/902/600/600", layer: 1, x: "48vw", y: "30%", width: "20vw" },
+
+        { src: "https://picsum.photos/seed/903/600/600", layer: 2, x: "22vw", y: "48%", width: "22vw" },
+        { src: "https://picsum.photos/seed/904/600/600", layer: 3, x: "74vw", y: "50%", width: "28vw" },
+        { src: "https://picsum.photos/seed/905/600/600", layer: 1, x: "48vw", y: "58%", width: "18vw" },
+
+        { src: "https://picsum.photos/seed/906/600/600", layer: 2, x: "28vw", y: "74%", width: "24vw" },
+        { src: "https://picsum.photos/seed/907/600/600", layer: 3, x: "70vw", y: "78%", width: "30vw" },
+        { src: "https://picsum.photos/seed/908/600/600", layer: 1, x: "50vw", y: "86%", width: "20vw" },
+
+        { src: "https://picsum.photos/seed/909/600/600", layer: 2, x: "12vw", y: "32%", width: "22vw" },
+        { src: "https://picsum.photos/seed/910/600/600", layer: 1, x: "88vw", y: "34%", width: "18vw" },
+        { src: "https://picsum.photos/seed/911/600/600", layer: 3, x: "8vw",  y: "86%", width: "28vw" },
+        { src: "https://picsum.photos/seed/912/600/600", layer: 2, x: "92vw", y: "82%", width: "24vw" },
+        { src: "https://picsum.photos/seed/913/600/600", layer: 1, x: "50vw", y: "10%", width: "16vw" },
+    ];
+
+    const [isMobile, setIsMobile] = React.useState(false);
+
+    React.useEffect(() => {
+        const mql = window.matchMedia("(max-width: 640px)");
+        const update = () => setIsMobile(mql.matches);
+        update();
+        mql.addEventListener("change", update);
+        return () => mql.removeEventListener("change", update);
+    }, []);
+
   return (
     <main className="bg-[color:var(--color-dusty-50)] text-neutral-900">
       {/*/!* 1. Hero *!/*/}
@@ -24,6 +89,38 @@ export default function InvitationContent() {
       <Countdown />
       {/* Banner 1: Panel pin stack */}
       <PanelPinStack />
+      {/*/!* 3. Nuestra historia *!/*/}
+
+        <PerspectiveZoom
+            headingContent={
+                <BiblicalVerse_1
+                    kicker="11 Años De Historia"
+                    couple="DIOS ES FIEL"
+                    bgColor="bg-white"
+                    textColor="text-accent-800"
+                    accentColor="text-accent-800"
+                    centerContent
+                    uppercaseNames
+                    namesTracking="tracking-widecaps"
+                    namesWeight="font-medium"
+                    maxWidth="max-w-3xl"
+                    padding="px-6"
+                    showDivider
+                    fontKicker="font-script"
+                    fontNames="font-display"
+                    fontBody="font-body"
+                    inline
+                />
+            }
+            quoteText="Reconócelo en todos tus caminos, Y él enderezará tus veredas. Proverbios 3:6"
+            items={isMobile ? MOBILE_ITEMS : DESKTOP_ITEMS}
+            autoLayout={true}
+            perspective="100svh"
+            seed={42}
+        />
+
+
+
       {/*/!* 3. Nuestra historia *!/*/}
       <StoryBeats />
       {/*/!* 4. Detalles principales *!/*/}

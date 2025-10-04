@@ -58,6 +58,15 @@ const ORIGIN_CSS: Record<PhotoZoomAnchor, string> = {
 
      /** Punto de anclaje del zoom */
      anchor?: PhotoZoomAnchor;
+
+     /** Filtro CSS opcional para la imagen (ej.: "grayscale(100%)", "sepia(40%) contrast(1.1)") */
+     imageFilter?: string;
+
+     /** Opacidad de la imagen (0–1). Ej.: 0.6 */
+     imageOpacity?: number;
+
+     /** Contenido proyectado centrado sobre la imagen */
+     projection?: React.ReactNode;
  };
 
  export default function PhotoBanner1({
@@ -71,6 +80,9 @@ const ORIGIN_CSS: Record<PhotoZoomAnchor, string> = {
                                           id = "inicio",
                                           priority = false,
                                           anchor = PhotoZoomAnchor.Center,
+                                          imageFilter,
+                                          imageOpacity,
+                                          projection,
                                       }: PhotoBanner1Props) {
     const sectionRef = React.useRef<HTMLElement | null>(null);
 
@@ -147,42 +159,17 @@ const ORIGIN_CSS: Record<PhotoZoomAnchor, string> = {
                     quality={70}
                     priority={priority}
                     className="object-cover [transform:translateZ(0)_scale(var(--hero-zoom,1))]"
-                    style={{ transformOrigin: ORIGIN_CSS[anchor] }}
+                    style={{ transformOrigin: ORIGIN_CSS[anchor], filter: imageFilter, opacity: imageOpacity }}
                 />
                 {/* Tinte con gradiente (más opaco abajo, se desvanece hacia arriba) */}
                 <div className="absolute inset-0 pointer-events-none [background:linear-gradient(to_top,var(--tint)_0%,transparent_30%)]" />
             </div>
 
-            {/* Contenido */}
-          {/*  <div className="z-20 max-w-5xl mx-auto px-6 absolute inset-x-0 bottom-0 pt-[62dvh] pb-[calc(10dvh+env(safe-area-inset-bottom))] md:relative md:inset-auto md:bottom-auto md:pt-[22dvh] md:pb-[calc(12dvh+env(safe-area-inset-bottom))]">*/}
-          {/*      <div className="relative isolate grid place-items-center py-10 text-center">*/}
-          {/*<span aria-hidden="true" className="pointer-events-none select-none absolute inset-0 grid place-items-center -z-10">*/}
-          {/*  <span className="font-display italic leading-none text-[clamp(12rem,30vw,28rem)] text-wedgewood-1100/10">*/}
-          {/*    &*/}
-          {/*  </span>*/}
-          {/*</span>*/}
-
-          {/*          <p className="uppercase tracking-[0.35em] text-[0.8rem] md:text-sm text-wedgewood-1100/90">*/}
-          {/*              Boda*/}
-          {/*          </p>*/}
-
-          {/*          <h1 className="mt-1 font-display italic text-5xl md:text-6xl lg:text-7xl text-foreground">*/}
-          {/*              Clarisa*/}
-          {/*          </h1>*/}
-
-          {/*          <p className="mt-2 text-[0.85rem] md:text-base tracking-[0.45em] text-wedgewood-1100/90">*/}
-          {/*              21 · 12 · 2025*/}
-          {/*          </p>*/}
-
-          {/*          <h2 className="mt-1 font-display italic text-5xl md:text-6xl lg:text-7xl text-foreground">*/}
-          {/*              José*/}
-          {/*          </h2>*/}
-
-          {/*          <p className="mt-2 uppercase tracking-[0.35em] text-[0.8rem] md:text-sm text-wedgewood-1100/90">*/}
-          {/*              DIOS ES FIEL*/}
-          {/*          </p>*/}
-          {/*      </div>*/}
-          {/*  </div>*/}
+            {projection ? (
+                <div className="absolute inset-0 z-20 grid place-items-center">
+                    {projection}
+                </div>
+            ) : null}
 
             {/* Bottom fade divider to smooth the transition into the next section */}
             <div id="hero-fade" aria-hidden="true" className="pointer-events-none absolute inset-0 z-10">

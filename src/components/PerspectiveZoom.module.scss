@@ -1,0 +1,29 @@
+.zoomContainer {
+  transform-style: preserve-3d;
+}
+
+.heading {
+  font-size: clamp(3.125rem, 3.464vw + 2.229rem, 5rem);
+  line-height: clamp(4.688rem, 3.349vw + 3.821rem, 6.5rem);
+  margin: 0;
+  transform: translate3d(-50%, -50%, -2000px);
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.zoomItem {
+  transform-origin: center center;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+
+.zoomItem img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.sectionStick {
+  /* Tailwind maneja el layout; aquí no hace falta nada extra */
+}
