@@ -18,6 +18,8 @@ export default function Home() {
   const [invitationMounted, setInvitationMounted] = useState(false);
   const [invitationVisible, setInvitationVisible] = useState(false);
   const [, setDigitalGuests] = useState<any[]>([]);
+  const [, setInvitations] = useState<any[]>([]);
+  const [, setWedding] = useState<any | null>(null);
   const loaderFadeTimeoutRef = useRef<number | undefined>(undefined);
   const envelopeTimeoutRef = useRef<number | undefined>(undefined);
 
@@ -82,16 +84,32 @@ export default function Home() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/digital-guests")
-      .then((r) => r.json())
-      .then((data) => {
+    const weddingId = process.env.NEXT_PUBLIC_WEDDING_ID;
+    const invitationsUrl = weddingId
+      ? `/api/wedding-invitations?wedding_id=${encodeURIComponent(weddingId)}`
+      : "/api/wedding-invitations";
+    const weddingUrl = weddingId
+      ? `/api/wedding-generalities?wedding_id=${encodeURIComponent(weddingId)}`
+      : "/api/wedding-generalities";
+
+    Promise.all([
+      fetch("/api/digital-guests").then((r) => r.json()).catch(() => ({ guests: [] })),
+      fetch(invitationsUrl).then((r) => r.json()).catch(() => ({ invitations: [] })),
+      fetch(weddingUrl).then((r) => r.json()).catch(() => ({ wedding: null })),
+    ])
+      .then(([guestsRes, invitationsRes, weddingRes]) => {
         if (!active) return;
-        setDigitalGuests(Array.isArray(data?.guests) ? data.guests : []);
+        setDigitalGuests(Array.isArray(guestsRes?.guests) ? guestsRes.guests : []);
+        setInvitations(Array.isArray(invitationsRes?.invitations) ? invitationsRes.invitations : []);
+        setWedding(weddingRes?.wedding ?? null);
       })
       .catch(() => {
         if (!active) return;
         setDigitalGuests([]);
+        setInvitations([]);
+        setWedding(null);
       });
+
     return () => {
       active = false;
     };
