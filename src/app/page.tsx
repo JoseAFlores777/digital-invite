@@ -17,6 +17,7 @@ export default function Home() {
   const [envelopeFading, setEnvelopeFading] = useState(false);
   const [invitationMounted, setInvitationMounted] = useState(false);
   const [invitationVisible, setInvitationVisible] = useState(false);
+  const [, setDigitalGuests] = useState<any[]>([]);
   const loaderFadeTimeoutRef = useRef<number | undefined>(undefined);
   const envelopeTimeoutRef = useRef<number | undefined>(undefined);
 
@@ -78,6 +79,23 @@ export default function Home() {
       document.body.style.overflow = prev;
     };
   }, [envelopeVisible]);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/digital-guests")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!active) return;
+        setDigitalGuests(Array.isArray(data?.guests) ? data.guests : []);
+      })
+      .catch(() => {
+        if (!active) return;
+        setDigitalGuests([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
 
