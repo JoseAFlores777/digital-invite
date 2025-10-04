@@ -129,7 +129,7 @@ pipeline {
 
             payload='{"force":true,"pull":true}'
             code=$(curl -sS -o /tmp/dokploy_resp.txt -w "%{http_code}" \
-              -X POST "$INVITE_JOSEIZS_DOKPLOY_WEBHOOK_URL" \
+              -X POST "$INVITE_JOSEIZ_DOKPLOY_WEBHOOK_URL" \
               -H "Content-Type: application/json" \
               --data "$payload")
 
