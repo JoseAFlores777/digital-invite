@@ -140,7 +140,6 @@ export default function AnilloScrollSequence({
         ensureCtx();
         setCanvasSize();
 
-        // Registrar tamaños iniciales
         lastSizeRef.current = { w: window.innerWidth, h: window.innerHeight };
 
         const onResize = () => {
@@ -150,11 +149,9 @@ export default function AnilloScrollSequence({
             const widthChanged = w !== prev.w;
             lastSizeRef.current = { w, h };
 
-            // Ajusta el canvas siempre (altura depende del ancho base)
             setCanvasSize();
             render();
 
-            // Evita refrescos por cambios de alto causados por la barra de direcciones móvil
             if (widthChanged) {
                 ScrollTrigger.refresh();
             }
@@ -170,32 +167,15 @@ export default function AnilloScrollSequence({
 
         let killed = false;
 
-        (async () => {
-            imagesRef.current = new Array(frameCount).fill(null);
+        imagesRef.current = new Array(frameCount).fill(null);
 
-            for (let i = 0; i < frameCount; i++) {
-                if (killed) return;
-                const url = currentFrame(i);
-                try {
-                    const img = await loadImage(url);
-                    imagesRef.current[i] = img;
-                    if (i === 0) render();
-                } catch (e) {
-                    console.warn("[AnilloSequence] No se pudo cargar:", url, e);
-                }
-            }
+        const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+        const totalScrollPx = Math.max(1, frameCount * pixelsPerFrame);
 
-            if (killed) return;
-
-            const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-            if (reduce) {
-                sequenceRef.current.frame = 0;
-                render();
-                return;
-            }
-
-            const totalScrollPx = Math.max(1, frameCount * pixelsPerFrame);
-
+        if (reduce) {
+            sequenceRef.current.frame = 0;
+            render();
+        } else {
             animRef.current = gsap.to(sequenceRef.current, {
                 frame: frameCount - 1,
                 ease: "none",
@@ -223,7 +203,24 @@ export default function AnilloScrollSequence({
                     },
                 },
             });
-        })();
+        }
+
+        for (let i = 0; i < frameCount; i++) {
+            if (killed) break;
+            const url = currentFrame(i);
+            loadImage(url)
+                .then((img) => {
+                    if (killed) return;
+                    imagesRef.current[i] = img;
+                    if (i === 0) {
+                        render();
+                        ScrollTrigger.refresh();
+                    }
+                })
+                .catch((e) => {
+                    console.warn("[AnilloSequence] No se pudo cargar:", url, e);
+                });
+        }
 
         return () => {
             killed = true;

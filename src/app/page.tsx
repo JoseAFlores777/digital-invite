@@ -5,7 +5,6 @@ import Loader from "@/components/Loader";
 import EnvelopeWelcome from "@/components/EnvelopeWelcome";
 import InvitationContent from "@/components/InvitationContent";
 import MusicControls from "@/components/MusicControls";
-import { preloadImages } from "@/utils/preloadImages";
 
 import MusicRoot from "@/components/MusicRoot";
 
@@ -14,7 +13,6 @@ export default function Home() {
   const [animationFinished, setAnimationFinished] = useState(false);
   const [showLoaderOverlay, setShowLoaderOverlay] = useState(true);
   const [fadeOutLoader, setFadeOutLoader] = useState(false);
-  const [assetsLoaded, setAssetsLoaded] = useState(false);
   const [envelopeVisible, setEnvelopeVisible] = useState(true);
   const [envelopeFading, setEnvelopeFading] = useState(false);
   const [invitationMounted, setInvitationMounted] = useState(false);
@@ -28,39 +26,6 @@ export default function Home() {
   useEffect(() => {
     const timer = window.setTimeout(() => setMinimumDelayPassed(true), 1500);
     return () => window.clearTimeout(timer);
-  }, []);
-
-  // Preload critical images (seal, hero, panels, perspective zoom items)
-  useEffect(() => {
-    let active = true;
-
-    const urls: string[] = [
-      "/wedding_seal.png",
-      "/images/IMG_0150.JPG",
-      "/images/Etapas/hermanos.png",
-      "/images/Etapas/amigos.png",
-      "/images/Etapas/novios.jpeg",
-      "/images/Etapas/prometidos.JPG",
-    ];
-
-    const range = (start: number, end: number) => Array.from({ length: end - start + 1 }, (_, i) => i + start);
-    const picsum = [
-      ...range(800, 824).map((seed) => `https://picsum.photos/seed/${seed}/600/600`),
-      ...range(900, 913).map((seed) => `https://picsum.photos/seed/${seed}/600/600`),
-    ];
-
-    // Anillo frames (scroll sequence)
-    const anilloFrames = Array.from({ length: 79 }, (_, i) => `/images/anillo/anillo-${i + 1}.jpg`);
-
-    urls.push(...picsum, ...anilloFrames);
-
-    preloadImages(urls, { timeoutMs: 45000 }).then(() => {
-      if (active) setAssetsLoaded(true);
-    });
-
-    return () => {
-      active = false;
-    };
   }, []);
 
   const handleLoaderComplete = useCallback(() => {
@@ -92,7 +57,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!showLoaderOverlay) return;
-    if (minimumDelayPassed && animationFinished && assetsLoaded) {
+    if (minimumDelayPassed && animationFinished) {
       setFadeOutLoader(true);
       loaderFadeTimeoutRef.current = window.setTimeout(() => {
         setShowLoaderOverlay(false);
@@ -103,7 +68,7 @@ export default function Home() {
         }
       };
     }
-  }, [animationFinished, minimumDelayPassed, assetsLoaded, showLoaderOverlay]);
+  }, [animationFinished, minimumDelayPassed, showLoaderOverlay]);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
