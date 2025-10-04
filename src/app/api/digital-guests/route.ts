@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getDigitalGuests } from "@/lib/directus";
+import { getDigitalGuests } from "@/server/services/guests.service";
 
 export async function GET() {
   try {
