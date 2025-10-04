@@ -7,4 +7,4 @@ export { getDirectusClient } from "@/server/directus-client";
 
 // Services
 export { getInvitationContent } from "@/server/services/invitation.service";
-export { getDigitalGuestsRx } from "@/server/services/guests.service";
+export { getDigitalGuests } from "@/server/services/guests.service";

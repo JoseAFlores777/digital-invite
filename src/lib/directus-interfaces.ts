@@ -872,3 +872,125 @@ export type CustomDirectusTypes = {
     wedding_events: WeddingEvents[];
     weddings: Weddings[];
 };
+export enum DirectusCollectionKeys {
+    accommodation_blocks = 'accommodation_blocks',
+    accommodations = 'accommodations',
+    budget_categories = 'budget_categories',
+    budget_items = 'budget_items',
+    checklist_items = 'checklist_items',
+    communications = 'communications',
+    contracts = 'contracts',
+    contracts_files = 'contracts_files',
+    couples = 'couples',
+    directus_access = 'directus_access',
+    directus_activity = 'directus_activity',
+    directus_collections = 'directus_collections',
+    directus_dashboards = 'directus_dashboards',
+    directus_extensions = 'directus_extensions',
+    directus_fields = 'directus_fields',
+    directus_files = 'directus_files',
+    directus_flows = 'directus_flows',
+    directus_folders = 'directus_folders',
+    directus_migrations = 'directus_migrations',
+    directus_notifications = 'directus_notifications',
+    directus_operations = 'directus_operations',
+    directus_panels = 'directus_panels',
+    directus_permissions = 'directus_permissions',
+    directus_policies = 'directus_policies',
+    directus_presets = 'directus_presets',
+    directus_relations = 'directus_relations',
+    directus_revisions = 'directus_revisions',
+    directus_roles = 'directus_roles',
+    directus_sessions = 'directus_sessions',
+    directus_settings = 'directus_settings',
+    directus_shares = 'directus_shares',
+    directus_translations = 'directus_translations',
+    directus_users = 'directus_users',
+    directus_versions = 'directus_versions',
+    directus_webhooks = 'directus_webhooks',
+    gallery_assets = 'gallery_assets',
+    guest_groups = 'guest_groups',
+    guests = 'guests',
+    invitations = 'invitations',
+    invitations_guests = 'invitations_guests',
+    invoices = 'invoices',
+    invoices_files = 'invoices_files',
+    meal_options = 'meal_options',
+    music_playlist_items = 'music_playlist_items',
+    payments = 'payments',
+    payments_files = 'payments_files',
+    payments_files_1 = 'payments_files_1',
+    people = 'people',
+    printables = 'printables',
+    seating_assignments = 'seating_assignments',
+    seating_tables = 'seating_tables',
+    tasks = 'tasks',
+    timeline_items = 'timeline_items',
+    transport_rides = 'transport_rides',
+    vendor_bookings = 'vendor_bookings',
+    vendor_financials_view = 'vendor_financials_view',
+    vendor_packages = 'vendor_packages',
+    vendors = 'vendors',
+    venues = 'venues',
+    wedding_events = 'wedding_events',
+    weddings = 'weddings',
+};
+
+export interface Schema extends CustomDirectusTypes {}
+
+
+//utils mappers
+
+
+
+
+// 2) Utilitarios de tipos para construir rutas "a.b.c" con profundidad limitada
+type Dec = { 3: 2; 2: 1; 1: 0; 0: 0 };
+type IsZero<N extends number> = N extends 0 ? true : false;
+type Join<A extends string, B extends string> = A extends '' ? B : `${A}.${B}`;
+type KeysOf<T> = Extract<keyof T, string>;
+type ObjPart<T> = Extract<T, object>;     // extrae la parte "objeto" de una unión (ej. de string | Person → Person)
+type IsArray<T> = T extends any[] ? true : false;
+type Elem<T> = T extends (infer U)[] ? U : never;
+
+/**
+ * FieldPath<T, D>
+ * - Genera rutas válidas de T hasta profundidad D (0..3).
+ * - Si el campo es unión (p.ej. string | Person), sigue navegando solo por la parte objeto.
+ * - Si es array de objetos, navega por el elemento (U) del array.
+ */
+export type FieldPath<T, D extends number = 2> =
+    IsZero<D> extends true
+        ? never
+        : T extends object
+            ? {
+                [K in KeysOf<T>]:
+                IsArray<T[K]> extends true
+                    ? (
+                        ObjPart<Elem<T[K]>> extends never
+                            ? K // array primitivo → no hay rutas internas
+                            : K | Join<K, FieldPath<ObjPart<Elem<T[K]>>, Dec[D]>>
+                        )
+                    : (
+                        ObjPart<T[K]> extends never
+                            ? K // primitivo/union sin objeto → hoja
+                            : K | Join<K, FieldPath<ObjPart<T[K]>, Dec[D]>>
+                        )
+            }[KeysOf<T>]
+            : never;
+
+// 3) Versión por colección (desde tu Schema)
+export type CollectionFieldPath<C extends keyof Schema, D extends number = 2> =
+    FieldPath<Schema[C][number], D>;
+
+// 4) Helpers para una DX cómoda
+// a) Builder por colección: te da autocompletado y valida cada string
+export function fieldsFor<
+    C extends keyof Schema,
+    D extends number = 2
+>(collection: C) {
+    return <T extends readonly CollectionFieldPath<C, D>[]>(...f: T) => f;
+}
+
+// b) Si prefieres anotar un array directamente, 'satisfies' mantiene literales y valida:
+export type GuestFieldPath<D extends number = 2> = CollectionFieldPath<'guests', D>;

@@ -1,6 +1,18 @@
 import { readItems } from "@directus/sdk";
 import { getDirectusClient } from "@/server/directus-client";
-import type { InvitationContent } from "@/lib/directus-interfaces";
+
+
+class InvitationContent {
+    id: string;
+    title: string;
+    couple: string;
+    date: string;
+    time: string;
+    venue: string;
+    address: string;
+    message: string;
+    cover_image?: string;
+}
 
 export async function getInvitationContent(): Promise<InvitationContent> {
   try {
