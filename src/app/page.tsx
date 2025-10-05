@@ -8,6 +8,8 @@ import MusicControls from "@/components/MusicControls";
 
 import MusicRoot from "@/components/MusicRoot";
 
+type InvitationGuest = { guest?: { person?: { first_name?: string; last_name?: string } } };
+
 export default function Home() {
   const [minimumDelayPassed, setMinimumDelayPassed] = useState(false);
   const [animationFinished, setAnimationFinished] = useState(false);
@@ -20,6 +22,9 @@ export default function Home() {
   const [, setDigitalGuests] = useState<any[]>([]);
   const [, setInvitations] = useState<any[]>([]);
   const [, setWedding] = useState<any | null>(null);
+  const [inviteError, setInviteError] = useState<string | null>(null);
+  const [inviteSender, setInviteSender] = useState<string | undefined>(undefined);
+  const [inviteSubtitle, setInviteSubtitle] = useState<string | undefined>(undefined);
   const loaderFadeTimeoutRef = useRef<number | undefined>(undefined);
   const envelopeTimeoutRef = useRef<number | undefined>(undefined);
 
@@ -82,7 +87,47 @@ export default function Home() {
     };
   }, [envelopeVisible]);
 
+  // Read invitationID from URL and fetch invitation details before showing EnvelopeWelcome
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const invitationID = params.get("invitationID");
+    if (!invitationID) {
+      setInviteError("missing_invitation_id");
+      setShowLoaderOverlay(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/invitation-by-id?id=${encodeURIComponent(invitationID)}`);
+        if (!res.ok) {
+          setInviteError("invitation_not_found");
+          setShowLoaderOverlay(false);
+          return;
+        }
+        const data = await res.json();
+        const guests = (data?.invitation?.guests ?? []) as InvitationGuest[];
+        const code = data.invitation?.code ?? "";
+        const invitationName = code.includes("Familia") ? `La ${code}` : code;
+        const label = `Invitación Especial para ${invitationName}`;
+        if (!cancelled) {
+          setInviteSender(label);
+          setInviteSubtitle("Con mucho amor");
+        }
+      } catch (e) {
+        if (!cancelled) setInviteError("failed_to_fetch");
+      } finally {
+        if (!cancelled) setShowLoaderOverlay(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Keep loading of supplemental data (optional) after invite validation
+  useEffect(() => {
+    if (inviteError) return; // skip if invalid
     let active = true;
     const weddingId = process.env.NEXT_PUBLIC_WEDDING_ID;
     const invitationsUrl = weddingId
@@ -113,18 +158,28 @@ export default function Home() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [inviteError]);
 
   return (
 
     <MusicRoot>
       <div className="bg-[color:var(--color-dusty-50)] text-[color:var(--color-dusty-900)]" style={{ minHeight: "100dvh" }}>
-        {envelopeVisible ? (
+        {inviteError ? (
+          <main className="min-h-screen grid place-items-center p-6 text-center">
+            <div>
+              <h1 className="text-2xl font-semibold mb-2">Lo sentimos</h1>
+              <p className="opacity-80 max-w-md mx-auto">
+                Para ver esta invitación debes acceder con un enlace válido que incluya tu identificador de invitación.
+                Por favor, abre el enlace que recibiste o contacta a los anfitriones.
+              </p>
+            </div>
+          </main>
+        ) : envelopeVisible && inviteSender ? (
           <EnvelopeWelcome
             className={envelopeFading ? "opacity-0 pointer-events-none" : "opacity-100"}
             sealSlot={<img src="/wedding_seal.png" alt="Sello de cera" className="seal-img" />}
-            sender="Invitación especial para Familia Izaguirre Vallejo"
-            subtitle="Con mucho amor"
+            sender={inviteSender}
+            subtitle={inviteSubtitle || "Con mucho amor"}
             buttonText="Abrir invitación"
             onOpenComplete={handleOpenComplete}
           />
@@ -135,7 +190,7 @@ export default function Home() {
             {invitationVisible ? <MusicControls /> : null}
           </div>
         ) : null}
-        {showLoaderOverlay ? (
+        {!inviteError && showLoaderOverlay ? (
           <Loader
             onComplete={handleLoaderComplete}
             className={fadeOutLoader ? "fade-out" : ""}

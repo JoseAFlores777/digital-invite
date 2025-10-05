@@ -8,5 +8,5 @@ export { getDirectusClient } from "@/server/directus-client";
 // Services
 export { getInvitationContent } from "@/server/services/invitation.service";
 export { getDigitalGuests } from "@/server/services/guests.service";
-export { getWeddingInvitations } from "@/server/services/invitations.service";
+export { getWeddingInvitations, getInvitationById } from "@/server/services/invitations.service";
 export { getWeddingById } from "@/server/services/weddings.service";
