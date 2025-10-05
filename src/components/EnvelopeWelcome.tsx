@@ -58,10 +58,11 @@ export default function EnvelopeWelcome({
           {sealSlot ? sealSlot : <span className={ew.sealText}>{sealText}</span>}
         </div>
         <div className={ew.overlay} aria-hidden={false}>
-          <div className="flex flex-col justify-between items-center gap-6 min-h-[40vh] py-6 px-4">
+          <div className="flex flex-col justify-between items-center gap-20 min-h-[40vh] py-6 px-4">
             <div className="text-center">
-              <p className="display-font text-2xl md:text-3xl tracking-wide" style={{ color: "var(--color-dusty-900)" }}>{sender}</p>
-              <p className="sans-font text-sm opacity-80 mt-1" style={{ color: "var(--color-dusty-700)" }}>{subtitle}</p>
+              <p className="sans-font text-base font-semibold tracking-wide" style={{ color: "var(--color-dusty-900)" }}>Invitación Especial para</p>
+              <p className="display-font text-2xl md:text-3xl tracking-wide mt-1" style={{ color: "var(--color-dusty-900)" }}>{sender}</p>
+              <p className="sans-font text-base opacity-80 mt-2" style={{ color: "var(--color-dusty-700)" }}>{subtitle}</p>
             </div>
             <div className={ew.swipeWrap}>
               <p className="display-font text-base md:text-lg mb-1 text-center opacity-70" style={{ color: "var(--color-dusty-700)" }}>

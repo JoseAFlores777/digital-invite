@@ -71,7 +71,7 @@
 
 .seal {
   position: absolute;
-  top: 28%;
+  top: 22%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 250px;
@@ -88,10 +88,28 @@
   transition: transform 400ms ease, opacity 400ms ease;
 }
 
+@media (max-width: 480px) {
+  .seal {
+    top: 22%;
+    width: 180px;
+    height: 180px;
+  }
+  .seal :global(.seal-img),
+  .seal :global(img) {
+    width: 80%;
+  }
+  .mouth {
+    height: 189px;
+  }
+  .overlay {
+    padding-top: calc(10vh + 110px + env(safe-area-inset-top));
+  }
+}
+
 /* Allow styling slotted image */
 .seal :global(.seal-img),
 .seal :global(img) {
-  width: 110%;
+  width: 80%;
   height: auto;
   display: block;
   filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
@@ -109,7 +127,7 @@
     inset 0 -2px 4px rgba(0,0,0,0.14),
     0 12px 18px -10px rgba(0,0,0,0.45);
   z-index: 2;
-  height: 250px;
+  height: 177px;
   width: 100%;
 }
 

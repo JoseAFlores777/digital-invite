@@ -49,7 +49,7 @@ export default function Loader({ className = "", onComplete }: LoaderProps) {
       <span className="sr-only">Cargando invitación</span>
       <DotLottieReact
         src="https://lottie.host/e4b8e419-dcda-4cb2-b36b-c2510d7f9c7a/26Hso0MUE2.lottie"
-        loop={false}
+        loop
         autoplay
         className="loader-animation"
         dotLottieRefCallback={handleDotInstance}

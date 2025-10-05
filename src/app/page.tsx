@@ -13,6 +13,7 @@ type InvitationGuest = { guest?: { person?: { first_name?: string; last_name?: s
 export default function Home() {
   const [minimumDelayPassed, setMinimumDelayPassed] = useState(false);
   const [animationFinished, setAnimationFinished] = useState(false);
+  const [dataReady, setDataReady] = useState(false);
   const [showLoaderOverlay, setShowLoaderOverlay] = useState(true);
   const [fadeOutLoader, setFadeOutLoader] = useState(false);
   const [envelopeVisible, setEnvelopeVisible] = useState(true);
@@ -62,7 +63,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!showLoaderOverlay) return;
-    if (minimumDelayPassed && animationFinished) {
+    if (minimumDelayPassed && animationFinished && dataReady) {
       setFadeOutLoader(true);
       loaderFadeTimeoutRef.current = window.setTimeout(() => {
         setShowLoaderOverlay(false);
@@ -73,7 +74,7 @@ export default function Home() {
         }
       };
     }
-  }, [animationFinished, minimumDelayPassed, showLoaderOverlay]);
+  }, [animationFinished, minimumDelayPassed, dataReady, showLoaderOverlay]);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -93,7 +94,7 @@ export default function Home() {
     const invitationID = params.get("invitationID");
     if (!invitationID) {
       setInviteError("missing_invitation_id");
-      setShowLoaderOverlay(false);
+      setDataReady(true);
       return;
     }
     let cancelled = false;
@@ -102,22 +103,21 @@ export default function Home() {
         const res = await fetch(`/api/invitation-by-id?id=${encodeURIComponent(invitationID)}`);
         if (!res.ok) {
           setInviteError("invitation_not_found");
-          setShowLoaderOverlay(false);
+          setDataReady(true);
           return;
         }
         const data = await res.json();
         const guests = (data?.invitation?.guests ?? []) as InvitationGuest[];
         const code = data.invitation?.code ?? "";
         const invitationName = code.includes("Familia") ? `La ${code}` : code;
-        const label = `Invitación Especial para ${invitationName}`;
         if (!cancelled) {
-          setInviteSender(label);
-          setInviteSubtitle("Con mucho amor");
+          setInviteSender(invitationName);
+          setInviteSubtitle("Boda Clarisa & José | 13-dic-2025");
         }
       } catch (e) {
         if (!cancelled) setInviteError("failed_to_fetch");
       } finally {
-        if (!cancelled) setShowLoaderOverlay(false);
+        if (!cancelled) setDataReady(true);
       }
     })();
     return () => {
