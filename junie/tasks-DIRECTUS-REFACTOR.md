@@ -1,18 +1,24 @@
 # Tasks — DIRECTUS-REFACTOR
 
-1. Revisar estándares del proyecto en `./junie/development-standards.md` y documentar hallazgos. [impacto: proceso] — No existe; se siguen patrones del repo (Next.js App Router, TS estricto). — done ✓
-2. Auditar uso actual de Directus (tipos, cliente y servicios) y referencias (`getInvitationContent`, `getDigitalGuests`). [impacto: backend] — done ✓
-3. Crear archivo centralizado de interfaces: `src/lib/directus-interfaces.ts` con `InvitationContent` y `Guest`. [impacto: backend, typings] — done ✓
-4. Extraer cliente de Directus a `src/server/directus-client.ts` para uso exclusivo server-side. [impacto: backend] — done ✓
-5. Mover lógica de negocio a servicios:
-   - `src/server/services/invitation.service.ts` → `getInvitationContent`. [impacto: backend] — done ✓
-   - `src/server/services/guests.service.ts` → `getDigitalGuests`. [impacto: backend] — done ✓
-6. Actualizar ruta API `src/app/api/digital-guests/route.ts` para importar desde `guests.service`. [impacto: backend] — done ✓
-7. Convertir `src/lib/directus.ts` en barrel: re-exportar interfaces, cliente y servicios para compatibilidad. [impacto: backend] — done ✓
-8. Verificar tipado y rutas de importación (`@/*`) en `tsconfig.json`. [impacto: build] — done ✓ (sin cambios requeridos)
-9. Validación rápida: compilar mentalmente/estáticamente cambios (sin secretos expuestos; lógica sin side-effects en cliente). [impacto: QA] — done ✓
+1. Revisar estándares en `./junie/development-standards.md` y alinear solución. [impacto: procesos]
+   - Hallazgo: No existe `development-standards.md` en el repo. Se siguen patrones existentes (Next.js App Router, servicios TS, helpers `fieldsFor`). — done
+2. Analizar archivos relevantes (`src/app/api/wedding-invitations/route.ts`, `src/server/services/invitations.service.ts`, `src/lib/directus-interfaces.ts`). [impacto: backend]
+   - Detección: Campo duplicado `guests.guest.invitation_status` en `invitations.service.ts`. — done
+3. Implementar nueva ruta `src/app/api/invitations/route.ts` con:
+   - `export const dynamic = "force-dynamic"` (o ISR opcional),
+   - función `withTimeout` con `AbortController`,
+   - `getWeddingInvitations` usando `client.request(readItems(...), { signal })`,
+   - lista de fields sin duplicados,
+   - lectura de `wedding_id` (query/env) y respuestas JSON con códigos apropiados. [impacto: backend]
+   — done
+4. Refactor mínimo del servicio `invitations.service.ts` para remover el field duplicado. [impacto: backend]
+   — done
+5. Mantener compatibilidad de la ruta existente `/api/wedding-invitations`. [impacto: backend]
+   — done
+6. Validación rápida (tipado y consistencia de imports). [impacto: tests]
+   — done (estática)
 
 Notas:
-- No se añadieron dependencias nuevas.
-- No se añadieron comentarios innecesarios en código.
-- Si aparecen nuevas rutas/servicios que usen Directus, se recomienda seguir el mismo patrón (`interfaces` + `server/services/*` + `server/directus-client`).
+- No se introdujeron dependencias nuevas.
+- Se evitó modificar contratos públicos existentes; se agregó nueva ruta `/api/invitations`.
+- Se sugiere cubrir con pruebas de integración de API en Playwright/Next si aplica.

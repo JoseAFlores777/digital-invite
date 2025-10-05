@@ -24,7 +24,6 @@ export async function getWeddingInvitations(weddingId: string): Promise<Invitati
     "guests.guest.person.first_name",
     "guests.guest.person.last_name",
     "guests.guest.invitation_status",
-    "guests.guest.invitation_status",
     "guests.guest.id",
     "guests.guest.rsvp_at",
     "guests.guest.rsvp_status",
