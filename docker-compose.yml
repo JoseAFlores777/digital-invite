@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  invite-joseiz:
+    image: docker.io/joseiz/invite-joseiz:latest   # la imagen que publica Jenkins
+    container_name: invite-joseiz
+    restart: unless-stopped                                # tu archivo de variables
+    ports:
+      - "3007:3000"                            # expone el puerto de la app (ajusta al que uses)
+    networks:
+      - invite-joseiz_net
+    # Opcional: montar volúmenes si tu app necesita persistencia
+    # volumes:
+    #   - ./data:/app/data
+
+networks:
+  invite-joseiz_net:
+    driver: bridge
