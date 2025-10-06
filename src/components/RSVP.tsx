@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import RSVPModal from "./RSVPModal";
+import React, { useRef } from "react";
 import { useGsapContext, gsap } from "@/hooks/useGsapContext";
 
 export default function RSVP() {
   const root = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState(false);
 
   useGsapContext(() => {
     if (!root.current) return;
@@ -19,14 +17,21 @@ export default function RSVP() {
     });
   }, []);
 
+  const openSolicitudModal = () => {
+    try {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("open-solicitud-modal"));
+      }
+    } catch {}
+  };
+
   return (
     <section id="rsvp" ref={root} className="bg-white">
       <div className="max-w-3xl mx-auto px-6 py-16 md:py-20 lg:py-28 text-center">
         <h2 className="display-font text-3xl md:text-4xl mb-3">RSVP</h2>
         <p className="text-neutral-700 mb-6">Nos encantará contar contigo. Por favor confirma tu asistencia.</p>
-        <button className="btn btn-primary" onClick={() => setOpen(true)} data-anim="rsvp-btn">Confirmar asistencia</button>
+        <button className="btn btn-primary" onClick={openSolicitudModal} data-anim="rsvp-btn">Confirmar asistencia</button>
       </div>
-      <RSVPModal open={open} onClose={() => setOpen(false)} />
     </section>
   );
 }

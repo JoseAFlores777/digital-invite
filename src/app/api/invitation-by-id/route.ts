@@ -1,19 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getInvitationById } from "@/lib/directus";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id") || "";
-
+    const url = new URL(req.url);
+    const id = url.searchParams.get("id");
     if (!id) {
-      return NextResponse.json({ invitation: null, error: "missing_invitation_id" }, { status: 400 });
+      return NextResponse.json({ invitation: null, error: "missing_id" }, { status: 400 });
     }
 
     const invitation = await getInvitationById(id);
-
     if (!invitation) {
-      return NextResponse.json({ invitation: null, error: "invitation_not_found" }, { status: 404 });
+      return NextResponse.json({ invitation: null, error: "not_found" }, { status: 404 });
     }
 
     return NextResponse.json({ invitation }, { status: 200 });

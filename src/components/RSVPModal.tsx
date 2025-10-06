@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { useGsapContext, gsap } from "@/hooks/useGsapContext";
+import Modal from "react-modal";
 
 type Props = {
   open: boolean;
@@ -9,99 +9,84 @@ type Props = {
 };
 
 export default function RSVPModal({ open, onClose }: Props) {
-  const backdropRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
   const firstFieldRef = useRef<HTMLInputElement>(null);
 
-  useGsapContext(() => {
-    const tl = gsap.timeline({ paused: true });
-    tl.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power1.out" })
-      .fromTo(cardRef.current, { scale: 0.95, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.22, ease: "power2.out" }, "<");
-    if (open) tl.play();
-    else tl.reverse(0);
-  }, [open]);
+  useEffect(() => {
+    try {
+      if (typeof window !== "undefined") {
+        const el = document.getElementById("__next") || document.body;
+        if (el) Modal.setAppElement(el as HTMLElement);
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     if (open) {
-      // focus management
       const prev = document.activeElement as HTMLElement | null;
-      firstFieldRef.current?.focus();
-      const onKey = (e: KeyboardEvent) => {
-        if (e.key === "Escape") onClose();
-      };
-      window.addEventListener("keydown", onKey);
-      return () => {
-        window.removeEventListener("keydown", onKey);
-        prev?.focus?.();
-      };
+      // focus first field shortly after open
+      setTimeout(() => firstFieldRef.current?.focus(), 0);
+      return () => prev?.focus?.();
     }
-  }, [open, onClose]);
-
-  // basic focus trap using sentinels
-  const trapStart = useRef<HTMLButtonElement>(null);
-  const trapEnd = useRef<HTMLButtonElement>(null);
-
-  if (!open) return null;
+  }, [open]);
 
   return (
-    <div
-      className="modal-backdrop grid place-items-center z-50"
-      ref={backdropRef}
-      aria-modal="true"
-      role="dialog"
-      aria-labelledby="rsvp-title"
+    <Modal
+      isOpen={open}
+      onRequestClose={onClose}
+      shouldCloseOnOverlayClick
+      shouldCloseOnEsc
+      overlayClassName="fixed inset-0 z-50 bg-black/40 backdrop-blur-[1px]"
+      className="outline-none w-[min(560px,92vw)] mx-auto my-12 bg-white/95 border border-[color:var(--color-dusty-300)] rounded-2xl shadow-xl p-6 focus-visible:ring-2 focus-visible:ring-[color:var(--color-dusty-500)]"
+      contentLabel="Confirmar asistencia"
+      ariaHideApp={false}
     >
-      <div ref={cardRef} className="modal-card w-[min(560px,92vw)] p-6 relative">
-        <h3 id="rsvp-title" className="display-font text-2xl mb-3">Confirmar asistencia</h3>
+      <div className="relative">
+        <h3 id="rsvp-title" className="display-font text-2xl mb-3 text-[color:var(--color-dusty-900)]">Confirmar asistencia</h3>
         <button
           aria-label="Cerrar"
           onClick={onClose}
-          className="absolute top-3 right-3 text-neutral-500 hover:text-neutral-800"
+          className="absolute top-2 right-2 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--color-dusty-300)] text-[color:var(--color-dusty-800)] bg-white/70 hover:bg-[color:var(--color-dusty-100)] active:scale-[0.98] transition"
         >
           ×
         </button>
-        <button className="sr-only" ref={trapStart} onFocus={() => trapEnd.current?.focus()} aria-hidden="true" />
-        <form
-          className="grid gap-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const btn = e.currentTarget.querySelector("button[type=submit]") as HTMLButtonElement | null;
-            if (btn) {
-              btn.disabled = true;
-            }
-            setTimeout(() => {
-              (e.currentTarget.querySelector(".thanks") as HTMLDivElement | null)?.classList.remove("hidden");
-            }, 500);
-          }}
-        >
-          <label className="grid gap-1">
-            <span className="text-sm">Nombre completo</span>
-            <input ref={firstFieldRef} required type="text" className="border rounded-lg px-3 py-2" />
-          </label>
-          <label className="grid gap-1">
-            <span className="text-sm">Email</span>
-            <input required type="email" className="border rounded-lg px-3 py-2" />
-          </label>
-          <label className="grid gap-1">
-            <span className="text-sm">Número de invitados</span>
-            <input required type="number" min={1} max={8} defaultValue={1} className="border rounded-lg px-3 py-2" />
-          </label>
-          <label className="grid gap-1">
-            <span className="text-sm">Restricciones alimentarias</span>
-            <input type="text" className="border rounded-lg px-3 py-2" />
-          </label>
-          <label className="grid gap-1">
-            <span className="text-sm">Mensaje</span>
-            <textarea rows={3} className="border rounded-lg px-3 py-2" />
-          </label>
-          <div className="flex gap-3 justify-end mt-2">
-            <button type="button" className="btn btn-ghost" onClick={onClose}>Cancelar</button>
-            <button type="submit" className="btn btn-primary">Enviar RSVP</button>
-          </div>
-          <div className="thanks hidden text-center py-2 text-emerald-700">¡Gracias! Hemos recibido tu confirmación.</div>
-        </form>
-        <button className="sr-only" ref={trapEnd} onFocus={() => trapStart.current?.focus()} aria-hidden="true" />
       </div>
-    </div>
+      <form
+        className="grid gap-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const btn = e.currentTarget.querySelector("button[type=submit]") as HTMLButtonElement | null;
+          if (btn) btn.disabled = true;
+          setTimeout(() => {
+            (e.currentTarget.querySelector(".thanks") as HTMLDivElement | null)?.classList.remove("hidden");
+          }, 500);
+        }}
+      >
+        <label className="grid gap-1">
+          <span className="text-sm text-[color:var(--color-dusty-800)]">Nombre completo</span>
+          <input ref={firstFieldRef} required type="text" className="border border-[color:var(--color-dusty-300)] rounded-lg px-3 py-2 bg-white/70 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-dusty-400)]" />
+        </label>
+        <label className="grid gap-1">
+          <span className="text-sm text-[color:var(--color-dusty-800)]">Email</span>
+          <input required type="email" className="border border-[color:var(--color-dusty-300)] rounded-lg px-3 py-2 bg-white/70 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-dusty-400)]" />
+        </label>
+        <label className="grid gap-1">
+          <span className="text-sm text-[color:var(--color-dusty-800)]">Número de invitados</span>
+          <input required type="number" min={1} max={8} defaultValue={1} className="border border-[color:var(--color-dusty-300)] rounded-lg px-3 py-2 bg-white/70 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-dusty-400)]" />
+        </label>
+        <label className="grid gap-1">
+          <span className="text-sm text-[color:var(--color-dusty-800)]">Restricciones alimentarias</span>
+          <input type="text" className="border border-[color:var(--color-dusty-300)] rounded-lg px-3 py-2 bg-white/70 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-dusty-400)]" />
+        </label>
+        <label className="grid gap-1">
+          <span className="text-sm text-[color:var(--color-dusty-800)]">Mensaje</span>
+          <textarea rows={3} className="border border-[color:var(--color-dusty-300)] rounded-lg px-3 py-2 bg-white/70 focus:outline-none focus:ring-2 focus:ring-[color:var(--color-dusty-400)]" />
+        </label>
+        <div className="flex gap-3 justify-end mt-2">
+          <button type="button" className="inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm border border-[color:var(--color-dusty-300)] text-[color:var(--color-dusty-900)] bg-white/70 hover:bg-[color:var(--color-dusty-100)] active:scale-[0.99] transition" onClick={onClose}>Cerrar</button>
+          <button type="submit" className="inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm bg-[color:var(--color-dusty-600)] text-white hover:bg-[color:var(--color-dusty-700)] active:scale-[0.99] transition">Enviar RSVP</button>
+        </div>
+        <div className="thanks hidden text-center py-2 text-[color:var(--color-dusty-800)]">¡Gracias! Hemos recibido tu confirmación.</div>
+      </form>
+    </Modal>
   );
 }

@@ -3,6 +3,8 @@
   right: calc(min(24px, 6vw) + env(safe-area-inset-right));
   bottom: calc(min(24px, 6vw) + env(safe-area-inset-bottom));
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 12px;
   z-index: 60;
 }
@@ -42,4 +44,89 @@
 .svgIcon {
   width: 24px;
   height: 24px;
+}
+
+/* RSVP trigger button with halo animation */
+.rsvpButton {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: linear-gradient(165deg, rgba(124, 149, 171, 0.96), rgba(92, 120, 142, 0.98));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 22px 40px -16px rgba(24, 44, 63, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: transform 180ms ease, box-shadow 220ms ease, background 220ms ease, opacity 180ms ease;
+}
+
+.rsvpButton::before,
+.rsvpButton::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+/* Outer halo pulse */
+.rsvpButton::before {
+  box-shadow: 0 0 0 0 rgba(156, 179, 199, 0.45);
+  animation: haloPulse 2.6s ease-out infinite;
+}
+
+/* Inner halo sync with tooltip */
+.rsvpButton::after {
+  box-shadow: 0 0 0 0 rgba(156, 179, 199, 0.35);
+  animation: haloPulse 2.6s ease-out infinite;
+  animation-delay: .9s;
+}
+
+@keyframes haloPulse {
+  0% { box-shadow: 0 0 0 0 rgba(156, 179, 199, 0.45); }
+  70% { box-shadow: 0 0 0 16px rgba(156, 179, 199, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(156, 179, 199, 0); }
+}
+
+/* Tooltip with gentle bouncing */
+.tooltip {
+  position: absolute;
+  right: 64px;
+  bottom: 50%;
+  transform: translateY(50%);
+  background: rgba(255, 255, 255, 0.95);
+  color: #2a3947;
+  border: 1px solid rgba(201, 216, 231, 0.9);
+  border-radius: 9999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+  box-shadow:
+    0 8px 20px -10px rgba(24, 44, 63, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  animation: floaty 2.6s ease-in-out infinite;
+}
+
+.tooltip::after {
+  content: "";
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  background: inherit;
+  border-right: inherit;
+  border-bottom: inherit;
+  transform-origin: center;
+  rotate: 45deg;
+}
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(50%) translateX(0); }
+  50% { transform: translateY(44%) translateX(-1px); }
 }

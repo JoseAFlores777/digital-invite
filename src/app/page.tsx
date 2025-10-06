@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import Loader from "@/components/Loader";
 import EnvelopeWelcome from "@/components/EnvelopeWelcome";
 import InvitationContent from "@/components/InvitationContent";
+import SolicitudManager from "@/components/SolicitudManager";
 import MusicControls from "@/components/MusicControls";
 
 import MusicRoot from "@/components/MusicRoot";
@@ -17,9 +18,12 @@ export default function Home() {
   const [showLoaderOverlay, setShowLoaderOverlay] = useState(true);
   const [fadeOutLoader, setFadeOutLoader] = useState(false);
   const [envelopeVisible, setEnvelopeVisible] = useState(true);
+  const [invitationId, setInvitationId] = useState<string | null>(null);
+  const [initialHash, setInitialHash] = useState<string>("");
   const [envelopeFading, setEnvelopeFading] = useState(false);
   const [invitationMounted, setInvitationMounted] = useState(false);
   const [invitationVisible, setInvitationVisible] = useState(false);
+  const [showSolicitudModal, setShowSolicitudModal] = useState(false);
   const [, setDigitalGuests] = useState<any[]>([]);
   const [, setInvitations] = useState<any[]>([]);
   const [, setWedding] = useState<any | null>(null);
@@ -49,6 +53,15 @@ export default function Home() {
       requestAnimationFrame(() => setInvitationVisible(true));
     }, 950);
   }, []);
+
+  useEffect(() => {
+    if (!initialHash) return;
+    if (envelopeVisible) {
+      setEnvelopeVisible(false);
+      setInvitationMounted(true);
+      setInvitationVisible(true);
+    }
+  }, [initialHash]);
 
   useEffect(() => {
     return () => {
@@ -92,6 +105,8 @@ export default function Home() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const invitationID = params.get("invitationID");
+    setInvitationId(invitationID);
+    setInitialHash(window.location.hash || "");
     if (!invitationID) {
       setInviteError("missing_invitation_id");
       setDataReady(true);
@@ -160,6 +175,23 @@ export default function Home() {
     };
   }, [inviteError]);
 
+  useEffect(() => {
+    if (!invitationVisible) return;
+    const hash = initialHash.replace('#','');
+    if (!hash) return;
+    const el = document.getElementById(hash) || document.querySelector(hash) as HTMLElement | null;
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [invitationVisible, initialHash]);
+
+  // Listen for RSVP section button to open SolicitudManager modal
+  useEffect(() => {
+    const handler = () => setShowSolicitudModal(true);
+    (window as any).addEventListener('open-solicitud-modal', handler);
+    return () => (window as any).removeEventListener('open-solicitud-modal', handler);
+  }, []);
+
   return (
 
     <MusicRoot>
@@ -194,6 +226,14 @@ export default function Home() {
           <Loader
             onComplete={handleLoaderComplete}
             className={fadeOutLoader ? "fade-out" : ""}
+          />
+        ) : null}
+        {invitationId ? (
+          <SolicitudManager
+            solicitudId={invitationId}
+            asModal
+            open={showSolicitudModal}
+            onClose={() => setShowSolicitudModal(false)}
           />
         ) : null}
       </div>

@@ -229,7 +229,7 @@ export default function PerspectiveZoom({
     return (
         <main ref={rootRef} className="bg-white text-neutral-900 font-sans">
             <div
-                className={`${styles.zoomContainer} w-screen h-screen overflow-hidden relative`}
+                className={`${styles.zoomContainer} w-full h-screen overflow-hidden relative`}
                 style={{ perspective }}
             >
                 {/* Heading */}
