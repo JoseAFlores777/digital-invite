@@ -27,12 +27,12 @@ type UiGuest = {
 };
 
 const statusLabel: Record<GuestStatus, string> = {
-    confirmed: "Confirmar",
-    pending: "Pendiente",
+    accepted: "Confirmar",
+    unknown: "Pendiente",
     declined: "Rechazar",
 };
 
-const STATUS_ORDER: GuestStatus[] = ["pending", "confirmed", "declined"];
+const STATUS_ORDER: GuestStatus[] = ["unknown", "accepted", "declined"];
 type FilterTab = "all" | GuestStatus;
 
 /* --- Iconos inline (sin dependencias) --- */
@@ -110,11 +110,17 @@ export default function SolicitudManager({
                         const person = rel?.guest?.person;
                         const guestId = rel?.guest?.id;
                         if (!guestId) return null;
-                        const rawStatus = (rel?.guest?.rsvp_status || rel?.guest?.invitation_status || "pending") as string;
-                        const status: GuestStatus =
-                            rawStatus === "confirmed" || rawStatus === "declined" || rawStatus === "pending"
-                                ? (rawStatus as GuestStatus)
-                                : "pending";
+                        const rawStatus = (rel?.guest?.rsvp_status || rel?.guest?.invitation_status || "unknown") as string;
+                        let status: GuestStatus;
+                        if (rawStatus === "accepted" || rawStatus === "declined" || rawStatus === "unknown") {
+                            status = rawStatus as GuestStatus;
+                        } else if (rawStatus === "confirmed") {
+                            status = "accepted";
+                        } else if (rawStatus === "pending") {
+                            status = "unknown";
+                        } else {
+                            status = "unknown";
+                        }
                         const name = [person?.first_name, person?.last_name].filter(Boolean).join(" ") || "Invitado";
                         const email = person?.email;
                         return { id: guestId, name, email, status } as UiGuest;
@@ -190,7 +196,7 @@ export default function SolicitudManager({
                 acc[g.status] += 1;
                 return acc;
             },
-            { total: 0, confirmed: 0, pending: 0, declined: 0 } as Record<"total" | GuestStatus, number>
+            { total: 0, accepted: 0, unknown: 0, declined: 0 } as Record<"total" | GuestStatus, number>
         );
     }, [guests]);
 
@@ -207,7 +213,7 @@ export default function SolicitudManager({
 
     const updateGuestStatus = async (guestId: string, status: GuestStatus) => {
         if (isClosed) return;
-        const prev = guests.find((g) => g.id === guestId)?.status ?? "pending";
+        const prev = guests.find((g) => g.id === guestId)?.status ?? "unknown";
         if (prev === status) return;
         setSaving(guestId);
         setGuests((curr) => curr.map((g) => (g.id === guestId ? { ...g, status } : g)));
@@ -220,7 +226,7 @@ export default function SolicitudManager({
         }
     };
 
-    const updateAllGuestsStatus = async (status: Exclude<GuestStatus, "pending">) => {
+    const updateAllGuestsStatus = async (status: Exclude<GuestStatus, "unknown">) => {
         if (isClosed) return;
         setSaving("all");
         setGuests((curr) => curr.map((g) => ({ ...g, status })));
@@ -282,7 +288,7 @@ export default function SolicitudManager({
     const attendeesBadge = (
         <span className="inline-flex items-center gap-2 text-sm px-3 py-1 rounded-full bg-slate-100 text-slate-800 border border-slate-200">
       <IconUsers className="h-4 w-4" />
-            {`${guests.filter((g) => g.status === "confirmed").length}/${guests.length}`}
+            {`${guests.filter((g) => g.status === "accepted").length}/${guests.length}`}
     </span>
     );
 
@@ -338,8 +344,8 @@ export default function SolicitudManager({
                     {showFilters && (
                         <div className="flex flex-wrap items-center gap-2 order-1">
                             <FilterPill value="all" label="Todos" count={counts.total} />
-                            <FilterPill value="pending" label="Pendientes" count={counts.pending} />
-                            <FilterPill value="confirmed" label="Confirmados" count={counts.confirmed} />
+                            <FilterPill value="unknown" label="Pendientes" count={counts.unknown} />
+                            <FilterPill value="accepted" label="Confirmados" count={counts.accepted} />
                             <FilterPill value="declined" label="Rechazados" count={counts.declined} />
                         </div>
                     )}
@@ -361,7 +367,7 @@ export default function SolicitudManager({
                                 <button
                                     type="button"
                                     disabled={saving === "all" || guests.length === 0 || isClosed}
-                                    onClick={() => updateAllGuestsStatus("confirmed")}
+                                    onClick={() => updateAllGuestsStatus("accepted") }
                                     className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm border border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 active:scale-[0.98] disabled:opacity-50 whitespace-nowrap"
                                 >
                                     <IconCheck className="h-4 w-4" /> Confirmar todos
@@ -400,15 +406,15 @@ export default function SolicitudManager({
                             </div>
 
                             <div className="flex flex-wrap items-center gap-2">
-                                {(["confirmed", "pending", "declined"] as GuestStatus[]).map((st) => {
+                                {(STATUS_ORDER as GuestStatus[]).map((st) => {
                                     const selected = guest.status === st;
                                     const base =
                                         "px-3 py-1.5 md:py-2 rounded-full text-sm border inline-flex items-center gap-2 transition active:scale-[0.98] focus:outline-none focus:ring-2";
                                     const variants: Record<GuestStatus, string> = {
-                                        confirmed: selected
+                                        accepted: selected
                                             ? "bg-emerald-50 text-emerald-700 border-emerald-200 focus:ring-emerald-300"
                                             : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50",
-                                        pending: selected
+                                        unknown: selected
                                             ? "bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-300"
                                             : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50",
                                         declined: selected
@@ -424,8 +430,8 @@ export default function SolicitudManager({
                                             className={`${base} ${variants[st]}`}
                                             title={statusLabel[st]}
                                         >
-                                            {st === "confirmed" && <IconCheck className="h-4 w-4" />}
-                                            {st === "pending" && <IconClock className="h-4 w-4" />}
+                                            {st === "accepted" && <IconCheck className="h-4 w-4" />}
+                                            {st === "unknown" && <IconClock className="h-4 w-4" />}
                                             {st === "declined" && <IconX className="h-4 w-4" />}
                                             <span className="hidden xs:inline">{statusLabel[st]}</span>
                                             <span className="inline xs:hidden">{statusLabel[st].charAt(0)}</span>

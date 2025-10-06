@@ -1,4 +1,4 @@
-export type GuestStatus = "confirmed" | "pending" | "declined";
+export type GuestStatus = "unknown" | "accepted" | "declined";
 
 export async function fetchInvitationById(id: string) {
   const res = await fetch(`/api/invitation-by-id?id=${encodeURIComponent(id)}`);
@@ -8,8 +8,8 @@ export async function fetchInvitationById(id: string) {
 
 export async function patchGuestStatus(guestId: string, status: GuestStatus) {
   const map: Record<GuestStatus, string> = {
-    confirmed: "confirmed",
-    pending: "pending",
+    unknown: "unknown",
+    accepted: "accepted",
     declined: "declined",
   };
   const payload = { guestId, rsvp_status: map[status] };
