@@ -93,6 +93,8 @@ export default function SolicitudManager({
     const [filter, setFilter] = useState<FilterTab>("all");
     const [query, setQuery] = useState("");
     const [reloadKey, setReloadKey] = useState(0);
+    const [deadlineMs, setDeadlineMs] = useState<number | null>(null);
+    const [nowMs, setNowMs] = useState<number>(Date.now());
 
     useEffect(() => {
         let active = true;
@@ -135,6 +137,19 @@ export default function SolicitudManager({
                         const dt = [date, time].filter(Boolean).join(" • ");
                         setDateTime(dt + (tz ? ` (${tz})` : ""));
                         setLocation([locName, locAddr].filter(Boolean).join(", "));
+
+                        // Compute RSVP deadline: 3 weeks before event date/time
+                        try {
+                            if (date) {
+                                const timePart = typeof time === "string" && time ? time : "00:00:00";
+                                const iso = `${date}T${timePart}`; // local time parsing
+                                const eventMs = Date.parse(iso);
+                                if (!Number.isNaN(eventMs)) {
+                                    const threeWeeksMs = 21 * 24 * 60 * 60 * 1000;
+                                    setDeadlineMs(eventMs - threeWeeksMs);
+                                }
+                            }
+                        } catch {}
                     } catch {}
                 }
             })
@@ -145,6 +160,28 @@ export default function SolicitudManager({
             active = false;
         };
     }, [solicitudId, reloadKey]);
+
+    // Tick for countdown
+    useEffect(() => {
+        if (!deadlineMs) return;
+        const id = setInterval(() => setNowMs(Date.now()), 1000);
+        return () => clearInterval(id);
+    }, [deadlineMs]);
+
+    const timeLeft = useMemo(() => {
+        if (!deadlineMs) return null;
+        const diff = Math.max(0, deadlineMs - nowMs);
+        const days = Math.floor(diff / (24 * 60 * 60 * 1000));
+        const hours = Math.floor((diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+        const minutes = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
+        const seconds = Math.floor((diff % (60 * 1000)) / 1000);
+        return { diff, days, hours, minutes, seconds };
+    }, [deadlineMs, nowMs]);
+
+    const isClosed = useMemo(() => {
+        if (!deadlineMs) return false;
+        return nowMs >= deadlineMs;
+    }, [deadlineMs, nowMs]);
 
     const counts = useMemo(() => {
         return guests.reduce(
@@ -169,6 +206,7 @@ export default function SolicitudManager({
     }, [guests, filter, query]);
 
     const updateGuestStatus = async (guestId: string, status: GuestStatus) => {
+        if (isClosed) return;
         const prev = guests.find((g) => g.id === guestId)?.status ?? "pending";
         if (prev === status) return;
         setSaving(guestId);
@@ -183,6 +221,7 @@ export default function SolicitudManager({
     };
 
     const updateAllGuestsStatus = async (status: Exclude<GuestStatus, "pending">) => {
+        if (isClosed) return;
         setSaving("all");
         setGuests((curr) => curr.map((g) => ({ ...g, status })));
         try {
@@ -273,6 +312,26 @@ export default function SolicitudManager({
                     </div>
                 </div>
 
+                {/* Countdown / Notice */}
+                {deadlineMs && (
+                    <div className="mt-3">
+                        {!isClosed && timeLeft ? (
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-sky-200 bg-sky-50 text-sky-800 text-sm">
+                                <IconClock className="h-4 w-4" />
+                                <span>Tiempo para confirmar:</span>
+                                <span className="font-medium tabular-nums">
+                                    {timeLeft.days}d {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m {String(timeLeft.seconds).padStart(2, '0')}s
+                                </span>
+                            </div>
+                        ) : (
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-rose-200 bg-rose-50 text-rose-700 text-sm">
+                                <IconX className="h-4 w-4" />
+                                <span>Ya no se puede confirmar: el tiempo ha finalizado.</span>
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 {/* Controles opcionales */}
                 <div className="mt-4 grid grid-cols-1 gap-3 sm:flex sm:flex-row sm:items-center sm:justify-between">
                     {/* Filters */}
@@ -301,7 +360,7 @@ export default function SolicitudManager({
                             <div className="flex flex-row gap-2 flex-wrap">
                                 <button
                                     type="button"
-                                    disabled={saving === "all" || guests.length === 0}
+                                    disabled={saving === "all" || guests.length === 0 || isClosed}
                                     onClick={() => updateAllGuestsStatus("confirmed")}
                                     className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm border border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 active:scale-[0.98] disabled:opacity-50 whitespace-nowrap"
                                 >
@@ -309,7 +368,7 @@ export default function SolicitudManager({
                                 </button>
                                 <button
                                     type="button"
-                                    disabled={saving === "all" || guests.length === 0}
+                                    disabled={saving === "all" || guests.length === 0 || isClosed}
                                     onClick={() => updateAllGuestsStatus("declined")}
                                     className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm border border-rose-300 text-rose-700 bg-rose-50 hover:bg-rose-100 active:scale-[0.98] disabled:opacity-50 whitespace-nowrap"
                                 >
@@ -359,7 +418,7 @@ export default function SolicitudManager({
                                     return (
                                         <button
                                             key={st}
-                                            disabled={saving === guest.id}
+                                            disabled={saving === guest.id || isClosed}
                                             onClick={() => updateGuestStatus(guest.id, st)}
                                             aria-pressed={selected}
                                             className={`${base} ${variants[st]}`}

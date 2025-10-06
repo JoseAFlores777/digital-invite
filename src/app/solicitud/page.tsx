@@ -1,11 +1,12 @@
-"use client";
-
 import React from "react";
 import SolicitudManager from "@/components/SolicitudManager";
 
-export default function SolicitudPage() {
-  const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
-  const solicitudId = params.get("solicitudId") || params.get("invitationID");
+export default function SolicitudPage({
+  searchParams,
+}: {
+  searchParams: { solicitudId?: string; invitationID?: string };
+}) {
+  const solicitudId = searchParams?.solicitudId || searchParams?.invitationID || null;
 
   if (!solicitudId) {
     return (
