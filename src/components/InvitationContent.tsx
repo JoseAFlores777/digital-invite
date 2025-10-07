@@ -122,17 +122,17 @@ export default function InvitationContent() {
 
 
       {/*/!* 3. Nuestra historia *!/*/}
-      <StoryBeats />
+      {/*<StoryBeats />*/}
       {/*/!* 4. Detalles principales *!/*/}
       <MainDetails />
       {/*/!* 5. Programa *!/*/}
       <Itinerary />
       {/*/!* 6. Dress code *!/*/}
-      <DressCode />
+      {/*<DressCode />*/}
       {/*/!* 7. RSVP *!/*/}
       <RSVP />
       {/*/!* 8. Alojamientos / Transporte *!/*/}
-      <Lodging />
+      {/*<Lodging />*/}
       {/*/!* 9. Regalo *!/*/}
       <Gift />
       {/*/!* 10. Álbum / QR *!/*/}

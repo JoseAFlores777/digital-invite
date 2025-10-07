@@ -8,6 +8,7 @@ import {
     GuestStatus,
     fetchWeddingGeneralities,
 } from "@/lib/api/solicitudes";
+import toast, { Toaster } from "react-hot-toast";
 
 export type SolicitudManagerProps = {
     solicitudId: string;
@@ -30,6 +31,11 @@ const statusLabel: Record<GuestStatus, string> = {
     accepted: "Confirmar",
     unknown: "Pendiente",
     declined: "Rechazar",
+};
+const statusLabelPast: Record<GuestStatus, string> = {
+    accepted: "Confirmado",
+    unknown: "Pendiente",
+    declined: "Rechazado",
 };
 
 const STATUS_ORDER: GuestStatus[] = ["unknown", "accepted", "declined"];
@@ -219,8 +225,11 @@ export default function SolicitudManager({
         setGuests((curr) => curr.map((g) => (g.id === guestId ? { ...g, status } : g)));
         try {
             await patchGuestStatus(guestId, status);
+            const msg = status === "accepted" ? "Confirmado" : status === "declined" ? "Rechazado" : "Pendiente";
+            toast.success(`${msg}`);
         } catch {
             setGuests((curr) => curr.map((g) => (g.id === guestId ? { ...g, status: prev } : g)));
+            toast.error("No se pudo guardar el cambio de estado");
         } finally {
             setSaving(null);
         }
@@ -233,6 +242,10 @@ export default function SolicitudManager({
         try {
             const ids = guests.map((g) => g.id);
             await Promise.all(ids.map((id) => patchGuestStatus(id, status)));
+            const msg = status === "accepted" ? "Confirmados" : "Rechazados";
+            toast.success(`${ids.length} ${msg}`);
+        } catch {
+            toast.error("No se pudieron guardar los cambios masivos");
         } finally {
             setSaving(null);
         }
@@ -428,13 +441,13 @@ export default function SolicitudManager({
                                             onClick={() => updateGuestStatus(guest.id, st)}
                                             aria-pressed={selected}
                                             className={`${base} ${variants[st]}`}
-                                            title={statusLabel[st]}
+                                            title={(selected ? statusLabelPast[st] : statusLabel[st])}
                                         >
                                             {st === "accepted" && <IconCheck className="h-4 w-4" />}
                                             {st === "unknown" && <IconClock className="h-4 w-4" />}
                                             {st === "declined" && <IconX className="h-4 w-4" />}
-                                            <span className="hidden xs:inline">{statusLabel[st]}</span>
-                                            <span className="inline xs:hidden">{statusLabel[st].charAt(0)}</span>
+                                            <span className="hidden xs:inline">{selected ? statusLabelPast[st] : statusLabel[st]}</span>
+                                            <span className="inline xs:hidden">{(selected ? statusLabelPast[st] : statusLabel[st]).charAt(0)}</span>
                                         </button>
                                     );
                                 })}
@@ -510,14 +523,20 @@ export default function SolicitudManager({
                         ×
                     </button>
                 </div>
-                <div className="max-h-[calc(85vh-0px)] overflow-y-auto overscroll-contain px-4 sm:px-6 md:px-8 py-3">{card}</div>
+                <div className="max-h-[calc(85vh-0px)] overflow-y-auto overscroll-contain px-4 sm:px-6 md:px-8 py-3">
+                    <Toaster position="top-right" />
+                    {card}
+                </div>
             </Modal>
         );
     }
 
     return (
-        <div className="min-h-screen bg-slate-50/60 flex items-center justify-center p-3 sm:p-6">
-            {card}
-        </div>
+        <>
+            <Toaster position="top-right" />
+            <div className="min-h-screen bg-slate-50/60 flex items-center justify-center p-3 sm:p-6">
+                {card}
+            </div>
+        </>
     );
 }
