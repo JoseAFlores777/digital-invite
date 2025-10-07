@@ -1,4 +1,11 @@
 export type GuestStatus = "unknown" | "accepted" | "declined";
+export type InvitationStatus =
+  | "draft"
+  | "sent"
+  | "bounced"
+  | "accepted_all"
+  | "accepted_partial"
+  | "declined_all";
 
 export async function fetchInvitationById(id: string) {
   const res = await fetch(`/api/invitation-by-id?id=${encodeURIComponent(id)}`);
@@ -27,5 +34,15 @@ export async function fetchWeddingGeneralities(weddingId: string) {
   if (weddingId) params.set("wedding_id", weddingId);
   const res = await fetch(`/api/wedding-generalities?${params.toString()}`);
   if (!res.ok) throw new Error("failed_to_fetch_wedding");
+  return await res.json();
+}
+
+export async function patchInvitationStatus(invitationId: string, status: InvitationStatus) {
+  const res = await fetch("/api/invitation-status", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ invitationId, status }),
+  });
+  if (!res.ok) throw new Error("failed_to_update_invitation_status");
   return await res.json();
 }

@@ -145,16 +145,16 @@ export default function Home() {
     if (inviteError) return; // skip if invalid
     let active = true;
     const weddingId = process.env.NEXT_PUBLIC_WEDDING_ID;
-    const invitationsUrl = weddingId
-      ? `/api/wedding-invitations?wedding_id=${encodeURIComponent(weddingId)}`
-      : "/api/wedding-invitations";
+    // const invitationsUrl = weddingId
+    //   ? `/api/wedding-invitations?wedding_id=${encodeURIComponent(weddingId)}`
+    //   : "/api/wedding-invitations";
     const weddingUrl = weddingId
       ? `/api/wedding-generalities?wedding_id=${encodeURIComponent(weddingId)}`
       : "/api/wedding-generalities";
 
     Promise.all([
       fetch("/api/digital-guests").then((r) => r.json()).catch(() => ({ guests: [] })),
-      fetch(invitationsUrl).then((r) => r.json()).catch(() => ({ invitations: [] })),
+     // fetch(invitationsUrl).then((r) => r.json()).catch(() => ({ invitations: [] })),
       fetch(weddingUrl).then((r) => r.json()).catch(() => ({ wedding: null })),
     ])
       .then(([guestsRes, invitationsRes, weddingRes]) => {

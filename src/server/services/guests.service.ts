@@ -33,7 +33,6 @@ export async function getDigitalGuests(): Promise<Guests[]> {
         timeout(8000),
         retry(2),
         map((items: any[]): Guests[] => {
-            console.log('items', items)
             return items
         }),
         catchError(() => of<Guests[]>([]))

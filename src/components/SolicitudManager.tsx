@@ -7,6 +7,8 @@ import {
     patchGuestStatus,
     GuestStatus,
     fetchWeddingGeneralities,
+    patchInvitationStatus,
+    InvitationStatus,
 } from "@/lib/api/solicitudes";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -18,6 +20,7 @@ export type SolicitudManagerProps = {
     showFilters?: boolean;
     showSearch?: boolean;
     showBulkActions?: boolean;
+    onChanged?: () => void;
 };
 
 type UiGuest = {
@@ -87,12 +90,20 @@ export default function SolicitudManager({
     showFilters = false,
     showSearch = false,
     showBulkActions = true,
+    onChanged,
 }: SolicitudManagerProps) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [title, setTitle] = useState<string>("Invitación");
     const [dateTime, setDateTime] = useState<string>("");
     const [location, setLocation] = useState<string>("");
+    const [eventDateStr, setEventDateStr] = useState<string>("");
+    const [eventStartTimeStr, setEventStartTimeStr] = useState<string>("");
+    const [eventEndTimeStr, setEventEndTimeStr] = useState<string>("");
+    const [eventTz, setEventTz] = useState<string>("");
+    const [eventLat, setEventLat] = useState<number | null>(null);
+    const [eventLng, setEventLng] = useState<number | null>(null);
+    const [coupleName, setCoupleName] = useState<string>("");
     const [weddingId, setWeddingId] = useState<string | null>(null);
     const [guests, setGuests] = useState<UiGuest[]>([]);
     const [saving, setSaving] = useState<string | null>(null); // guestId | "all" | null
@@ -142,12 +153,47 @@ export default function SolicitudManager({
                     try {
                         const wg = await fetchWeddingGeneralities(wId);
                         const date = wg?.wedding?.date || null;
-                        const time = wg?.wedding?.start_time || null;
+                        const start_time = wg?.wedding?.start_time || null;
+                        const end_time = wg?.wedding?.end_time || null;
                         const tz = wg?.wedding?.timezone || null;
+                        const couple = wg?.wedding?.couple?.name || "";
                         const locName = wg?.location?.venue_name || "";
                         const locAddr = wg?.location?.address || "";
-                        const dt = [date, time].filter(Boolean).join(" • ");
-                        setDateTime(dt + (tz ? ` (${tz})` : ""));
+                        const lat = Number(wg?.location?.latitude);
+                        const lng = Number(wg?.location?.longitude);
+
+                        // Save raw for ICS
+                        setEventDateStr(date || "");
+                        setEventStartTimeStr(typeof start_time === "string" ? start_time : "");
+                        setEventEndTimeStr(typeof end_time === "string" ? end_time : "");
+                        setEventTz(typeof tz === "string" ? tz : "");
+                        setCoupleName(typeof couple === "string" ? couple : "");
+                        setEventLat(Number.isFinite(lat) ? lat : null);
+                        setEventLng(Number.isFinite(lng) ? lng : null);
+
+                        // Format date/time in Spanish: "13 de diciembre del 2025 a las 3:00 p. m."
+                        try {
+                            if (date) {
+                                const timePart = typeof start_time === "string" && start_time ? start_time : "00:00:00";
+                                const [h, m] = timePart.split(":");
+                                const d = new Date();
+                                const [yy, mm, dd] = String(date).split("-").map(Number);
+                                d.setFullYear(yy || d.getFullYear());
+                                d.setMonth((mm || 1) - 1);
+                                d.setDate(dd || d.getDate());
+                                d.setHours(Number(h || 0), Number(m || 0), 0, 0);
+                                const fmtDate = d.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+                                const hour12 = d.toLocaleTimeString("es-ES", { hour: "numeric", minute: "2-digit", hour12: true }).toLowerCase();
+                                // Ensure "p. m." spacing
+                                const hourPretty = hour12.replace("am", "a. m.").replace("a. m.", "a. m.").replace("pm", "p. m.").replace("p. m.", "p. m.");
+                                setDateTime(`${fmtDate} a las ${hourPretty}`);
+                            } else {
+                                setDateTime("");
+                            }
+                        } catch {
+                            const dt = [date, time].filter(Boolean).join(" • ");
+                            setDateTime(dt + (tz ? ` (${tz})` : ""));
+                        }
                         setLocation([locName, locAddr].filter(Boolean).join(", "));
 
                         // Compute RSVP deadline: 3 weeks before event date/time
@@ -217,16 +263,46 @@ export default function SolicitudManager({
         return [...arr].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
     }, [guests, filter, query]);
 
+    function computeAggregateStatus(list: UiGuest[]): InvitationStatus | null {
+        const total = list.length;
+        if (total === 0) return null;
+        let acc = 0, dec = 0, unk = 0;
+        for (const g of list) {
+            if (g.status === "accepted") acc++;
+            else if (g.status === "declined") dec++;
+            else unk++;
+        }
+        if (acc === total) return "accepted_all";
+        if (dec === total) return "declined_all";
+        if (acc > 0) return "accepted_partial";
+        if (unk > 0) return "sent";
+        return null;
+    }
+
+    async function maybePatchInvitationStatus(nextGuests: UiGuest[]) {
+        const agg = computeAggregateStatus(nextGuests);
+        if (!agg) return;
+        try {
+            await patchInvitationStatus(solicitudId, agg);
+        } catch (e) {
+            // non-blocking; keep silent to avoid noise
+            console.warn("Failed to auto-update invitation status", e);
+        }
+    }
+
     const updateGuestStatus = async (guestId: string, status: GuestStatus) => {
         if (isClosed) return;
         const prev = guests.find((g) => g.id === guestId)?.status ?? "unknown";
         if (prev === status) return;
         setSaving(guestId);
-        setGuests((curr) => curr.map((g) => (g.id === guestId ? { ...g, status } : g)));
+        const optimistic = guests.map((g) => (g.id === guestId ? { ...g, status } : g));
+        setGuests(optimistic);
         try {
             await patchGuestStatus(guestId, status);
             const msg = status === "accepted" ? "Confirmado" : status === "declined" ? "Rechazado" : "Pendiente";
             toast.success(`${msg}`);
+            await maybePatchInvitationStatus(optimistic);
+            try { onChanged && onChanged(); } catch {}
         } catch {
             setGuests((curr) => curr.map((g) => (g.id === guestId ? { ...g, status: prev } : g)));
             toast.error("No se pudo guardar el cambio de estado");
@@ -238,12 +314,15 @@ export default function SolicitudManager({
     const updateAllGuestsStatus = async (status: Exclude<GuestStatus, "unknown">) => {
         if (isClosed) return;
         setSaving("all");
-        setGuests((curr) => curr.map((g) => ({ ...g, status })));
+        const optimistic = guests.map((g) => ({ ...g, status }));
+        setGuests(optimistic);
         try {
             const ids = guests.map((g) => g.id);
             await Promise.all(ids.map((id) => patchGuestStatus(id, status)));
             const msg = status === "accepted" ? "Confirmados" : "Rechazados";
             toast.success(`${ids.length} ${msg}`);
+            await maybePatchInvitationStatus(optimistic);
+            try { onChanged && onChanged(); } catch {}
         } catch {
             toast.error("No se pudieron guardar los cambios masivos");
         } finally {
@@ -257,7 +336,7 @@ export default function SolicitudManager({
             onClick={() => setFilter(value)}
             aria-pressed={filter === value}
             className={`px-3 py-1.5 rounded-full border text-sm transition-all select-none
-        ${filter === value ? "bg-blue-600 text-white border-blue-600 shadow" : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"}`}
+        ${filter === value ? " bg-sky-50 text-sky-800 border-sky-200 shadow" : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"}`}
         >
       <span className="inline-flex items-center gap-2">
         <span>{label}</span>
@@ -305,30 +384,104 @@ export default function SolicitudManager({
     </span>
     );
 
+    function normalizeTz(tz: string): string {
+        const t = (tz || "").trim();
+        if (!t) return t;
+        // Common mapping for provided data
+        if (t.toUpperCase() === "GTM-6" || t.toUpperCase() === "GMT-6" || t === "UTC-6") return "America/Tegucigalpa";
+        return t;
+    }
+
+    function icsEscape(input: string): string {
+        // Escape commas, semicolons, and backslashes per RFC 5545
+        return input.replace(/\\/g, "\\\\").replace(/,/g, "\\,").replace(/;/g, "\\;").replace(/\r?\n/g, "\\n");
+    }
+
+    function handleDownloadIcs() {
+        try {
+            if (!eventDateStr) return;
+            const startPart = eventStartTimeStr || "00:00:00";
+            const endPart = eventEndTimeStr || "";
+            const [sh, sm] = startPart.split(":");
+            const [yy, mm, dd] = String(eventDateStr).split("-").map(Number);
+            const pad = (n: number) => String(n).padStart(2, "0");
+
+            const DTSTART_LOCAL = `${yy}${pad(mm)}${pad(dd)}T${pad(Number(sh || 0))}${pad(Number(sm || 0))}00`;
+
+            let DTEND_LOCAL = "";
+            if (endPart) {
+                const [eh, em] = endPart.split(":");
+                DTEND_LOCAL = `${yy}${pad(mm)}${pad(dd)}T${pad(Number(eh || 0))}${pad(Number(em || 0))}00`;
+            }
+
+            const tzid = normalizeTz(eventTz);
+            const lines = [
+                "BEGIN:VCALENDAR",
+                "VERSION:2.0",
+                "PRODID:-//digital-invite//SolicitudManager//ES",
+                "CALSCALE:GREGORIAN",
+                "METHOD:PUBLISH",
+                "BEGIN:VEVENT",
+                tzid ? `DTSTART;TZID=${tzid}:${DTSTART_LOCAL}` : `DTSTART:${DTSTART_LOCAL}`,
+                (DTEND_LOCAL && tzid) ? `DTEND;TZID=${tzid}:${DTEND_LOCAL}` : (DTEND_LOCAL ? `DTEND:${DTEND_LOCAL}` : ""),
+                `DTSTAMP:${(() => { const d=new Date(); return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`; })()}`,
+                `UID:${solicitudId}-${Date.now()}@digital-invite`,
+                `SUMMARY:${icsEscape(`Boda ${coupleName || ""}`.trim() || "Boda")}`,
+                location ? `LOCATION:${icsEscape(location)}` : "",
+                (eventLat != null && eventLng != null) ? `GEO:${String(eventLat)};${String(eventLng)}` : "",
+                "END:VEVENT",
+                "END:VCALENDAR",
+            ].filter(Boolean);
+            const blob = new Blob([lines.join("\r\n")], { type: "text/calendar;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            const safeName = (coupleName ? `Boda ${coupleName}` : "Boda").replace(/[\/:*?"<>|]+/g, "-");
+            a.download = `${safeName}.ics`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+                a.remove();
+            }, 0);
+        } catch {}
+    }
+
     const card = (
         <div className={`w-full max-w-full sm:max-w-2xl md:max-w-4xl ${asModal ? "" : "shadow-xl border border-slate-200 rounded-2xl bg-white"}`}>
             {/* Header */}
-            <div className="px-4 sm:px-6 md:px-8 pt-6 pb-4 border-b border-slate-200">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
+            <div className="px-4 sm:px-6 md:px-8 pt-6 pb-4">
+                <div className="flex flex-col gap-2">
+                    <div className="min-w-0 flex items-center gap-3">
                         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-800 break-words">{title}</h2>
-                        {(dateTime || location) && (
-                            <div className="mt-2 text-sm md:text-[15px] text-slate-600 space-y-1.5">
+                        <button
+                            type="button"
+                            onClick={handleDownloadIcs}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-sm"
+                            title="Añadir al calendario"
+                        >
+                            <IconCalendar className="h-4 w-4" />
+                            <span className="hidden sm:inline">Añadir al calendario</span>
+                        </button>
+                    </div>
+                    {(dateTime || location) && (
+                        <div className="mt-1 text-sm md:text-[15px] text-slate-600">
+                            <div className="flex flex-wrap items-center gap-3">
                                 {dateTime && (
-                                    <div className="inline-flex items-center gap-2">
+                                    <span className="inline-flex items-center gap-2">
                                         <IconCalendar className="h-4 w-4" />
-                                        <span>{dateTime}</span>
-                                    </div>
+                                        <span className="truncate">{dateTime}</span>
+                                    </span>
                                 )}
                                 {location && (
-                                    <div className="inline-flex items-center gap-2 block">
+                                    <span className="inline-flex items-center gap-2">
                                         <IconPin className="h-4 w-4" />
-                                        <span>{location}</span>
-                                    </div>
+                                        <span className="truncate">{location}</span>
+                                    </span>
                                 )}
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Countdown / Notice */}
@@ -352,36 +505,26 @@ export default function SolicitudManager({
                 )}
 
                 {/* Controles opcionales */}
-                <div className="mt-4 grid grid-cols-1 gap-3 sm:flex sm:flex-row sm:items-center sm:justify-between">
-                    {/* Filters */}
-                    {showFilters && (
-                        <div className="flex flex-wrap items-center gap-2 order-1">
-                            <FilterPill value="all" label="Todos" count={counts.total} />
-                            <FilterPill value="unknown" label="Pendientes" count={counts.unknown} />
-                            <FilterPill value="accepted" label="Confirmados" count={counts.accepted} />
-                            <FilterPill value="declined" label="Rechazados" count={counts.declined} />
-                        </div>
+                <div className="mt-4 grid gap-3 md:grid-cols-3">
+                    {/* Search */}
+                    {showSearch && (
+                        <input
+                            type="search"
+                            placeholder="Buscar por nombre"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            className="border border-slate-300 rounded-lg px-3 py-2 bg-white md:col-span-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                            aria-label="Buscar invitados"
+                        />
                     )}
-
-                    {/* Search and bulk actions */}
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center order-2 sm:order-2">
-                        {showSearch && (
-                            <input
-                                type="search"
-                                placeholder="Buscar por nombre o email…"
-                                value={query}
-                                onChange={(e) => setQuery(e.target.value)}
-                                className="w-full sm:w-[min(300px,60vw)] rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400"
-                                aria-label="Buscar invitados"
-                            />
-                        )}
-                        {!asModal && showBulkActions && (
-                            <div className="flex flex-row gap-2 flex-wrap">
-                                <button
-                                    type="button"
-                                    disabled={saving === "all" || guests.length === 0 || isClosed}
-                                    onClick={() => updateAllGuestsStatus("accepted") }
-                                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm border border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 active:scale-[0.98] disabled:opacity-50 whitespace-nowrap"
+                    {/* Bulk actions */}
+                    {!asModal && showBulkActions && (
+                        <div className="flex flex-row gap-2 flex-wrap">
+                            <button
+                                type="button"
+                                disabled={saving === "all" || guests.length === 0 || isClosed}
+                                onClick={() => updateAllGuestsStatus("accepted") }
+                                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm border border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 active:scale-[0.98] disabled:opacity-50 whitespace-nowrap"
                                 >
                                     <IconCheck className="h-4 w-4" /> Confirmar todos
                                 </button>
@@ -396,8 +539,16 @@ export default function SolicitudManager({
                             </div>
                         )}
                     </div>
+                {showFilters && (
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <FilterPill value="all" label="Todos" count={counts.total} />
+                        <FilterPill value="unknown" label="Pendientes" count={counts.unknown} />
+                        <FilterPill value="accepted" label="Confirmados" count={counts.accepted} />
+                        <FilterPill value="declined" label="Rechazados" count={counts.declined} />
+                    </div>
+                )}
                 </div>
-            </div>
+            <div className="border-b border-slate-200"></div>
 
             {/* Lista */}
             <div className="px-4 sm:px-6 md:px-8 py-5">

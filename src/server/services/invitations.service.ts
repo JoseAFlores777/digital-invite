@@ -22,6 +22,7 @@ export async function getInvitationById(invitationId: string): Promise<Invitatio
     "wedding",
     "guests.guest.person.first_name",
     "guests.guest.person.last_name",
+    "guests.guest.person.WhatsApp",
     "guests.guest.invitation_status",
     "guests.guest.id",
     "guests.guest.rsvp_at",
@@ -70,6 +71,7 @@ export async function getWeddingInvitations(weddingId: string): Promise<Invitati
     "guests.guest.id",
     "guests.guest.rsvp_at",
     "guests.guest.rsvp_status",
+    "guests.guest.group",
   );
 
   const source$ = defer(() =>
