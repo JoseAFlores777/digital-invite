@@ -538,6 +538,7 @@ export type Invitations = {
     invite_type?: string | null;
     notes?: string | null;
     public_link?: string | null;
+    rsvp_deadline?: string | null;
     sent_at?: string | null;
     status?: string | null;
     wedding?: (string & Weddings) | null;
@@ -769,6 +770,8 @@ export type Venues = {
     id: string;
     latitude?: number | null;
     longitude?: number | null;
+    waze_link?: string | null;
+    google_maps_link?: string | null;
     name?: string | null;
     notes?: string | null;
     type?: string | null;

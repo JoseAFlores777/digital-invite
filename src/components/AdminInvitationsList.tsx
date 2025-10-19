@@ -39,6 +39,17 @@ export default function AdminInvitationsList() {
   const cardRef = useRef<HTMLDivElement>(null);
   const [listShouldScroll, setListShouldScroll] = useState(false);
 
+  // Origen para construir URL de confirmación
+  const [origin, setOrigin] = useState("");
+  const [copiedUrl, setCopiedUrl] = useState(false);
+  useEffect(() => {
+    try {
+      if (typeof window !== "undefined") {
+        setOrigin(window.location.origin);
+      }
+    } catch {}
+  }, []);
+
   useEffect(() => {
     let active = true;
     setLoading(true);
@@ -494,6 +505,7 @@ export default function AdminInvitationsList() {
           showSearch
           showBulkActions
           onChanged={reloadInvitations}
+          adminMode
         />
       )}
 
@@ -556,6 +568,27 @@ export default function AdminInvitationsList() {
                     <option value="accepted_partial">Parcial</option>
                     <option value="declined_all">Rechazada</option>
                   </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-slate-600 mb-1">Direccion URL</label>
+                  <div className="flex gap-2">
+                    <input
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 bg-white"
+                      readOnly
+                      value={`${origin}/solicitud?invitationID=${sendInviteFor || ""}`}
+                    />
+                    <button
+                      type="button"
+                      className="px-3 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50"
+                      onClick={() => {
+                        try {
+                          const val = `${origin}/solicitud?invitationID=${sendInviteFor || ""}`;
+                          navigator.clipboard.writeText(val).then(() => setCopiedUrl(true)).catch(() => setCopiedUrl(false));
+                          setTimeout(() => setCopiedUrl(false), 1500);
+                        } catch {}
+                      }}
+                    >{copiedUrl ? "Copiado" : "Copiar"}</button>
+                  </div>
                 </div>
                 <div className="pt-2 flex items-center justify-between">
                   <div className="text-sm text-slate-600">El botón abrirá WhatsApp con el texto prellenado.</div>

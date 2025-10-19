@@ -1,12 +1,13 @@
 import React from "react";
 import SolicitudManager from "@/components/SolicitudManager";
 
-export default function SolicitudPage({
+export default async function SolicitudPage({
   searchParams,
 }: {
-  searchParams: { solicitudId?: string; invitationID?: string };
+  searchParams: Promise<{ solicitudId?: string; invitationID?: string }>;
 }) {
-  const solicitudId = searchParams?.solicitudId || searchParams?.invitationID || null;
+  const params = await searchParams;
+  const solicitudId = params?.solicitudId || params?.invitationID || null;
 
   if (!solicitudId) {
     return (

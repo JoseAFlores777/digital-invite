@@ -9,6 +9,7 @@ import {
     fetchWeddingGeneralities,
     patchInvitationStatus,
     InvitationStatus,
+    patchInvitationDeadline,
 } from "@/lib/api/solicitudes";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -21,6 +22,7 @@ export type SolicitudManagerProps = {
     showSearch?: boolean;
     showBulkActions?: boolean;
     onChanged?: () => void;
+    adminMode?: boolean;
 };
 
 type UiGuest = {
@@ -91,6 +93,7 @@ export default function SolicitudManager({
     showSearch = false,
     showBulkActions = true,
     onChanged,
+    adminMode = false,
 }: SolicitudManagerProps) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -103,6 +106,8 @@ export default function SolicitudManager({
     const [eventTz, setEventTz] = useState<string>("");
     const [eventLat, setEventLat] = useState<number | null>(null);
     const [eventLng, setEventLng] = useState<number | null>(null);
+    const [eventWazeLink, setEventWazeLink] = useState<string>("");
+    const [eventGoogleMapsLink, setEventGoogleMapsLink] = useState<string>("");
     const [coupleName, setCoupleName] = useState<string>("");
     const [weddingId, setWeddingId] = useState<string | null>(null);
     const [guests, setGuests] = useState<UiGuest[]>([]);
@@ -112,6 +117,9 @@ export default function SolicitudManager({
     const [reloadKey, setReloadKey] = useState(0);
     const [deadlineMs, setDeadlineMs] = useState<number | null>(null);
     const [nowMs, setNowMs] = useState<number>(Date.now());
+    const [deadlineIso, setDeadlineIso] = useState<string | null>(null);
+    const [editedDeadlineLocal, setEditedDeadlineLocal] = useState<string>("");
+    const [savingDeadline, setSavingDeadline] = useState(false);
 
     useEffect(() => {
         let active = true;
@@ -149,6 +157,26 @@ export default function SolicitudManager({
                 const wId = inv?.wedding || null;
                 setWeddingId(wId);
 
+                // Prefer RSVP deadline from invitation if provided (ISO datetime)
+                try {
+                    const invDeadline: unknown = inv?.rsvp_deadline;
+                    if (typeof invDeadline === "string" && invDeadline) {
+                        const ms = Date.parse(invDeadline);
+                        if (!Number.isNaN(ms)) {
+                            setDeadlineMs(ms);
+                            setDeadlineIso(invDeadline);
+                            // format to yyyy-MM-ddTHH:mm in local time
+                            const d = new Date(invDeadline);
+                            const pad = (n: number) => String(n).padStart(2, "0");
+                            const local = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                            setEditedDeadlineLocal(local);
+                        }
+                    } else {
+                        setDeadlineIso(null);
+                        setEditedDeadlineLocal("");
+                    }
+                } catch {}
+
                 if (wId) {
                     try {
                         const wg = await fetchWeddingGeneralities(wId);
@@ -161,6 +189,8 @@ export default function SolicitudManager({
                         const locAddr = wg?.location?.address || "";
                         const lat = Number(wg?.location?.latitude);
                         const lng = Number(wg?.location?.longitude);
+                        const waze = wg?.location?.waze_link || "";
+                        const gmaps = wg?.location?.google_maps_link || "";
 
                         // Save raw for ICS
                         setEventDateStr(date || "");
@@ -170,6 +200,8 @@ export default function SolicitudManager({
                         setCoupleName(typeof couple === "string" ? couple : "");
                         setEventLat(Number.isFinite(lat) ? lat : null);
                         setEventLng(Number.isFinite(lng) ? lng : null);
+                        setEventWazeLink(typeof waze === "string" ? waze : "");
+                        setEventGoogleMapsLink(typeof gmaps === "string" ? gmaps : "");
 
                         // Format date/time in Spanish: "13 de diciembre del 2025 a las 3:00 p. m."
                         try {
@@ -191,23 +223,11 @@ export default function SolicitudManager({
                                 setDateTime("");
                             }
                         } catch {
-                            const dt = [date, time].filter(Boolean).join(" • ");
+                            const dt = [date, start_time].filter(Boolean).join(" • ");
                             setDateTime(dt + (tz ? ` (${tz})` : ""));
                         }
                         setLocation([locName, locAddr].filter(Boolean).join(", "));
 
-                        // Compute RSVP deadline: 3 weeks before event date/time
-                        try {
-                            if (date) {
-                                const timePart = typeof time === "string" && time ? time : "00:00:00";
-                                const iso = `${date}T${timePart}`; // local time parsing
-                                const eventMs = Date.parse(iso);
-                                if (!Number.isNaN(eventMs)) {
-                                    const threeWeeksMs = 21 * 24 * 60 * 60 * 1000;
-                                    setDeadlineMs(eventMs - threeWeeksMs);
-                                }
-                            }
-                        } catch {}
                     } catch {}
                 }
             })
@@ -240,6 +260,8 @@ export default function SolicitudManager({
         if (!deadlineMs) return false;
         return nowMs >= deadlineMs;
     }, [deadlineMs, nowMs]);
+
+    const canEdit = useMemo(() => adminMode || !isClosed, [adminMode, isClosed]);
 
     const counts = useMemo(() => {
         return guests.reduce(
@@ -291,7 +313,7 @@ export default function SolicitudManager({
     }
 
     const updateGuestStatus = async (guestId: string, status: GuestStatus) => {
-        if (isClosed) return;
+        if (!canEdit) return;
         const prev = guests.find((g) => g.id === guestId)?.status ?? "unknown";
         if (prev === status) return;
         setSaving(guestId);
@@ -312,7 +334,7 @@ export default function SolicitudManager({
     };
 
     const updateAllGuestsStatus = async (status: Exclude<GuestStatus, "unknown">) => {
-        if (isClosed) return;
+        if (!canEdit) return;
         setSaving("all");
         const optimistic = guests.map((g) => ({ ...g, status }));
         setGuests(optimistic);
@@ -333,9 +355,10 @@ export default function SolicitudManager({
     const FilterPill = ({ value, label, count }: { value: FilterTab; label: string; count?: number }) => (
         <button
             type="button"
-            onClick={() => setFilter(value)}
+            disabled={!canEdit}
+            onClick={() => { if (canEdit) setFilter(value); }}
             aria-pressed={filter === value}
-            className={`px-3 py-1.5 rounded-full border text-sm transition-all select-none
+            className={`px-3 py-1.5 rounded-full border text-sm transition-all select-none disabled:opacity-50
         ${filter === value ? " bg-sky-50 text-sky-800 border-sky-200 shadow" : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"}`}
         >
       <span className="inline-flex items-center gap-2">
@@ -415,6 +438,27 @@ export default function SolicitudManager({
             }
 
             const tzid = normalizeTz(eventTz);
+            const hasWaze = !!eventWazeLink;
+            const hasGmaps = !!eventGoogleMapsLink;
+            // Build confirmation URL for ICS URL property: `${origin}/solicitud?invitationID=${solicitudId}`
+            let confirmUrl = "";
+            try {
+                if (typeof window !== "undefined") {
+                    confirmUrl = `${window.location.origin}/solicitud?invitationID=${solicitudId}`;
+                }
+            } catch {}
+            const urlLine = confirmUrl ? `URL:${confirmUrl}` : "";
+            let descriptionText = "";
+            if (hasWaze && hasGmaps) {
+                descriptionText = `Maneja con Waze -> ${eventWazeLink}\nAbrir en Google Maps -> ${eventGoogleMapsLink}`;
+            } else if (hasWaze) {
+                descriptionText = `Maneja con Waze -> ${eventWazeLink}`;
+            } else if (hasGmaps) {
+                descriptionText = `Abrir en Google Maps -> ${eventGoogleMapsLink}`;
+            } else if (location) {
+                descriptionText = `Ubicación: ${location}`;
+            }
+
             const lines = [
                 "BEGIN:VCALENDAR",
                 "VERSION:2.0",
@@ -428,7 +472,8 @@ export default function SolicitudManager({
                 `UID:${solicitudId}-${Date.now()}@digital-invite`,
                 `SUMMARY:${icsEscape(`Boda ${coupleName || ""}`.trim() || "Boda")}`,
                 location ? `LOCATION:${icsEscape(location)}` : "",
-                (eventLat != null && eventLng != null) ? `GEO:${String(eventLat)};${String(eventLng)}` : "",
+                urlLine,
+                descriptionText ? `DESCRIPTION:${icsEscape(descriptionText)}` : "",
                 "END:VEVENT",
                 "END:VCALENDAR",
             ].filter(Boolean);
@@ -454,29 +499,20 @@ export default function SolicitudManager({
                 <div className="flex flex-col gap-2">
                     <div className="min-w-0 flex items-center gap-3">
                         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-800 break-words">{title}</h2>
-                        <button
-                            type="button"
-                            onClick={handleDownloadIcs}
-                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-sm"
-                            title="Añadir al calendario"
-                        >
-                            <IconCalendar className="h-4 w-4" />
-                            <span className="hidden sm:inline">Añadir al calendario</span>
-                        </button>
                     </div>
                     {(dateTime || location) && (
                         <div className="mt-1 text-sm md:text-[15px] text-slate-600">
                             <div className="flex flex-wrap items-center gap-3">
                                 {dateTime && (
-                                    <span className="inline-flex items-center gap-2">
-                                        <IconCalendar className="h-4 w-4" />
-                                        <span className="truncate">{dateTime}</span>
+                                    <span className="inline-flex items-center gap-2 min-w-0">
+                                        <IconCalendar className="h-4 w-4 shrink-0" />
+                                        <span className="min-w-0 break-words md:truncate">{dateTime}</span>
                                     </span>
                                 )}
                                 {location && (
-                                    <span className="inline-flex items-center gap-2">
-                                        <IconPin className="h-4 w-4" />
-                                        <span className="truncate">{location}</span>
+                                    <span className="inline-flex items-center gap-2 min-w-0">
+                                        <IconPin className="h-4 w-4 shrink-0" />
+                                        <span className="min-w-0 break-words md:truncate">{location}</span>
                                     </span>
                                 )}
                             </div>
@@ -504,41 +540,78 @@ export default function SolicitudManager({
                     </div>
                 )}
 
-                {/* Controles opcionales */}
-                <div className="mt-4 grid gap-3 md:grid-cols-3">
-                    {/* Search */}
-                    {showSearch && (
+                {/* Toolbar: calendario a la izquierda; acciones masivas a la derecha */}
+                <div className="mt-4 flex items-center gap-2 flex-wrap">
+                    <button
+                        type="button"
+                        disabled={!canEdit}
+                        onClick={handleDownloadIcs}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-sm disabled:opacity-50"
+                        title="Añadir al calendario"
+                    >
+                        <IconCalendar className="h-4 w-4" />
+                        <span className="whitespace-nowrap">Añadir al calendario</span>
+                    </button>
+
+                    {adminMode && (
+                        <div className="inline-flex items-center gap-2 flex-wrap">
+                            <input
+                                type="datetime-local"
+                                className="border border-slate-300 rounded-lg px-2 py-1 text-sm"
+                                value={editedDeadlineLocal}
+                                onChange={(e) => setEditedDeadlineLocal(e.target.value)}
+                                aria-label="Fecha límite RSVP"
+                            />
+                            <button
+                                type="button"
+                                disabled={savingDeadline}
+                                onClick={async () => {
+                                    try {
+                                        setSavingDeadline(true);
+                                        const localStr = editedDeadlineLocal
+                                            ? (editedDeadlineLocal.length === 16
+                                                ? `${editedDeadlineLocal}:00`
+                                                : editedDeadlineLocal)
+                                            : null;
+                                        await patchInvitationDeadline(solicitudId, localStr);
+                                        if (localStr) {
+                                            setDeadlineIso(localStr);
+                                            const ms = Date.parse(localStr);
+                                            if (!Number.isNaN(ms)) setDeadlineMs(ms);
+                                        } else {
+                                            setDeadlineIso(null);
+                                            setDeadlineMs(null);
+                                        }
+                                        toast.success("Fecha límite actualizada");
+                                    } catch {
+                                        toast.error("No se pudo actualizar la fecha límite");
+                                    } finally {
+                                        setSavingDeadline(false);
+                                    }
+                                }}
+                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-sm disabled:opacity-50"
+                            >
+                                Guardar deadline
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Bulk actions moved to the guest list title row */}
+                </div>
+
+                {/* Búsqueda opcional debajo del toolbar */}
+                {showSearch && (
+                    <div className="mt-3">
                         <input
                             type="search"
                             placeholder="Buscar por nombre"
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
-                            className="border border-slate-300 rounded-lg px-3 py-2 bg-white md:col-span-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                            className="w-full border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
                             aria-label="Buscar invitados"
                         />
-                    )}
-                    {/* Bulk actions */}
-                    {!asModal && showBulkActions && (
-                        <div className="flex flex-row gap-2 flex-wrap">
-                            <button
-                                type="button"
-                                disabled={saving === "all" || guests.length === 0 || isClosed}
-                                onClick={() => updateAllGuestsStatus("accepted") }
-                                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm border border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 active:scale-[0.98] disabled:opacity-50 whitespace-nowrap"
-                                >
-                                    <IconCheck className="h-4 w-4" /> Confirmar todos
-                                </button>
-                                <button
-                                    type="button"
-                                    disabled={saving === "all" || guests.length === 0 || isClosed}
-                                    onClick={() => updateAllGuestsStatus("declined")}
-                                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm border border-rose-300 text-rose-700 bg-rose-50 hover:bg-rose-100 active:scale-[0.98] disabled:opacity-50 whitespace-nowrap"
-                                >
-                                    <IconX className="h-4 w-4" /> Rechazar todos
-                                </button>
-                            </div>
-                        )}
                     </div>
+                )}
                 {showFilters && (
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                         <FilterPill value="all" label="Todos" count={counts.total} />
@@ -553,9 +626,31 @@ export default function SolicitudManager({
             {/* Lista */}
             <div className="px-4 sm:px-6 md:px-8 py-5">
                 <div className="mb-3 md:mb-4">
-                    <h3 className="text-base md:text-lg font-semibold text-slate-800 inline-flex items-center gap-2">
-                        Lista de Invitados {attendeesBadge}
-                    </h3>
+                    <div className="flex items-center gap-5 flex-wrap sm:gap-2">
+                        <h3 className="text-base md:text-lg font-semibold text-slate-800 inline-flex items-center gap-2">
+                            Lista de Invitados {attendeesBadge}
+                        </h3>
+                        {(showBulkActions && (adminMode || !asModal)) && (
+                            <div className="ml-auto flex items-center justify-center gap-2 w-full sm:w-auto sm:justify-end">
+                                <button
+                                    type="button"
+                                    disabled={saving === "all" || guests.length === 0 || !canEdit}
+                                    onClick={() => updateAllGuestsStatus("accepted") }
+                                    className="w-full sm:w-auto inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm border border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 active:scale-[0.98] disabled:opacity-50 whitespace-nowrap"
+                                >
+                                    <IconCheck className="h-4 w-4" /> Confirmar todos
+                                </button>
+                                <button
+                                    type="button"
+                                    disabled={saving === "all" || guests.length === 0 || !canEdit}
+                                    onClick={() => updateAllGuestsStatus("declined")}
+                                    className="w-full sm:w-auto inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm border border-rose-300 text-rose-700 bg-rose-50 hover:bg-rose-100 active:scale-[0.98] disabled:opacity-50 whitespace-nowrap"
+                                >
+                                    <IconX className="h-4 w-4" /> Rechazar todos
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="space-y-2 md:space-y-3">
@@ -570,38 +665,63 @@ export default function SolicitudManager({
                             </div>
 
                             <div className="flex flex-wrap items-center gap-2">
-                                {(STATUS_ORDER as GuestStatus[]).map((st) => {
-                                    const selected = guest.status === st;
-                                    const base =
-                                        "px-3 py-1.5 md:py-2 rounded-full text-sm border inline-flex items-center gap-2 transition active:scale-[0.98] focus:outline-none focus:ring-2";
-                                    const variants: Record<GuestStatus, string> = {
-                                        accepted: selected
-                                            ? "bg-emerald-50 text-emerald-700 border-emerald-200 focus:ring-emerald-300"
-                                            : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50",
-                                        unknown: selected
-                                            ? "bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-300"
-                                            : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50",
-                                        declined: selected
-                                            ? "bg-rose-50 text-rose-700 border-rose-200 focus:ring-rose-300"
-                                            : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50",
-                                    };
-                                    return (
-                                        <button
-                                            key={st}
-                                            disabled={saving === guest.id || isClosed}
-                                            onClick={() => updateGuestStatus(guest.id, st)}
-                                            aria-pressed={selected}
-                                            className={`${base} ${variants[st]}`}
-                                            title={(selected ? statusLabelPast[st] : statusLabel[st])}
-                                        >
-                                            {st === "accepted" && <IconCheck className="h-4 w-4" />}
-                                            {st === "unknown" && <IconClock className="h-4 w-4" />}
-                                            {st === "declined" && <IconX className="h-4 w-4" />}
-                                            <span className="hidden xs:inline">{selected ? statusLabelPast[st] : statusLabel[st]}</span>
-                                            <span className="inline xs:hidden">{(selected ? statusLabelPast[st] : statusLabel[st]).charAt(0)}</span>
-                                        </button>
-                                    );
-                                })}
+                                {(isClosed && !adminMode) ? (
+                                    (() => {
+                                        const st = guest.status as GuestStatus;
+                                        const base = "px-3 py-1.5 md:py-2 rounded-full text-sm border inline-flex items-center gap-2";
+                                        const variants: Record<GuestStatus, string> = {
+                                            accepted: "bg-emerald-50 text-emerald-700 border-emerald-200",
+                                            unknown: "bg-blue-50 text-blue-700 border-blue-200",
+                                            declined: "bg-rose-50 text-rose-700 border-rose-200",
+                                        };
+                                        const labelMap: Record<GuestStatus, string> = {
+                                            accepted: "Ha aceptado la invitación",
+                                            declined: "Ha rechazado la invitación",
+                                            unknown: "Ha rechazado la invitación",
+                                        };
+                                        const variantKey: GuestStatus = st === "unknown" ? "declined" : st;
+                                        return (
+                                            <span className={`${base} ${variants[variantKey]}`} aria-label={labelMap[st]}>
+                                                {st === "accepted" && <IconCheck className="h-4 w-4" />}
+                                                {(st === "unknown" || st === "declined") && <IconX className="h-4 w-4" />}
+                                                <span className="whitespace-nowrap">{labelMap[st]}</span>
+                                            </span>
+                                        );
+                                    })()
+                                ) : (
+                                    (STATUS_ORDER as GuestStatus[]).map((st) => {
+                                        const selected = guest.status === st;
+                                        const base =
+                                            "px-3 py-1.5 md:py-2 rounded-full text-sm border inline-flex items-center gap-2 transition active:scale-[0.98] focus:outline-none focus:ring-2 disabled:opacity-60 disabled:cursor-not-allowed";
+                                        const variants: Record<GuestStatus, string> = {
+                                            accepted: selected
+                                                ? "bg-emerald-50 text-emerald-700 border-emerald-200 focus:ring-emerald-300"
+                                                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50",
+                                            unknown: selected
+                                                ? "bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-300"
+                                                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50",
+                                            declined: selected
+                                                ? "bg-rose-50 text-rose-700 border-rose-200 focus:ring-rose-300"
+                                                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50",
+                                        };
+                                        return (
+                                            <button
+                                                key={st}
+                                                disabled={saving === guest.id || !canEdit}
+                                                onClick={() => updateGuestStatus(guest.id, st)}
+                                                aria-pressed={selected}
+                                                className={`${base} ${variants[st]}`}
+                                                title={(selected ? statusLabelPast[st] : statusLabel[st])}
+                                            >
+                                                {st === "accepted" && <IconCheck className="h-4 w-4" />}
+                                                {st === "unknown" && <IconClock className="h-4 w-4" />}
+                                                {st === "declined" && <IconX className="h-4 w-4" />}
+                                                <span className="hidden xs:inline">{selected ? statusLabelPast[st] : statusLabel[st]}</span>
+                                                <span className="inline xs:hidden">{(selected ? statusLabelPast[st] : statusLabel[st]).charAt(0)}</span>
+                                            </button>
+                                        );
+                                    })
+                                )}
                             </div>
                         </div>
                     ))}

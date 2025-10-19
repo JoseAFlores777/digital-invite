@@ -26,6 +26,8 @@ export async function getWeddingLocation(weddingId: string): Promise<WeddingLoca
     "venue.address",
     "venue.latitude",
     "venue.longitude",
+    "venue.waze_link",
+    "venue.google_maps_link",
   );
 
   // Prefer reception, then ceremony, else any
@@ -55,6 +57,8 @@ export async function getWeddingLocation(weddingId: string): Promise<WeddingLoca
         latitude: selected?.venue?.latitude ?? null,
         longitude: selected?.venue?.longitude ?? null,
         event_type: selected?.type ?? null,
+          ...(selected?.venue?.waze_link ? { waze_link: selected?.venue?.waze_link } : {}),
+          ...(selected?.venue?.google_maps_link ? { google_maps_link: selected?.venue?.google_maps_link } : {}),
       };
     }),
     catchError(() => of<WeddingLocation | null>(null))

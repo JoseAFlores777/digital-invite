@@ -46,3 +46,13 @@ export async function patchInvitationStatus(invitationId: string, status: Invita
   if (!res.ok) throw new Error("failed_to_update_invitation_status");
   return await res.json();
 }
+
+export async function patchInvitationDeadline(invitationId: string, rsvp_deadline: string | null) {
+  const res = await fetch("/api/invitation-deadline", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ invitationId, rsvp_deadline }),
+  });
+  if (!res.ok) throw new Error("failed_to_update_invitation_deadline");
+  return await res.json();
+}
