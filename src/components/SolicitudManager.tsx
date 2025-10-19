@@ -786,7 +786,7 @@ export default function SolicitudManager({
                     } catch {}
                 }}
                 overlayClassName="fixed inset-0 z-[60] bg-black/40 backdrop-blur-[1px]"
-                className="outline-none w-full max-w-full sm:max-w-2xl md:max-w-4xl mx-auto my-4 sm:my-6 bg-white border border-slate-200 rounded-2xl shadow-2xl max-h-[85vh] overflow-hidden"
+                className="outline-none w-[95vw] h-[95vh] max-w-[95vw] max-h-[95vh] mx-auto my-[2.5vh] bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden"
                 contentLabel="Gestión de invitados"
                 ariaHideApp={false}
             >
@@ -799,7 +799,7 @@ export default function SolicitudManager({
                         ×
                     </button>
                 </div>
-                <div className="max-h-[calc(85vh-0px)] overflow-y-auto overscroll-contain px-4 sm:px-6 md:px-8 py-3">
+                <div className="max-h-[calc(95vh-0px)] overflow-y-auto overscroll-contain px-4 sm:px-6 md:px-8 py-3">
                     <Toaster position="top-right" />
                     {card}
                 </div>
