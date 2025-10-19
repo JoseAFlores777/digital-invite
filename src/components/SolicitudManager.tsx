@@ -664,7 +664,7 @@ export default function SolicitudManager({
                                 {guest.email && <p className="text-xs text-slate-600 mt-0.5 break-all">{guest.email}</p>}
                             </div>
 
-                            <div className="flex flex-wrap items-center gap-2">
+                            <div className="flex flex-col items-end gap-1">
                                 {(isClosed && !adminMode) ? (
                                     (() => {
                                         const st = guest.status as GuestStatus;
@@ -689,38 +689,43 @@ export default function SolicitudManager({
                                         );
                                     })()
                                 ) : (
-                                    (STATUS_ORDER as GuestStatus[]).map((st) => {
-                                        const selected = guest.status === st;
-                                        const base =
-                                            "px-3 py-1.5 md:py-2 rounded-full text-sm border inline-flex items-center gap-2 transition active:scale-[0.98] focus:outline-none focus:ring-2 disabled:opacity-60 disabled:cursor-not-allowed";
-                                        const variants: Record<GuestStatus, string> = {
-                                            accepted: selected
-                                                ? "bg-emerald-50 text-emerald-700 border-emerald-200 focus:ring-emerald-300"
-                                                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50",
-                                            unknown: selected
-                                                ? "bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-300"
-                                                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50",
-                                            declined: selected
-                                                ? "bg-rose-50 text-rose-700 border-rose-200 focus:ring-rose-300"
-                                                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50",
-                                        };
-                                        return (
-                                            <button
-                                                key={st}
-                                                disabled={saving === guest.id || !canEdit}
-                                                onClick={() => updateGuestStatus(guest.id, st)}
-                                                aria-pressed={selected}
-                                                className={`${base} ${variants[st]}`}
-                                                title={(selected ? statusLabelPast[st] : statusLabel[st])}
-                                            >
-                                                {st === "accepted" && <IconCheck className="h-4 w-4" />}
-                                                {st === "unknown" && <IconClock className="h-4 w-4" />}
-                                                {st === "declined" && <IconX className="h-4 w-4" />}
-                                                <span className="hidden xs:inline">{selected ? statusLabelPast[st] : statusLabel[st]}</span>
-                                                <span className="inline xs:hidden">{(selected ? statusLabelPast[st] : statusLabel[st]).charAt(0)}</span>
-                                            </button>
-                                        );
-                                    })
+                                    <>
+                                        <div className="flex flex-wrap items-center gap-2 pt-2">
+                                            {(STATUS_ORDER as GuestStatus[]).map((st) => {
+                                                const selected = guest.status === st;
+                                                const base =
+                                                    "px-3 py-1.5 md:py-2 rounded-full text-sm border inline-flex items-center gap-2 transition active:scale-[0.98] focus:outline-none focus:ring-2 disabled:opacity-60 disabled:cursor-not-allowed";
+                                                const variants: Record<GuestStatus, string> = {
+                                                    accepted: selected
+                                                        ? "bg-emerald-50 text-emerald-700 border-emerald-200 focus:ring-emerald-300"
+                                                        : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50",
+                                                    unknown: selected
+                                                        ? "bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-300"
+                                                        : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50",
+                                                    declined: selected
+                                                        ? "bg-rose-50 text-rose-700 border-rose-200 focus:ring-rose-300"
+                                                        : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50",
+                                                };
+                                                return (
+                                                    <button
+                                                        key={st}
+                                                        disabled={saving === guest.id || !canEdit}
+                                                        onClick={() => updateGuestStatus(guest.id, st)}
+                                                        aria-pressed={selected}
+                                                        className={`${base} ${variants[st]}`}
+                                                        title={(selected ? statusLabelPast[st] : statusLabel[st])}
+                                                    >
+                                                        {st === "accepted" && <IconCheck className="h-4 w-4" />}
+                                                        {st === "unknown" && <IconClock className="h-4 w-4" />}
+                                                        {st === "declined" && <IconX className="h-4 w-4" />}
+                                                        <span className="hidden xs:inline">{selected ? statusLabelPast[st] : statusLabel[st]}</span>
+                                                        <span className="inline xs:hidden">{(selected ? statusLabelPast[st] : statusLabel[st]).charAt(0)}</span>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                        <div className="w-full text-right text-[11px] md:text-xs text-slate-500">Haz clic en cualquiera de estas opciones</div>
+                                    </>
                                 )}
                             </div>
                         </div>
