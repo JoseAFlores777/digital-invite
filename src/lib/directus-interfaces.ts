@@ -810,6 +810,7 @@ export type Weddings = {
     timezone?: string | null;
     user_created?: string | null;
     user_updated?: string | null;
+    web_photos: any[] & WebPhotos[];
 };
 
 export type CustomDirectusTypes = {
@@ -997,3 +998,31 @@ export function fieldsFor<
 
 // b) Si prefieres anotar un array directamente, 'satisfies' mantiene literales y valida:
 export type GuestFieldPath<D extends number = 2> = CollectionFieldPath<'guests', D>;
+
+
+export type WebPhotos = {
+    asset?: (string & DirectusFiles) | null;
+    date_created?: string | null;
+    date_updated?: string | null;
+    desktop_config: string;
+    id: string;
+    initialOpacity?: number | null;
+    initialOpacity_m?: number | null;
+    layer?: number | null;
+    layer_m?: number | null;
+    mobile_config: string;
+    sort?: number | null;
+    status: string;
+    type?: string | null;
+    user_created?: (string & DirectusUsers) | null;
+    user_updated?: (string & DirectusUsers) | null;
+    wedding?: (string & Weddings) | null;
+    width?: string | null;
+    width_m?: string | null;
+    xposition?: string | null;
+    xposition_m?: string | null;
+    yposition?: string | null;
+    yposition_m?: string | null;
+    zIndex?: number | null;
+    zIndex_m?: number | null;
+};

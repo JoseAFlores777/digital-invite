@@ -19,7 +19,8 @@ export async function GET(req: Request) {
       getWeddingLocation(weddingId),
     ]);
 
-    return NextResponse.json({ wedding, location }, { status: 200 });
+    const directus_url = process.env.DIRECTUS_URL || null;
+    return NextResponse.json({ wedding, location, directus_url }, { status: 200 });
   } catch (e) {
     return NextResponse.json({ wedding: null, location: null, error: "failed_to_fetch" }, { status: 500 });
   }

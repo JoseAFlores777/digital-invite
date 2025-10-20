@@ -3,7 +3,7 @@ import { getDirectusClient } from "@/server/directus-client";
 
 import { from, defer, lastValueFrom, of } from "rxjs";
 import { map, catchError, retry, timeout } from "rxjs/operators";
-import { DirectusCollectionKeys, fieldsFor, Weddings } from "@/lib/directus-interfaces";
+import { DirectusCollectionKeys, fieldsFor, Weddings, WebPhotos } from "@/lib/directus-interfaces";
 
 export type WeddingGeneralities = Pick<
   Weddings,
@@ -33,6 +33,8 @@ export type WeddingGeneralities = Pick<
       last_name?: string | null;
     } | null;
   } | null;
+} & {
+  web_photos?: WebPhotos[];
 };
 
 export async function getWeddingById(weddingId: string): Promise<WeddingGeneralities | null> {
@@ -62,6 +64,20 @@ export async function getWeddingById(weddingId: string): Promise<WeddingGenerali
     "couple.partner_2.id",
     "couple.partner_2.first_name",
     "couple.partner_2.last_name",
+    "web_photos.asset",
+    "web_photos.initialOpacity",
+    "web_photos.initialOpacity_m",
+    "web_photos.layer",
+    "web_photos.layer_m",
+    "web_photos.type",
+    "web_photos.width",
+    "web_photos.width_m",
+    "web_photos.xposition",
+    "web_photos.xposition_m",
+    "web_photos.yposition",
+    "web_photos.yposition_m",
+    "web_photos.zIndex",
+    "web_photos.zIndex_m",
   );
 
   const source$ = defer(() =>

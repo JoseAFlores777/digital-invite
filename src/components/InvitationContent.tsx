@@ -18,7 +18,7 @@ import BiblicalVerse_1 from "@/components/biblical-verse_1";
 import PerspectiveZoom, {ZoomItemConfig} from "@/components/PerspectiveZoom";
 
 export default function InvitationContent() {
-    const DESKTOP_ITEMS: ZoomItemConfig[] = [
+    const FALLBACK_DESKTOP: ZoomItemConfig[] = [
         { src: "https://picsum.photos/seed/800/600/600", layer: 3, x: "12vw", y: "18%", width: "10vw" },
         { src: "https://picsum.photos/seed/801/600/600", layer: 2, x: "26vw", y: "12%", width: "8.5vw" },
         { src: "https://picsum.photos/seed/802/600/600", layer: 1, x: "40vw", y: "8%",  width: "7.5vw" },
@@ -33,7 +33,7 @@ export default function InvitationContent() {
 
         { src: "https://picsum.photos/seed/810/600/600", layer: 3, x: "10vw", y: "50%", width: "12vw" },
         { src: "https://picsum.photos/seed/811/600/600", layer: 1, x: "26vw", y: "52%", width: "6vw" },
-        { src: "https://picsum.photos/seed/812/600/600", layer: 2, x: "42vw", y: "48%", width: "7.2vw" },
+        { src: "httpsum.photos/seed/812/600/600", layer: 2, x: "42vw", y: "48%", width: "7.2vw" },
         { src: "https://picsum.photos/seed/813/600/600", layer: 3, x: "58vw", y: "52%", width: "10vw" },
         { src: "https://picsum.photos/seed/814/600/600", layer: 1, x: "74vw", y: "50%", width: "6.2vw" },
 
@@ -50,8 +50,7 @@ export default function InvitationContent() {
         { src: "https://picsum.photos/seed/824/600/600", layer: 3, x: "78vw", y: "82%", width: "12.4vw" },
     ];
 
-    const MOBILE_ITEMS: ZoomItemConfig[] = [
-        // En mobile usamos menos items, mayores anchos y posiciones más centradas
+    const FALLBACK_MOBILE: ZoomItemConfig[] = [
         { src: "https://picsum.photos/seed/900/600/600", layer: 3, x: "20vw", y: "16%", width: "26vw" },
         { src: "https://picsum.photos/seed/901/600/600", layer: 2, x: "68vw", y: "18%", width: "24vw" },
         { src: "https://picsum.photos/seed/902/600/600", layer: 1, x: "48vw", y: "30%", width: "20vw" },
@@ -71,7 +70,62 @@ export default function InvitationContent() {
         { src: "https://picsum.photos/seed/913/600/600", layer: 1, x: "50vw", y: "10%", width: "16vw" },
     ];
 
+    const [desktopItems, setDesktopItems] = React.useState<ZoomItemConfig[]>(FALLBACK_DESKTOP);
+    const [mobileItems, setMobileItems] = React.useState<ZoomItemConfig[]>(FALLBACK_MOBILE);
     const [isMobile, setIsMobile] = React.useState(false);
+
+    React.useEffect(() => {
+        const mql = window.matchMedia("(max-width: 640px)");
+        const update = () => setIsMobile(mql.matches);
+        update();
+        mql.addEventListener("change", update);
+        return () => mql.removeEventListener("change", update);
+    }, []);
+
+    React.useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const weddingId = params.get("wedding_id") || process.env.NEXT_PUBLIC_WEDDING_ID || "";
+        const url = weddingId ? `/api/wedding-generalities?wedding_id=${encodeURIComponent(weddingId)}` : "/api/wedding-generalities";
+        fetch(url)
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(data => {
+                const base: string | undefined = data?.directus_url || undefined;
+                const photos: any[] = data?.wedding?.web_photos || [];
+                if (!base || !Array.isArray(photos) || photos.length === 0) return;
+
+                const buildSrc = (asset?: string | null) => (asset ? `${base}/assets/${asset}` : "");
+
+                const sortPhotos = [...photos].sort((a, b) => {
+                    const sa = a?.sort ?? 0;
+                    const sb = b?.sort ?? 0;
+                    return sa - sb;
+                });
+
+                const mapDesktop: ZoomItemConfig[] = sortPhotos.map((p) => ({
+                    src: buildSrc(p?.asset),
+                    layer: p?.layer ?? undefined,
+                    x: p?.xposition ?? undefined,
+                    y: p?.yposition ?? undefined,
+                    width: p?.width ?? undefined,
+                    initialOpacity: p?.initialOpacity ?? undefined,
+                    zIndex: p?.zIndex ?? undefined,
+                })).filter(it => !!it.src);
+
+                const mapMobile: ZoomItemConfig[] = sortPhotos.map((p) => ({
+                    src: buildSrc(p?.asset),
+                    layer: (p?.layer_m ?? p?.layer) ?? undefined,
+                    x: (p?.xposition_m ?? p?.xposition) ?? undefined,
+                    y: (p?.yposition_m ?? p?.yposition) ?? undefined,
+                    width: (p?.width_m ?? p?.width) ?? undefined,
+                    initialOpacity: (p?.initialOpacity_m ?? p?.initialOpacity) ?? undefined,
+                    zIndex: (p?.zIndex_m ?? p?.zIndex) ?? undefined,
+                })).filter(it => !!it.src);
+
+                if (mapDesktop.length) setDesktopItems(mapDesktop);
+                if (mapMobile.length) setMobileItems(mapMobile);
+            })
+            .catch(() => void 0);
+    }, []);
 
     React.useEffect(() => {
         const mql = window.matchMedia("(max-width: 640px)");
@@ -113,7 +167,7 @@ export default function InvitationContent() {
                 />
             }
             quoteText="Reconócelo en todos tus caminos, Y él enderezará tus veredas. Proverbios 3:6"
-            items={isMobile ? MOBILE_ITEMS : DESKTOP_ITEMS}
+            items={isMobile ? mobileItems : desktopItems}
             autoLayout={true}
             perspective="100svh"
             seed={42}
