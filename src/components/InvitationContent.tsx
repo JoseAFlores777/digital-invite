@@ -17,7 +17,7 @@ import PanelPinStack from "./PanelPinStack";
 import BiblicalVerse_1 from "@/components/biblical-verse_1";
 import PerspectiveZoom, {ZoomItemConfig} from "@/components/PerspectiveZoom";
 
-export default function InvitationContent() {
+export default function InvitationContent({ inviteCode }: { inviteCode?: string }) {
     const FALLBACK_DESKTOP: ZoomItemConfig[] = [
         { src: "https://picsum.photos/seed/800/600/600", layer: 3, x: "12vw", y: "18%", width: "10vw" },
         { src: "https://picsum.photos/seed/801/600/600", layer: 2, x: "26vw", y: "12%", width: "8.5vw" },
@@ -166,7 +166,12 @@ export default function InvitationContent() {
                     inline
                 />
             }
-            quoteText="Reconócelo en todos tus caminos, Y él enderezará tus veredas. Proverbios 3:6"
+            quoteText={[
+                `<p>DIOS cruzó nuestros caminos,<br><strong>y en Su amor eterno hallamos nuestro hogar.</strong></p>`,
+
+                `<p>Él escribió esta historia,<br><strong>y hoy celebramos el capítulo más hermoso: nuestra unión.</strong></p>`,
+                `<p>Y deseamos que <br><strong>${inviteCode ?? ""}</strong><br> sean parte de esta celebración.</p>`,
+            ]}
             items={isMobile ? mobileItems : desktopItems}
             autoLayout={true}
             perspective="100svh"

@@ -218,7 +218,7 @@ export default function Home() {
         ) : null}
         {invitationMounted ? (
           <div className={`transition-opacity duration-700 ${invitationVisible ? "opacity-100" : "opacity-0"}`}>
-            <InvitationContent />
+            <InvitationContent inviteCode={inviteSender || undefined} />
             {invitationVisible ? <MusicControls /> : null}
           </div>
         ) : null}
