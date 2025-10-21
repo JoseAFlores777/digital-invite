@@ -12,6 +12,7 @@ import {
     patchInvitationDeadline,
 } from "@/lib/api/solicitudes";
 import toast, { Toaster } from "react-hot-toast";
+import CalendarAddButton from "@/components/CalendarAddButton";
 
 export type SolicitudManagerProps = {
     solicitudId: string;
@@ -321,8 +322,9 @@ export default function SolicitudManager({
         setGuests(optimistic);
         try {
             await patchGuestStatus(guestId, status);
-            const msg = status === "accepted" ? "Confirmado" : status === "declined" ? "Rechazado" : "Pendiente";
-            toast.success(`${msg}`);
+            const guestName = guests.find((g) => g.id === guestId)?.name || "Invitado";
+            const statusText = status === "accepted" ? "Confirmado" : status === "declined" ? "Rechazado" : "Pendiente";
+            toast.success(`Marcado ${guestName} como ${statusText}`);
             await maybePatchInvitationStatus(optimistic);
             try { onChanged && onChanged(); } catch {}
         } catch {
@@ -407,90 +409,6 @@ export default function SolicitudManager({
     </span>
     );
 
-    function normalizeTz(tz: string): string {
-        const t = (tz || "").trim();
-        if (!t) return t;
-        // Common mapping for provided data
-        if (t.toUpperCase() === "GTM-6" || t.toUpperCase() === "GMT-6" || t === "UTC-6") return "America/Tegucigalpa";
-        return t;
-    }
-
-    function icsEscape(input: string): string {
-        // Escape commas, semicolons, and backslashes per RFC 5545
-        return input.replace(/\\/g, "\\\\").replace(/,/g, "\\,").replace(/;/g, "\\;").replace(/\r?\n/g, "\\n");
-    }
-
-    function handleDownloadIcs() {
-        try {
-            if (!eventDateStr) return;
-            const startPart = eventStartTimeStr || "00:00:00";
-            const endPart = eventEndTimeStr || "";
-            const [sh, sm] = startPart.split(":");
-            const [yy, mm, dd] = String(eventDateStr).split("-").map(Number);
-            const pad = (n: number) => String(n).padStart(2, "0");
-
-            const DTSTART_LOCAL = `${yy}${pad(mm)}${pad(dd)}T${pad(Number(sh || 0))}${pad(Number(sm || 0))}00`;
-
-            let DTEND_LOCAL = "";
-            if (endPart) {
-                const [eh, em] = endPart.split(":");
-                DTEND_LOCAL = `${yy}${pad(mm)}${pad(dd)}T${pad(Number(eh || 0))}${pad(Number(em || 0))}00`;
-            }
-
-            const tzid = normalizeTz(eventTz);
-            const hasWaze = !!eventWazeLink;
-            const hasGmaps = !!eventGoogleMapsLink;
-            // Build confirmation URL for ICS URL property: `${origin}/solicitud?invitationID=${solicitudId}`
-            let confirmUrl = "";
-            try {
-                if (typeof window !== "undefined") {
-                    confirmUrl = `${window.location.origin}/solicitud?invitationID=${solicitudId}`;
-                }
-            } catch {}
-            const urlLine = confirmUrl ? `URL:${confirmUrl}` : "";
-            let descriptionText = "";
-            if (hasWaze && hasGmaps) {
-                descriptionText = `Maneja con Waze -> ${eventWazeLink}\nAbrir en Google Maps -> ${eventGoogleMapsLink}`;
-            } else if (hasWaze) {
-                descriptionText = `Maneja con Waze -> ${eventWazeLink}`;
-            } else if (hasGmaps) {
-                descriptionText = `Abrir en Google Maps -> ${eventGoogleMapsLink}`;
-            } else if (location) {
-                descriptionText = `Ubicación: ${location}`;
-            }
-
-            const lines = [
-                "BEGIN:VCALENDAR",
-                "VERSION:2.0",
-                "PRODID:-//digital-invite//SolicitudManager//ES",
-                "CALSCALE:GREGORIAN",
-                "METHOD:PUBLISH",
-                "BEGIN:VEVENT",
-                tzid ? `DTSTART;TZID=${tzid}:${DTSTART_LOCAL}` : `DTSTART:${DTSTART_LOCAL}`,
-                (DTEND_LOCAL && tzid) ? `DTEND;TZID=${tzid}:${DTEND_LOCAL}` : (DTEND_LOCAL ? `DTEND:${DTEND_LOCAL}` : ""),
-                `DTSTAMP:${(() => { const d=new Date(); return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`; })()}`,
-                `UID:${solicitudId}-${Date.now()}@digital-invite`,
-                `SUMMARY:${icsEscape(`Boda ${coupleName || ""}`.trim() || "Boda")}`,
-                location ? `LOCATION:${icsEscape(location)}` : "",
-                urlLine,
-                descriptionText ? `DESCRIPTION:${icsEscape(descriptionText)}` : "",
-                "END:VEVENT",
-                "END:VCALENDAR",
-            ].filter(Boolean);
-            const blob = new Blob([lines.join("\r\n")], { type: "text/calendar;charset=utf-8" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            const safeName = (coupleName ? `Boda ${coupleName}` : "Boda").replace(/[\/:*?"<>|]+/g, "-");
-            a.download = `${safeName}.ics`;
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => {
-                URL.revokeObjectURL(url);
-                a.remove();
-            }, 0);
-        } catch {}
-    }
 
     const card = (
         <div className={`w-full max-w-full sm:max-w-2xl md:max-w-4xl ${asModal ? "" : "shadow-xl border border-slate-200 rounded-2xl bg-white"}`}>
@@ -542,16 +460,24 @@ export default function SolicitudManager({
 
                 {/* Toolbar: calendario a la izquierda; acciones masivas a la derecha */}
                 <div className="mt-4 flex items-center gap-2 flex-wrap">
-                    <button
-                        type="button"
-                        disabled={!canEdit}
-                        onClick={handleDownloadIcs}
+                    <CalendarAddButton
+                        date={eventDateStr}
+                        startTime={eventStartTimeStr}
+                        endTime={eventEndTimeStr}
+                        timezone={eventTz}
+                        coupleName={coupleName}
+                        location={location}
+                        googleMapsLink={eventGoogleMapsLink}
+                        wazeLink={eventWazeLink}
+                        uidPrefix={solicitudId}
+                        confirmUrl={typeof window !== "undefined" ? `${window.location.origin}/solicitud?invitationID=${solicitudId}` : ""}
                         className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-sm disabled:opacity-50"
                         title="Añadir al calendario"
+                        disabled={!canEdit}
                     >
                         <IconCalendar className="h-4 w-4" />
                         <span className="whitespace-nowrap">Añadir al calendario</span>
-                    </button>
+                    </CalendarAddButton>
 
                     {adminMode && (
                         <div className="inline-flex items-center gap-2 flex-wrap">
@@ -630,7 +556,7 @@ export default function SolicitudManager({
                         <h3 className="text-base md:text-lg font-semibold text-slate-800 inline-flex items-center gap-2">
                             Lista de Invitados {attendeesBadge}
                         </h3>
-                        {(showBulkActions && (adminMode || !asModal)) && (
+                        {(showBulkActions ) && (
                             <div className="ml-auto flex items-center justify-center gap-2 w-full sm:w-auto sm:justify-end">
                                 <button
                                     type="button"
@@ -786,7 +712,7 @@ export default function SolicitudManager({
                     } catch {}
                 }}
                 overlayClassName="fixed inset-0 z-[60] bg-black/40 backdrop-blur-[1px]"
-                className="outline-none w-[95vw] h-[95vh] max-w-[95vw] max-h-[95vh] mx-auto my-[2.5vh] bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden"
+                className="outline-none w-screen h-screen max-w-none max-h-none m-0 rounded-none sm:w-fit sm:h-auto sm:max-w-[95vw] sm:max-h-[90vh] sm:mx-auto sm:my-12 sm:rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden"
                 contentLabel="Gestión de invitados"
                 ariaHideApp={false}
             >
@@ -799,7 +725,7 @@ export default function SolicitudManager({
                         ×
                     </button>
                 </div>
-                <div className="max-h-[calc(95vh-0px)] overflow-y-auto overscroll-contain px-4 sm:px-6 md:px-8 py-3">
+                <div className="h-[100vh] overflow-y-auto overscroll-contain px-4 sm:px-6 md:px-8 py-3 sm:h-auto sm:w-auto sm:max-h-[80vh]">
                     <Toaster position="top-right" />
                     {card}
                 </div>

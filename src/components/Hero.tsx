@@ -110,14 +110,14 @@ export default function Hero({ fadeTo = "#ffffff" }: { fadeTo?: string }) {
                     </h1>
 
                     <p className="mt-2 text-[0.85rem] md:text-base tracking-[0.45em] text-wedgewood-1100/90">
-                        21 · 12 · 2025
+                        13 · DIC · 2025
                     </p>
 
                     <h2 className="mt-1 font-display italic text-5xl md:text-6xl lg:text-7xl text-foreground">
                         José
                     </h2>
 
-                    <p className="mt-2 uppercase tracking-[0.35em] text-[0.8rem] md:text-sm text-wedgewood-1100/90">
+                    <p className="mt-2 uppercase tracking-[0.35em] text-[0.8rem] md:text-lg text-wedgewood-1100/90">
                         DIOS ES FIEL
                     </p>
                 </div>

@@ -15,9 +15,13 @@
     "@gsap/react": "^2.1.2",
     "@iconify/react": "^6.0.2",
     "@lottiefiles/dotlottie-react": "^0.17.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "gsap": "^3.12.5",
+    "lucide-react": "^0.546.0",
     "next": "15.5.2",
     "next-view-transitions": "^0.3.4",
+    "photoswipe": "^5.4.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hot-toast": "^2.4.1",
@@ -25,6 +29,8 @@
     "react-swipeable-button": "^1.6.5",
     "recharts": "^2.12.7",
     "rxjs": "^7.8.1",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
     "use-sound": "^5.0.0"
   },
   "devDependencies": {

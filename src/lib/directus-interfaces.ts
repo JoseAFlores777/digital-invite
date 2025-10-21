@@ -802,6 +802,7 @@ export type Weddings = {
     date_updated?: string | null;
     end_time?: string | null;
     estimated_guests?: number | null;
+    gift_options: any[] & GiftOptions[];
     hashtag?: string | null;
     id: string;
     public_base_url?: string | null;
@@ -811,6 +812,7 @@ export type Weddings = {
     user_created?: string | null;
     user_updated?: string | null;
     web_photos: any[] & WebPhotos[];
+    live_url?: string | null;
 };
 
 export type CustomDirectusTypes = {
@@ -850,6 +852,7 @@ export type CustomDirectusTypes = {
     directus_versions: DirectusVersions[];
     directus_webhooks: DirectusWebhooks[];
     gallery_assets: GalleryAssets[];
+    gift_options: GiftOptions[];
     guest_groups: GuestGroups[];
     guests: Guests[];
     invitations: Invitations[];
@@ -913,6 +916,7 @@ export enum DirectusCollectionKeys {
     directus_versions = 'directus_versions',
     directus_webhooks = 'directus_webhooks',
     gallery_assets = 'gallery_assets',
+    gift_options = 'gift_options',
     guest_groups = 'guest_groups',
     guests = 'guests',
     invitations = 'invitations',
@@ -1025,4 +1029,23 @@ export type WebPhotos = {
     yposition_m?: string | null;
     zIndex?: number | null;
     zIndex_m?: number | null;
+};
+
+
+export type GiftOptions = {
+    date_created?: string | null;
+    date_updated?: string | null;
+    details: Record<string, string>;
+    icon?: string | null;
+    id: number;
+    redirectBtn_hide?: boolean | null;
+    redirectBtn_icon?: string | null;
+    redirectBtn_label?: string | null;
+    redirectBtn_url?: string | null;
+    sort?: number | null;
+    status: string;
+    title?: string | null;
+    user_created?: (string & DirectusUsers) | null;
+    user_updated?: (string & DirectusUsers) | null;
+    wedding_id?: (string & Weddings) | null;
 };

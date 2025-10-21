@@ -18,6 +18,7 @@ export type WeddingGeneralities = Pick<
   | "public_base_url"
   | "estimated_guests"
   | "color_palette"
+  | "live_url"
 > & {
   couple?: {
     id?: string;
@@ -56,6 +57,7 @@ export async function getWeddingById(weddingId: string): Promise<WeddingGenerali
     "public_base_url",
     "estimated_guests",
     "color_palette",
+    "live_url",
     "couple.id",
     "couple.name",
     "couple.partner_1.id",

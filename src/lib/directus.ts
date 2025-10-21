@@ -11,3 +11,4 @@ export { getDigitalGuests } from "@/server/services/guests.service";
 export { getWeddingInvitations, getInvitationById } from "@/server/services/invitations.service";
 export { getWeddingById } from "@/server/services/weddings.service";
 export { getWeddingLocation } from "@/server/services/locations.service";
+export { getGiftOptionsByWeddingId } from "@/server/services/gift-options.service";

@@ -29,6 +29,24 @@ export default function RSVPModal({ open, onClose }: Props) {
     }
   }, [open]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const { body, documentElement } = document;
+    const prevBodyOverflow = body.style.overflow;
+    const prevDocOverflow = documentElement.style.overflow;
+    const prevBodyTouch = body.style.touchAction;
+    if (open) {
+      body.style.overflow = "hidden";
+      documentElement.style.overflow = "hidden";
+      body.style.touchAction = "none";
+    }
+    return () => {
+      body.style.overflow = prevBodyOverflow;
+      documentElement.style.overflow = prevDocOverflow;
+      body.style.touchAction = prevBodyTouch;
+    };
+  }, [open]);
+
   return (
     <Modal
       isOpen={open}

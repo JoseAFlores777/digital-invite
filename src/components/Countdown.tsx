@@ -1,15 +1,45 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useCountdown } from "@/hooks/useCountdown";
 import { useIsReducedMotion } from "@/hooks/useIsReducedMotion";
 import { useGsapContext, gsap } from "@/hooks/useGsapContext";
 import AnilloScrollSequence from "@/components/AnilloScrollSequence";
+import { fetchWeddingGeneralities } from "@/lib/api/solicitudes";
+import LiveStreamButton from "@/components/LiveStreamButton";
+import { Icon } from "@iconify/react";
 
 export default function Countdown() {
   const root = useRef<HTMLDivElement>(null);
   const reduced = useIsReducedMotion();
-  const { days, hours, minutes, seconds, finished } = useCountdown("2025-12-21T16:30:00-06:00");
+  const [targetISO, setTargetISO] = useState<string>("2025-12-21T16:30:00");
+  const [liveUrl, setLiveUrl] = useState<string>("");
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const wg = await fetchWeddingGeneralities("");
+        if (!active || !wg) return;
+        const date: string = wg?.wedding?.date || ""; // yyyy-MM-dd
+        const start: string = wg?.wedding?.start_time || ""; // HH:mm[:ss]
+        const live: string = (wg?.wedding?.live_url as string) || (wg?.live_url as string) || "";
+        setLiveUrl(live);
+        if (date) {
+          const [h = "00", m = "00"] = (start || "00:00").split(":");
+          const iso = `${date}T${h.padStart(2, "0")}:${m.padStart(2, "0")}:00`;
+          setTargetISO(iso);
+        }
+      } catch {
+        // keep fallback targetISO
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const { days, hours, minutes, seconds, finished } = useCountdown(targetISO);
 
   useGsapContext(() => {
     if (!root.current) return;
@@ -84,6 +114,24 @@ export default function Countdown() {
             {renderUnit(seconds, "Segundos")}
           </div>
         )}
+
+        {liveUrl ? (
+          <div className="mt-8 flex items-center justify-center">
+            <LiveStreamButton
+              liveUrl={liveUrl}
+              className="inline-flex items-center gap-3 px-6 py-3 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 text-base"
+              title="Ver transmisión en vivo"
+            >
+              <span className="inline-flex items-center gap-2">
+                <Icon icon="mdi:youtube" className="w-5 h-5 text-red-600" />
+                <span className="truncate text-base font-medium">Ver en vivo</span>
+                <span className="ml-2 inline-flex items-center rounded-full bg-red-600 text-white text-xs leading-none px-2.5 py-0.5 animate-pulse">
+                  En vivo
+                </span>
+              </span>
+            </LiveStreamButton>
+          </div>
+        ) : null}
 
       </div>
     </section>

@@ -6,6 +6,7 @@ import StoryBeats from "./StoryBeats";
 import MainDetails from "./MainDetails";
 import Countdown from "./Countdown";
 import Itinerary from "./Itinerary";
+import Menu from "./Menu";
 import DressCode from "./DressCode";
 import RSVP from "./RSVP";
 import Lodging from "./Lodging";
@@ -13,6 +14,7 @@ import Gift from "./Gift";
 import AlbumQR from "./AlbumQR";
 import MapEmbed from "./MapEmbed";
 import Footer from "./Footer";
+import Gallery from "./Gallery";
 import PanelPinStack from "./PanelPinStack";
 import BiblicalVerse_1 from "@/components/biblical-verse_1";
 import PerspectiveZoom, {ZoomItemConfig} from "@/components/PerspectiveZoom";
@@ -96,7 +98,8 @@ export default function InvitationContent({ inviteCode }: { inviteCode?: string 
 
                 const buildSrc = (asset?: string | null) => (asset ? `${base}/assets/${asset}` : "");
 
-                const sortPhotos = [...photos].sort((a, b) => {
+                const filtered = (Array.isArray(photos) ? photos : []).filter((p: any) => String(p?.type || "").toLowerCase() === "collage");
+                const sortPhotos = [...filtered].sort((a, b) => {
                     const sa = a?.sort ?? 0;
                     const sb = b?.sort ?? 0;
                     return sa - sb;
@@ -217,9 +220,11 @@ export default function InvitationContent({ inviteCode }: { inviteCode?: string 
       {/*/!* 3. Nuestra historia *!/*/}
       {/*<StoryBeats />*/}
       {/*/!* 4. Detalles principales *!/*/}
-      <MainDetails />
+      {/*<MainDetails />*/}
       {/*/!* 5. Programa *!/*/}
-      {/*<Itinerary />*/}
+      <Itinerary />
+      {/* Menú */}
+      <Menu />
       {/*/!* 6. Dress code *!/*/}
       {/*<DressCode />*/}
       {/*/!* 7. RSVP *!/*/}
@@ -231,8 +236,10 @@ export default function InvitationContent({ inviteCode }: { inviteCode?: string 
       {/*/!* 10. Álbum / QR *!/*/}
       {/*<AlbumQR />*/}
       {/*/!* 11. Mapa embebido *!/*/}
-      <MapEmbed />
+      {/*<MapEmbed />*/}
       {/*/!* 12. Cierre *!/*/}
+      {/* Galería */}
+      <Gallery />
       <Footer />
     </main>
   );
