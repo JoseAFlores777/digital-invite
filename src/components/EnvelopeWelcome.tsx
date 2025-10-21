@@ -4,6 +4,7 @@ import React, { useCallback, useRef, useState } from "react";
 import { SwipeableButton } from "react-swipeable-button";
 import ew from "./EnvelopeWelcome.module.scss";
 import { useMusic } from "./MusicProvider";
+import CustomBtn from "@/components/CustomBtn";
 
 export type EnvelopeWelcomeProps = {
   sealText?: string;
@@ -27,6 +28,25 @@ export default function EnvelopeWelcome({
   const [isOpening, setIsOpening] = useState(false);
   const didTriggerRef = useRef(false);
   const { startMusic } = useMusic();
+  const [finalGifts, setFinalGifts] = useState<string | null>(null);
+  const [shareHref, setShareHref] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const current = new URL(window.location.href);
+      const weddingId = current.searchParams.get("wedding_id") || process.env.NEXT_PUBLIC_WEDDING_ID || "";
+      const giftsUrl = new URL(current.origin);
+      giftsUrl.pathname = "/gifts";
+      if (weddingId) giftsUrl.searchParams.set("wedding_id", weddingId);
+      const final = giftsUrl.toString();
+        setShareHref(final);
+    } catch {
+      const fallback = "/gifts";
+        setShareHref(fallback);
+    }
+  }, []);
+
 
   const handleOpen = useCallback(() => {
     if (didTriggerRef.current) return;
@@ -82,6 +102,21 @@ export default function EnvelopeWelcome({
                 borderRadius={32}
                 disabled={isOpening}
               />
+            </div>
+            <div className="mt-4 flex justify-center">
+              {shareHref ? (
+                <CustomBtn
+                  key="envelope-gifts-link"
+                  href={shareHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  label="Ir a mesa de regalos"
+                  icon="quill:link-out"
+                  variant="outline"
+                  ariaLabel="Compartir enlace de regalos por WhatsApp: Mesa de regalos"
+                  size={"lg"}
+                />
+              ) : null}
             </div>
           <div className="text-center mt-4">
             <p className="max-w-md mx-auto italic text-[13px]" style={{ color: "var(--color-dusty-800)" }}>

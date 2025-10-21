@@ -5,6 +5,7 @@ import { useGsapContext, gsap } from "@/hooks/useGsapContext";
 import Modal from "react-modal";
 import { Icon } from "@iconify/react";
 import toast, { Toaster } from "react-hot-toast";
+import CustomBtn from "@/components/CustomBtn";
 
 type GiftOption = {
   id: string | number;
@@ -20,7 +21,7 @@ type GiftOption = {
   };
 };
 
-export default function Gift({ hideCopy = false }: { hideCopy?: boolean }) {
+export default function Gift({ hideCopy = false, shareHref }: { hideCopy?: boolean; shareHref?: string }) {
   const root = useRef<HTMLDivElement>(null);
   const iconRef = useRef<HTMLSpanElement>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -124,6 +125,17 @@ export default function Gift({ hideCopy = false }: { hideCopy?: boolean }) {
             <Icon icon="lucide:gift" className="w-12 h-12 text-[color:var(--color-dusty-600)] animate-pulse" />
           </div>
           <h2 className="display-font text-3xl md:text-4xl mb-3">Mesa de Regalos</h2>
+            <div className="flex justify-center mb-6">
+                <CustomBtn
+                  key="share-info"
+                  href={shareHref || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  label="Compartir esta información"
+                  icon="mdi:whatsapp"
+                  variant="outline"
+                />
+            </div>
           <p className="text-neutral-700 max-w-2xl mx-auto">
             Tu presencia es lo más importante para nosotros. Si deseas hacernos un obsequio, aquí te compartimos algunas opciones.
           </p>
@@ -131,12 +143,11 @@ export default function Gift({ hideCopy = false }: { hideCopy?: boolean }) {
 
         <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
           {options.map((opt) => (
-            <button
+            <CustomBtn
               key={opt.id}
-              className="text-left group rounded-2xl border border-[color:var(--color-dusty-200)] bg-white/90 hover:bg-[color:var(--color-dusty-50)]/60 shadow-sm hover:shadow-lg transition-all duration-300 p-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-dusty-400)] hover:-translate-y-0.5"
               onClick={() => setOpenId(opt.id)}
-              aria-haspopup="dialog"
-              aria-controls={`gift-dialog-${opt.id}`}
+              className="w-full text-left group rounded-2xl border border-[color:var(--color-dusty-200)] bg-white/90 hover:bg-[color:var(--color-dusty-50)]/60 shadow-sm hover:shadow-lg transition-all duration-300 p-5 focus-visible:ring-2 focus-visible:ring-[color:var(--color-dusty-400)] hover:-translate-y-0.5 justify-start"
+              variant="outline"
             >
               <div className="flex items-center gap-4">
                 <div className="shrink-0 w-14 h-14 rounded-full bg-[color:var(--color-dusty-600)] shadow-md grid place-items-center">
@@ -150,13 +161,22 @@ export default function Gift({ hideCopy = false }: { hideCopy?: boolean }) {
                   </span>
                 </div>
               </div>
-            </button>
+            </CustomBtn>
           ))}
         </div>
 
         <div className="mt-8 text-center">
           <p className="text-sm uppercase tracking-wide text-[color:var(--color-dusty-700)] mb-2">¿Tienes dudas?</p>
-          <a href="https://api.whatsapp.com/send?phone=50497683309" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm bg-[color:var(--color-dusty-600)] text-white hover:bg-[color:var(--color-dusty-700)] active:scale-[0.99] transition">Hablar con la pareja</a>
+          <CustomBtn
+                      key="contact-couple"
+                      href="https://api.whatsapp.com/send?phone=50497683309"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      label="Hablar con la pareja"
+                      icon="mdi:whatsapp"
+                      variant="outline"
+                      size="md"
+                    />
         </div>
 
         <div className="mt-10 text-center">
@@ -238,18 +258,21 @@ function GiftDialog({ option, open, onClose, onCopy, iconRef, showCopy = true, c
       ariaHideApp={false}
       id={`gift-dialog-${option.id}`}
     >
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3 mb-4 w-full">
         <div className="w-10 h-10 rounded-full bg-[color:var(--color-dusty-600)] grid place-items-center">
           <Icon icon={option.icon} className="w-5 h-5 text-white" />
         </div>
-        <h3 className="display-font text-2xl text-[color:var(--color-dusty-900)]">{option.title}</h3>
-        <button
-          aria-label="Cerrar"
+        <h3 className="display-font text-2xl text-[color:var(--color-dusty-900)] flex-1">{option.title}</h3>
+        <CustomBtn
+          key={`close-${option.id}`}
           onClick={onClose}
-          className="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--color-dusty-300)] text-[color:var(--color-dusty-800)] bg-white/70 hover:bg-[color:var(--color-dusty-100)] active:scale-[0.98] transition"
+          ariaLabel="Cerrar"
+          className="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-full !px-0 !py-0 shrink-0"
+          variant="outline"
+          size="sm"
         >
           ×
-        </button>
+        </CustomBtn>
       </div>
       <div className="grid gap-3">
         {Object.entries(option.details).map(([label, value]) => (
@@ -259,31 +282,33 @@ function GiftDialog({ option, open, onClose, onCopy, iconRef, showCopy = true, c
               <p className="font-mono text-base text-[color:var(--color-dusty-800)] break-all">{value}</p>
             </div>
             {showCopy && (
-              <button
+              <CustomBtn
+                key={`copy-${label}`}
                 onClick={(e) => onCopy(label, value, (e.currentTarget.querySelector('[data-copy-icon]') as HTMLElement | null) || undefined)}
-                className="self-center inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs bg-[color:var(--color-dusty-600)] text-white hover:bg-[color:var(--color-dusty-700)] active:scale-[0.99] transition"
-                aria-label={`${copiedKey === label ? "Copiado" : "Copiar"} ${label}`}
+                ariaLabel={`${copiedKey === label ? "Copiado" : "Copiar"} ${label}`}
+                className="self-center inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs !px-3.5 !py-1.5"
+                variant="outline"
+                icon={copiedKey === label ? "lucide:check" : "lucide:copy"}
+                size="sm"
               >
-                <span ref={iconRef} data-copy-icon aria-hidden="true" className="inline-flex">
-                  <Icon icon={copiedKey === label ? "lucide:check" : "lucide:copy"} className="w-4 h-4 text-white" />
-                </span>
-                {copiedKey === label ? "Copiado" : "Copiar"}
-              </button>
+              </CustomBtn>
             )}
           </div>
         ))}
       </div>
       {option.redirectBtn && option.redirectBtn.hide !== true && option.redirectBtn.url ? (
         <div className="mt-5 pt-4 border-t border-[color:var(--color-dusty-200)]">
-          <a
+          <CustomBtn
+            key={`redirect-${option.id}`}
             href={option.redirectBtn.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm bg-[color:var(--color-dusty-600)] text-white hover:bg-[color:var(--color-dusty-700)] active:scale-[0.99] transition"
-          >
-            {option.redirectBtn.icon && <Icon icon={option.redirectBtn.icon} className="w-5 h-5 text-white" />}
-            {option.redirectBtn.label ?? "Abrir enlace"}
-          </a>
+            className="w-full"
+            label={option.redirectBtn.label ?? "Abrir enlace"}
+            icon={option.redirectBtn.icon}
+            variant="outline"
+            size="md"
+          />
         </div>
       ) : null}
     </Modal>

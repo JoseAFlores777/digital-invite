@@ -349,6 +349,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background;
+    color: var(--color-dusty-800);
   }
 }
