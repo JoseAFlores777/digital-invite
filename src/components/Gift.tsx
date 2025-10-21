@@ -21,11 +21,12 @@ type GiftOption = {
   };
 };
 
-export default function Gift({ hideCopy = false, shareHref }: { hideCopy?: boolean; shareHref?: string }) {
+export default function Gift({ hideCopy = false, shareHref, finalGifts }: { hideCopy?: boolean; shareHref?: string; finalGifts?: string }) {
   const root = useRef<HTMLDivElement>(null);
   const iconRef = useRef<HTMLSpanElement>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [openId, setOpenId] = useState<GiftOption["id"] | null>(null);
+  const [clientHref, setClientHref] = useState<string | null>(null);
 
   useGsapContext(() => {
     if (!root.current) return;
@@ -38,14 +39,40 @@ export default function Gift({ hideCopy = false, shareHref }: { hideCopy?: boole
     });
   }, []);
 
+  useEffect(() => {
+    if (shareHref) return;
+    if (typeof window === "undefined") return;
+    try {
+      let giftsUrlStr: string;
+      if (finalGifts) {
+        giftsUrlStr = finalGifts;
+      } else {
+        const current = new URL(window.location.href);
+        const weddingId = current.searchParams.get("wedding_id") || "";
+        const giftsUrl = new URL(current.origin);
+        giftsUrl.pathname = "/gifts";
+        if (weddingId) giftsUrl.searchParams.set("wedding_id", weddingId);
+        giftsUrlStr = giftsUrl.toString();
+      }
+      const message = `¡Hola! 🙌\n\nQuiero compartirte el enlace para enviar un regalo en línea por la boda de *Clarisa y José* 💍\n\nEnlace para enviar regalo:\n${giftsUrlStr}\n\n¡Gracias de todo corazón\n\n*DIOS te bendiga*! 🙌`;
+      setClientHref(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`);
+    } catch {
+      const fallback = finalGifts || "/gifts";
+      const message = `¡Hola! 🙌\n\nQuiero compartirte el enlace para enviar un regalo en línea por la boda de *Clarisa y José* 💍\n\nEnlace para enviar regalo:\n${fallback}\n\n¡Gracias de todo corazón\n\n*DIOS te bendiga*! 🙌`;
+      setClientHref(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`);
+    }
+  }, [shareHref, finalGifts]);
+
   const [options, setOptions] = useState<GiftOption[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+
     const params = new URLSearchParams(window.location.search);
     const weddingId = params.get("wedding_id") || process.env.NEXT_PUBLIC_WEDDING_ID || "";
     const url = weddingId ? `/api/gift-options?wedding_id=${encodeURIComponent(weddingId)}` : "/api/gift-options";
-
 
     fetch(url)
       .then((r) => (r.ok ? r.json() : Promise.reject()))
@@ -123,20 +150,23 @@ export default function Gift({ hideCopy = false, shareHref }: { hideCopy?: boole
       <div className="max-w-5xl mx-auto px-6 py-20">
         <div className="text-center mb-10">
           <div className="inline-block mb-4">
-            <Icon icon="lucide:gift" className="w-12 h-12 text-[color:var(--color-dusty-600)] animate-pulse" />
+            <Icon icon="lucide:gift" className="w-12 h-12 text-[color:var(--color-dusty-600)]" />
           </div>
           <h2 className="display-font text-3xl md:text-4xl mb-3">Mesa de Regalos</h2>
-            <div className="flex justify-center mb-6">
+            {!( !shareHref && typeof window === "undefined" ) && (
+              <div className="flex justify-center mb-6">
                 <CustomBtn
+                    className={"animate-pulse"}
                   key="share-info"
-                  href={shareHref || "#"}
+                  href={shareHref || clientHref || "#"}
                   target="_blank"
                   rel="noopener noreferrer"
                   label="Compartir esta información"
                   icon="mdi:whatsapp"
                   variant="outline"
                 />
-            </div>
+              </div>
+            )}
           <p className="text-neutral-700 max-w-2xl mx-auto">
             Tu presencia es lo más importante para nosotros. Si deseas hacernos un obsequio, aquí te compartimos algunas opciones.
           </p>
@@ -280,7 +310,7 @@ function GiftDialog({ option, open, onClose, onCopy, iconRef, showCopy = true, c
           <div key={label} className="flex items-start justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-[color:var(--color-dusty-900)]">{label}:</p>
-              <p className="font-mono text-base text-[color:var(--color-dusty-800)] break-all">{value}</p>
+              <p className="font-mono text-sm text-[color:var(--color-dusty-800)] break-all">{value}</p>
             </div>
             {showCopy && (
               <CustomBtn

@@ -10,6 +10,8 @@ Estado de estándares: No existe `./junie/development-standards.md`; se respetan
 3. Reemplazar texto e ícono hardcodeados en el render por las nuevas props. [impacto: frontend] — done ✓
 4. Mantener lógica actual de SSR/CSR (uso de `shareHref` cuando está presente y cálculo cliente post-mount cuando no). [impacto: frontend] — done ✓
 5. Validar visualmente que no cambie el estilo por defecto y que se pueda personalizar pasando props opcionales. [impacto: QA] — pending *
+6. Gift.tsx: agregar prop opcional `finalGifts?` y estado `clientHref` con `useEffect` para construir href de WhatsApp en cliente, replicando la lógica de GiftsShareButton. [impacto: frontend] — done ✓
+7. Gift.tsx: actualizar CustomBtn superior para usar `shareHref || clientHref` y evitar render SSR cuando no hay `shareHref` (previene mismatch). [impacto: frontend] — done ✓
 
 ## Notas
 - No se modificaron los lugares donde se usa el botón; al ser props opcionales, no rompen compilación ni comportamiento existente.
