@@ -119,6 +119,7 @@ export default function Gift({ hideCopy = false, shareHref }: { hideCopy?: boole
 
   return (
     <section id="regalo" ref={root} className="bg-white">
+
       <div className="max-w-5xl mx-auto px-6 py-20">
         <div className="text-center mb-10">
           <div className="inline-block mb-4">
@@ -308,6 +309,7 @@ function GiftDialog({ option, open, onClose, onCopy, iconRef, showCopy = true, c
             icon={option.redirectBtn.icon}
             variant="outline"
             size="md"
+            shine={true}
           />
         </div>
       ) : null}

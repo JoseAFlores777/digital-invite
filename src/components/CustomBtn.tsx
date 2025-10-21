@@ -71,17 +71,17 @@ function variantClasses(variant: CustomBtnVariant = "primary") {
 
 function Wrapper({ children, shine }: { children: React.ReactNode; shine?: boolean }) {
   return (
-    <span className="relative inline-block rounded-xl">
-      {children}
+    <span className="relative overflow-hidden inline-block rounded-xl">
       {shine ? (
         <ShineBorder
           aria-hidden
           borderWidth={2}
           duration={12}
-          shineColor={["#9cb3c7", "#dee8f2", "#b3c7db"]}
-          className="pointer-events-none"
+          shineColor={["#24d4f3", "#69a8ff", "#386baa"]}
+          className="pointer-events-none z-0"
         />
       ) : null}
+      {children}
     </span>
   );
 }
@@ -129,7 +129,7 @@ function CustomBtn(props: CustomBtnProps) {
   );
 
   const commonClasses = cn(
-    "relative inline-flex select-none items-center justify-center rounded-xl font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+    "relative z-10 inline-flex select-none items-center justify-center rounded-xl font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
     sizeClasses.container,
     variantClasses(variant),
     disabled ? "pointer-events-none cursor-not-allowed" : "cursor-pointer",

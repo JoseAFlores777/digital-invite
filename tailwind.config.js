@@ -132,6 +132,18 @@ const config = {
                     },
                 },
             }),
+
+            // ---- ANIMACIONES PERSONALIZADAS --------------------------------------
+            keyframes: {
+                shine: {
+                    '0%, 100%': { backgroundPosition: '0% 50%' },
+                    '50%': { backgroundPosition: '100% 50%' },
+                },
+            },
+            animation: {
+                // Usa la variable CSS --duration que define ShineBorder para sincronizar
+                shine: 'shine var(--duration,14s) ease-in-out infinite',
+            },
         },
     },
 
