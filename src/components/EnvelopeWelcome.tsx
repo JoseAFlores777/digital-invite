@@ -45,7 +45,7 @@ export default function EnvelopeWelcome({
 
   return (
     <main
-      className={`min-h-screen bg-[color:var(--color-dusty-50)] text-[color:var(--color-dusty-900)] overflow-hidden transition-opacity duration-500 ${className}`}
+      className={`min-h-screen bg-white text-[color:var(--color-dusty-900)] overflow-hidden transition-opacity duration-500 ${className}`}
       style={{
         minHeight: "100dvh",
       }}

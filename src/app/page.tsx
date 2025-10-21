@@ -195,7 +195,7 @@ export default function Home() {
   return (
 
     <MusicRoot>
-      <div className="bg-[color:var(--color-dusty-50)] text-[color:var(--color-dusty-900)]" style={{ minHeight: "100dvh" }}>
+      <div className="bg-white text-[color:var(--color-dusty-900)]" style={{ minHeight: "100dvh" }}>
         {inviteError ? (
           <main className="min-h-screen grid place-items-center p-6 text-center">
             <div>

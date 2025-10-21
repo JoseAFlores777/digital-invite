@@ -14,7 +14,7 @@
 }
 
 .paperTexture {
-  background-color: #e4edf5; /* dusty pale blue */
+
   background-image:
     radial-gradient(circle at 25% 15%, rgba(30,60,90,0.06) 0%, rgba(30,60,90,0) 60%),
     radial-gradient(circle at 70% 60%, rgba(30,60,90,0.05) 0%, rgba(30,60,90,0) 55%),
@@ -42,7 +42,6 @@
   margin: 0;
   border-radius: 0;
   border: none;
-  background-color: #e4edf5;
 }
 
 .flap {

@@ -221,35 +221,17 @@ export default function PerspectiveZoom({
             });
 
             if (paragraph) {
-                // Construcción idempotente de spans
-                if (!paragraph.querySelector(".char")) {
-                    const text = paragraph.textContent || "";
-                    paragraph.textContent = "";
-                    const frag = document.createDocumentFragment();
-                    for (const ch of text) {
-                        if (ch === "\n") {
-                            frag.appendChild(document.createElement("br"));
-                            continue;
-                        }
-                        const span = document.createElement("span");
-                        span.className = "char inline-block";
-                        span.textContent = ch === " " ? "\u00A0" : ch;
-                        (span.style as any).opacity = "0.2";
-                        frag.appendChild(span);
-                    }
-                    paragraph.appendChild(frag);
-                }
-
-                const chars = paragraph.querySelectorAll<HTMLSpanElement>(".char");
+                // Solo fade in/out sin movimiento (fijamos y:0 para evitar cualquier desplazamiento vertical)
                 tl2
-                    .to(chars, { opacity: 1, duration: 0.6, ease: "none", stagger: 0.03 })
-                    .to({}, { duration: 0.5 })
-                    .to(paragraph, { opacity: 0, scale: 1.2, duration: 1.2 });
+                    .fromTo(paragraph, { opacity: 0, y: 0 }, { opacity: 1, y: 0, duration: 0.8, ease: "none", immediateRender: false })
+                    .to({}, { duration: 0.6 })
+                    .to(paragraph, { opacity: 0, y: 0, duration: 0.8, ease: "none" });
             } else if (htmlBlock) {
+                // Solo fade in/out sin movimiento (fijamos y:0 para evitar cualquier desplazamiento vertical)
                 tl2
-                    .fromTo(htmlBlock, { opacity: 0.2 }, { opacity: 1, duration: 0.8, ease: "none" })
-                    .to({}, { duration: 0.5 })
-                    .to(htmlBlock, { opacity: 0, scale: 1.03, duration: 1.0 });
+                    .fromTo(htmlBlock, { opacity: 0, y: 0 }, { opacity: 1, y: 0, duration: 0.8, ease: "none", immediateRender: false })
+                    .to({}, { duration: 0.6 })
+                    .to(htmlBlock, { opacity: 0, y: 0, duration: 0.8, ease: "none" });
             }
         });
     }, [computedItems, markers, pinSpacing, sectionsEnd]);
