@@ -48,7 +48,6 @@ export default function EnvelopeWelcome({
       className={`min-h-screen bg-[color:var(--color-dusty-50)] text-[color:var(--color-dusty-900)] overflow-hidden transition-opacity duration-500 ${className}`}
       style={{
         minHeight: "100dvh",
-        paddingTop: "calc(13px + env(safe-area-inset-top))",
       }}
     >
       <div id="sobre-boda" className={`${ew.envelope} ${ew.envelopeFull} ${isOpening ? ew.opening : ""}`}>

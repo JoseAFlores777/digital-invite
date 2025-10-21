@@ -16,6 +16,7 @@ import Footer from "./Footer";
 import PanelPinStack from "./PanelPinStack";
 import BiblicalVerse_1 from "@/components/biblical-verse_1";
 import PerspectiveZoom, {ZoomItemConfig} from "@/components/PerspectiveZoom";
+import { Icon } from "@iconify/react";
 
 export default function InvitationContent({ inviteCode }: { inviteCode?: string }) {
     const FALLBACK_DESKTOP: ZoomItemConfig[] = [
@@ -136,7 +137,7 @@ export default function InvitationContent({ inviteCode }: { inviteCode?: string 
     }, []);
 
   return (
-    <main className="bg-[color:var(--color-dusty-50)] text-neutral-900">
+    <main className="bg-[color:var(--color-dusty-50)] text-[color:var(--color-dusty-800)]">
       {/*/!* 1. Hero *!/*/}
       <Hero />
       {/*/!* 2. Cuenta regresiva *!/*/}
@@ -149,7 +150,7 @@ export default function InvitationContent({ inviteCode }: { inviteCode?: string 
             headingContent={
                 <BiblicalVerse_1
                     kicker="11 Años De Historia"
-                    couple="DIOS ES FIEL"
+                    couple="DIOS HA SIDO FIEL"
                     bgColor="bg-white"
                     textColor="text-accent-800"
                     accentColor="text-accent-800"
@@ -164,13 +165,46 @@ export default function InvitationContent({ inviteCode }: { inviteCode?: string 
                     fontNames="font-display"
                     fontBody="font-body"
                     inline
+                    dividerClassName={"h-32 w-[32rem] text-[color:var(--color-dusty-900)]"}
+                    dividerStyle={{ fill: "#7c95ab" }}
                 />
             }
             quoteText={[
-                `<p>DIOS cruzó nuestros caminos,<br><strong>y en Su amor eterno hallamos nuestro hogar.</strong></p>`,
+                (
+                    <p
+                        key={1}
+                        className="text-center text-[color:var(--color-dusty-800)]">
+                        <Icon icon="ph:house-line" width={48} className="block mx-auto mb-3" />
+                        DIOS cruzó nuestros caminos,
+                        <br />
+                        y bajo su cuidado y gracia, hallamos
+                        <br />
+                        <strong>Nuestro Hogar.</strong>
+                    </p>
+                ),
 
-                `<p>Él escribió esta historia,<br><strong>y hoy celebramos el capítulo más hermoso: nuestra unión.</strong></p>`,
-                `<p>Y deseamos que <br><strong>${inviteCode ?? ""}</strong><br> sean parte de esta celebración.</p>`,
+                (
+                    <p
+                        key={2}
+                        className="text-center text-[color:var(--color-dusty-800)]">
+                        <Icon icon="hugeicons:wedding" width={48} className="block mx-auto mb-3" />
+                        Él escribió esta historia,
+                        <br />
+                        y hoy celebramos el capítulo más hermoso: <strong>Nuestra Unión.</strong>
+                    </p>
+                ),
+                (
+                    <p
+                        key={3}
+                        className="text-center text-[color:var(--color-dusty-800)]">
+                        <Icon icon="material-symbols:family-group" width={48} className="block mx-auto mb-3" />
+                        Y deseamos que
+                        <br />
+                        <strong>{inviteCode ?? ""}</strong>
+                        <br />
+                        sean parte de esta celebración.
+                    </p>
+                ),
             ]}
             items={isMobile ? mobileItems : desktopItems}
             autoLayout={true}
@@ -185,7 +219,7 @@ export default function InvitationContent({ inviteCode }: { inviteCode?: string 
       {/*/!* 4. Detalles principales *!/*/}
       <MainDetails />
       {/*/!* 5. Programa *!/*/}
-      <Itinerary />
+      {/*<Itinerary />*/}
       {/*/!* 6. Dress code *!/*/}
       {/*<DressCode />*/}
       {/*/!* 7. RSVP *!/*/}
@@ -195,7 +229,7 @@ export default function InvitationContent({ inviteCode }: { inviteCode?: string 
       {/*/!* 9. Regalo *!/*/}
       <Gift />
       {/*/!* 10. Álbum / QR *!/*/}
-      <AlbumQR />
+      {/*<AlbumQR />*/}
       {/*/!* 11. Mapa embebido *!/*/}
       <MapEmbed />
       {/*/!* 12. Cierre *!/*/}

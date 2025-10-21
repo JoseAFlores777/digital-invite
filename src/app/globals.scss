@@ -36,6 +36,18 @@
   --color-wedgewood-1800:#16212d;
   --color-wedgewood-1900:#0f1922;
 
+  /* Paleta dusty (compatibilidad con componentes existentes) */
+  --color-dusty-50: #f6f8fb;
+  --color-dusty-100: #eef3f9;
+  --color-dusty-200: #dee8f2;
+  --color-dusty-300: #c9d8e7;
+  --color-dusty-400: #b3c7db;
+  --color-dusty-500: #9cb3c7;
+  --color-dusty-600: #7c95ab;
+  --color-dusty-700: #5f788d;
+  --color-dusty-800: #465b6c;
+  --color-dusty-900: #2a3947;
+
   /* Alias semánticos (crean utilidades: bg-primary, text-foreground, etc.) */
   --color-primary: var(--color-wedgewood-800);
   --color-primary-soft: var(--color-wedgewood-300);

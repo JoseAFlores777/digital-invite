@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
+import PeonieSVG from "@/components/PeonieSvg";
 
 /**
  * Props del componente
@@ -25,7 +27,8 @@ export type BiblicalVerse_1Props = {
 
     // Divider decorativo
     showDivider?: boolean;
-    dividerClassName?: string;       // estilos extra al SVG
+    dividerClassName?: string
+    dividerStyle?: React.CSSProperties
     dividerType?: "leaf" | "peonies"; // tipo de divisor
 
     // Tipografías (mapeadas en tailwind.config)
@@ -40,9 +43,8 @@ export type BiblicalVerse_1Props = {
 export default function BiblicalVerse_1({
                                         kicker = "Save the Date",
                                         couple = "EMMA AND DAVID",
-                                        dateLine = "Saturday, September 23rd, 2035",
-                                        addressLines = ["123 Anywhere St., Any City,", "ST 12345"],
-
+                                        dateLine = "Clarisa & José",
+                                        addressLines = [],
                                         bgColor = "bg-white",
                                         textColor = "text-accent-800",
                                         accentColor = "text-accent-700",
@@ -55,6 +57,7 @@ export default function BiblicalVerse_1({
 
                                         showDivider = true,
                                         dividerClassName = "",
+                                        dividerStyle,
                                         dividerType = "peonies",
 
                                         fontKicker = "font-script",
@@ -91,9 +94,9 @@ export default function BiblicalVerse_1({
             {showDivider && (
                 <div className="my-8 flex justify-center">
                     {dividerType === "peonies" ? (
-                        <PeoniesDivider className={`${dividerClassName}`} />
+                        <PeoniesDivider className={`${dividerClassName}`} style={dividerStyle} />
                     ) : (
-                        <LeafDivider className={`${accentColor} ${dividerClassName}`} />
+                        <LeafDivider className={`${accentColor} ${dividerClassName}`} style={dividerStyle} />
                     )}
                 </div>
             )}
@@ -128,13 +131,14 @@ export default function BiblicalVerse_1({
 }
 
 /** Divider SVG “ramas” en trazo */
-function LeafDivider({ className = "" }: { className?: string }) {
+function LeafDivider({ className = "", style }: { className?: string, style?: React.CSSProperties }) {
     return (
         <svg
             viewBox="0 0 400 60"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             className={`h-10 w-auto ${className}`}
+            style={style}
             aria-hidden="true"
         >
             <g stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -146,14 +150,26 @@ function LeafDivider({ className = "" }: { className?: string }) {
     );
 }
 
-function PeoniesDivider({ className = "" }: { className?: string }) {
+function PeoniesDivider({ className = "", style }: { className?: string, style?: React.CSSProperties }) {
     return (
-        <img
-            src="/svg/peonies_divider.svg"
-            alt=""
-            className={`h-10 w-auto ${className}`}
-            aria-hidden="true"
-            loading="lazy"
-        />
+        <>
+            {/*<Image*/}
+            {/*src={"/svg/peonies_divider.svg"}*/}
+            {/*width={100}*/}
+            {/*height={100}*/}
+            {/*className={`h-40 w-auto ${className}`}*/}
+            {/*aria-hidden="true"*/}
+            {/*loading="lazy"*/}
+            {/*alt={""}*/}
+            {/*></Image>*/}
+
+            <PeonieSVG
+                width={100}
+                height={100}
+                className={`${className}`}
+                style={style}
+                aria-hidden="true"
+            />
+        </>
     );
 }

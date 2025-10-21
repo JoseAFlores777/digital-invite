@@ -10,6 +10,7 @@ const config = {
         './pages/**/*.{ts,tsx,js,jsx,mdx}',
         './components/**/*.{ts,tsx,js,jsx,mdx}',
         './content/**/*.{md,mdx}',
+        './src/**/*.{ts,tsx,js,jsx,mdx}',
     ],
     theme: {
         // Contenedor centrado, cómodo para layouts de boda

@@ -255,7 +255,7 @@ export default function PerspectiveZoom({
     }, [computedItems, markers, pinSpacing, sectionsEnd]);
 
     return (
-        <main ref={rootRef} className="bg-white text-neutral-900 font-sans">
+        <main ref={rootRef} className="bg-white text-[color:var(--color-dusty-800)] font-sans">
             <div
                 className={`${styles.zoomContainer} w-full h-screen overflow-hidden relative`}
                 style={{ perspective }}
@@ -324,12 +324,12 @@ export default function PerspectiveZoom({
                                 key={`html-${idx}`}
                                 data-quote-section="true"
                                 data-index={idx}
-                                className={`${styles.sectionStick} min-h-screen bg-white flex justify-center items-center text-neutral-900`}
+                                className={`${styles.sectionStick} min-h-screen bg-white flex justify-center items-center text-[color:var(--color-dusty-800)]`}
                                 tabIndex={-1}
                                 style={{ contentVisibility: "auto", containIntrinsicSize: "1000px" }}
                             >
                                 <div
-                                    className="opacity-reveal js-quote-html prose prose-neutral text-center text-3xl md:text-5xl lg:text-6xl w-4/5 md:w-3/5 leading-tight"
+                                    className="opacity-reveal js-quote-html prose text-center text-3xl md:text-5xl lg:text-6xl w-4/5 md:w-3/5 leading-tight [--tw-prose-body:var(--color-dusty-800)] [--tw-prose-headings:var(--color-dusty-800)] [--tw-prose-lead:var(--color-dusty-800)] [--tw-prose-links:var(--color-dusty-800)] [--tw-prose-bold:var(--color-dusty-800)] [--tw-prose-quotes:var(--color-dusty-800)]"
                                     dangerouslySetInnerHTML={{ __html: asHtml }}
                                 />
                             </section>
@@ -341,7 +341,7 @@ export default function PerspectiveZoom({
                             key={`text-${idx}`}
                             data-quote-section="true"
                             data-index={idx}
-                            className={`${styles.sectionStick} min-h-screen bg-white flex justify-center items-center text-neutral-900`}
+                            className={`${styles.sectionStick} min-h-screen bg-white flex justify-center items-center text-[color:var(--color-dusty-800)]`}
                             tabIndex={-1}
                             style={{ contentVisibility: "auto", containIntrinsicSize: "1000px" }}
                         >
@@ -357,11 +357,11 @@ export default function PerspectiveZoom({
                         key={`node-${idx}`}
                         data-quote-section="true"
                         data-index={idx}
-                        className={`${styles.sectionStick} min-h-screen bg-white flex justify-center items-center text-neutral-900`}
+                        className={`${styles.sectionStick} min-h-screen bg-white flex justify-center items-center text-[color:var(--color-dusty-800)]`}
                         tabIndex={-1}
                         style={{ contentVisibility: "auto", containIntrinsicSize: "1000px" }}
                     >
-                        <div className="opacity-reveal w-4/5 md:w-3/5">{q as React.ReactNode}</div>
+                        <div className="opacity-reveal js-quote-html prose text-center text-3xl md:text-5xl lg:text-6xl w-4/5 md:w-3/5 leading-tight [--tw-prose-body:var(--color-dusty-800)] [--tw-prose-headings:var(--color-dusty-800)] [--tw-prose-lead:var(--color-dusty-800)] [--tw-prose-links:var(--color-dusty-800)] [--tw-prose-bold:var(--color-dusty-800)] [--tw-prose-quotes:var(--color-dusty-800)]">{q as React.ReactNode}</div>
                     </section>
                 );
             })}

@@ -11,7 +11,7 @@ export default async function SolicitudPage({
 
   if (!solicitudId) {
     return (
-      <main className="min-h-screen grid place-items-center p-6 text-center">
+      <main className="min-h-screen grid place-items-center  text-center">
         <div>
           <h1 className="text-2xl font-semibold mb-2">Falta el identificador de la solicitud</h1>
           <p className="opacity-80 max-w-md mx-auto">
