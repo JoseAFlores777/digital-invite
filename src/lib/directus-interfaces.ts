@@ -813,6 +813,8 @@ export type Weddings = {
     user_updated?: string | null;
     web_photos: any[] & WebPhotos[];
     live_url?: string | null;
+    shared_album_url?: string | null;
+    shared_album_tutorial_url?: string | null;
 };
 
 export type CustomDirectusTypes = {

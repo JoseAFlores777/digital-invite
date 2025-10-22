@@ -15,6 +15,7 @@ import AlbumQR from "./AlbumQR";
 import MapEmbed from "./MapEmbed";
 import Footer from "./Footer";
 import Gallery from "./Gallery";
+import SharedAlbum from "./SharedAlbum";
 import PanelPinStack from "./PanelPinStack";
 import BiblicalVerse_1 from "@/components/biblical-verse_1";
 import PerspectiveZoom, {ZoomItemConfig} from "@/components/PerspectiveZoom";
@@ -233,6 +234,7 @@ export default function InvitationContent({ inviteCode }: { inviteCode?: string 
       {/*<Lodging />*/}
       {/*/!* 9. Regalo *!/*/}
       <Gift />
+      <SharedAlbum />
       {/*/!* 10. Álbum / QR *!/*/}
       {/*<AlbumQR />*/}
       {/*/!* 11. Mapa embebido *!/*/}

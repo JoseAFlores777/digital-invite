@@ -19,6 +19,8 @@ export type WeddingGeneralities = Pick<
   | "estimated_guests"
   | "color_palette"
   | "live_url"
+  | "shared_album_url"
+  | "shared_album_tutorial_url"
 > & {
   couple?: {
     id?: string;
@@ -58,6 +60,8 @@ export async function getWeddingById(weddingId: string): Promise<WeddingGenerali
     "estimated_guests",
     "color_palette",
     "live_url",
+    "shared_album_url",
+    "shared_album_tutorial_url",
     "couple.id",
     "couple.name",
     "couple.partner_1.id",
