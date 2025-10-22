@@ -111,7 +111,7 @@ export default function WeddingHeader({
     },
     lg: {
       logo: 120,
-      title: "text-4xl md:text-5xl",
+      title: "text-4xl font-light md:text-5xl",
       subtitle: "text-base md:text-lg",
       date: "text-lg md:text-xl",
       headerMargin: "mb-10 md:mb-12",
@@ -139,7 +139,7 @@ export default function WeddingHeader({
       }
       style={isSecondary ? { backgroundColor: "var(--color-dusty-500)" } : undefined}
     >
-      <div className={"mt-20 flex items-center justify-center " + cfg.logoMarginBottom}>
+      <div className={"mt-10 md:mt-20 flex items-center justify-center " + cfg.logoMarginBottom}>
         <span
           aria-hidden
           style={{
@@ -158,7 +158,7 @@ export default function WeddingHeader({
           }}
         />
       </div>
-      <h1 className={"display-font " + cfg.title + " font-semibold tracking-tight"}>{title}</h1>
+      <h1 className={"display-font " + cfg.title + " font-medium tracking-tight"}>{title}</h1>
       {subtitle ? (
         <p className={subtitleClass}>{subtitle}</p>
       ) : null}

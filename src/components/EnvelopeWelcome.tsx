@@ -22,7 +22,7 @@ export default function EnvelopeWelcome({
   sealSlot,
   sender = "De: Clari & José",
   subtitle = "Con mucho amor",
-  buttonText = "Abrir Invitación",
+  buttonText = "Abrir",
   onOpenComplete,
   className = "",
 }: EnvelopeWelcomeProps) {
@@ -104,7 +104,7 @@ export default function EnvelopeWelcome({
                 name="invite-swipe"
                 onSuccess={handleOpen}
                 text={buttonText}
-                text_unlocked=""
+                text_unlocked="¡Bienvenido!"
                 height={56}
                 autoWidth
                 background_color="#c8d6e4"
