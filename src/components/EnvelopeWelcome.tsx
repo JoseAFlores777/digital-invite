@@ -31,6 +31,7 @@ export default function EnvelopeWelcome({
   const { startMusic } = useMusic();
   const [finalGifts, setFinalGifts] = useState<string | null>(null);
   const [shareHref, setShareHref] = useState<string | null>(null);
+  const [confirmHref, setConfirmHref] = useState<string | null>(null);
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;
@@ -41,10 +42,20 @@ export default function EnvelopeWelcome({
       giftsUrl.pathname = "/gifts";
       if (weddingId) giftsUrl.searchParams.set("wedding_id", weddingId);
       const final = giftsUrl.toString();
-        setShareHref(final);
+      setShareHref(final);
+
+      const invitationID = current.searchParams.get("invitationID");
+      if (invitationID) {
+        const confirm = new URL("https://invite.joseiz.com/solicitud/");
+        confirm.searchParams.set("invitationID", invitationID);
+        setConfirmHref(confirm.toString());
+      } else {
+        setConfirmHref(null);
+      }
     } catch {
       const fallback = "/gifts";
-        setShareHref(fallback);
+      setShareHref(fallback);
+      setConfirmHref(null);
     }
   }, []);
 
@@ -105,7 +116,7 @@ export default function EnvelopeWelcome({
                 disabled={isOpening}
               />
             </div>
-            <div className="mt-4 flex justify-center">
+            <div className="mt-4 flex justify-center gap-3 flex-wrap">
               {shareHref ? (
                 <CustomBtn
                   key="envelope-gifts-link"
@@ -113,9 +124,22 @@ export default function EnvelopeWelcome({
                   target="_blank"
                   rel="noopener noreferrer"
                   label="Ir a mesa de regalos"
-                  icon="normal-emoji:🎁"
+                  icon="mingcute:gift-line"
                   variant="outline"
                   ariaLabel="Compartir enlace de regalos por WhatsApp: Mesa de regalos"
+                  size={"lg"}
+                />
+              ) : null}
+              {confirmHref ? (
+                <CustomBtn
+                  key="envelope-confirm-link"
+                  href={confirmHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  label="Confirmar invitación"
+                  icon="material-symbols:fact-check-outline-rounded"
+                  variant="outline"
+                  ariaLabel="Confirmar asistencia a la invitación"
                   size={"lg"}
                 />
               ) : null}
