@@ -155,6 +155,7 @@ export default function InvitationContent({ inviteCode }: { inviteCode?: string 
                 <BiblicalVerse_1
                     kicker="11 Años De Historia"
                     couple="DIOS HA SIDO FIEL"
+                    dateLine={"SANTIDAD, PUREZA Y AMOR"}
                     bgColor="bg-white"
                     textColor="text-accent-800"
                     accentColor="text-accent-800"
