@@ -11,6 +11,7 @@ type WeddingHeaderProps = {
   logoColor?: string;
   logoSize?: number;
   backgroundVariant?: "primary" | "secondary";
+  size?: "sm" | "md" | "lg";
 };
 
 export default function WeddingHeader({
@@ -18,8 +19,9 @@ export default function WeddingHeader({
   subtitle = "",
   className,
   logoColor = "var(--color-dusty-500)",
-  logoSize = 96,
+  logoSize,
   backgroundVariant = "primary",
+  size = "md",
 }: WeddingHeaderProps) {
   const [dateLabel, setDateLabel] = useState<string>("");
   const searchParams = useSearchParams();
@@ -79,26 +81,70 @@ export default function WeddingHeader({
 
   const isSecondary = backgroundVariant === "secondary";
   const effectiveLogoColor = isSecondary ? "#ffffff" : logoColor;
-  const subtitleClass = isSecondary
-    ? "mt-1 text-sm md:text-base text-white/90"
-    : "mt-1 text-sm md:text-base text-[color:var(--color-dusty-800)]";
-  const dateClass = isSecondary
-    ? "mt-2 text-base md:text-lg text-white"
-    : "mt-2 text-base md:text-lg text-[color:var(--color-dusty-800)]";
+
+  const sizeMap: Record<NonNullable<WeddingHeaderProps["size"]>, {
+    logo: number;
+    title: string;
+    subtitle: string;
+    date: string;
+    headerMargin: string;
+    padding: string;
+    logoMarginBottom: string;
+  }> = {
+    sm: {
+      logo: 72,
+      title: "text-2xl md:text-3xl",
+      subtitle: "text-xs md:text-sm",
+      date: "text-sm md:text-base",
+      headerMargin: "mb-6 md:mb-8",
+      padding: "p-5 md:p-6",
+      logoMarginBottom: "mb-3",
+    },
+    md: {
+      logo: 96,
+      title: "text-3xl md:text-4xl",
+      subtitle: "text-sm md:text-base",
+      date: "text-base md:text-lg",
+      headerMargin: "mb-8 md:mb-10",
+      padding: "p-6 md:p-8",
+      logoMarginBottom: "mb-4",
+    },
+    lg: {
+      logo: 120,
+      title: "text-4xl md:text-5xl",
+      subtitle: "text-base md:text-lg",
+      date: "text-lg md:text-xl",
+      headerMargin: "mb-10 md:mb-12",
+      padding: "p-8 md:p-10",
+      logoMarginBottom: "mb-5",
+    },
+  };
+
+  const cfg = sizeMap[size] || sizeMap.md;
+  const computedLogoSize = typeof logoSize === "number" ? logoSize : cfg.logo;
+  const subtitleColor = isSecondary ? "text-white/90" : "text-[color:var(--color-dusty-800)]";
+  const dateColor = isSecondary ? "text-white" : "text-[color:var(--color-dusty-800)]";
+  const subtitleClass = ["mt-1", cfg.subtitle, subtitleColor].join(" ");
+  const dateClass = ["mt-2", cfg.date, dateColor].join(" ");
 
   return (
     <header
       className={
-        ("text-center mb-8 md:mb-10 " + (isSecondary ? "text-white rounded-xl p-6 md:p-8 " : "")) + (className || "")
+        (
+          "text-center " +
+          cfg.headerMargin +
+          " " +
+          (isSecondary ? "text-white rounded-xl " + cfg.padding + " " : "")
+        ) + (className || "")
       }
       style={isSecondary ? { backgroundColor: "var(--color-dusty-500)" } : undefined}
     >
-      <div className="flex items-center justify-center mb-4">
+      <div className={"flex items-center justify-center " + cfg.logoMarginBottom}>
         <span
           aria-hidden
           style={{
-            width: logoSize,
-            height: logoSize,
+            width: computedLogoSize,
+            height: computedLogoSize,
             backgroundColor: effectiveLogoColor,
             WebkitMaskImage: 'url(/wedding-Logo.svg)',
             maskImage: 'url(/wedding-Logo.svg)',
@@ -112,7 +158,7 @@ export default function WeddingHeader({
           }}
         />
       </div>
-      <h1 className="display-font text-3xl md:text-4xl font-semibold tracking-tight">{title}</h1>
+      <h1 className={"display-font " + cfg.title + " font-semibold tracking-tight"}>{title}</h1>
       {subtitle ? (
         <p className={subtitleClass}>{subtitle}</p>
       ) : null}

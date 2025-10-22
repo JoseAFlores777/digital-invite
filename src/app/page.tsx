@@ -211,7 +211,7 @@ export default function Home() {
             className={envelopeFading ? "opacity-0 pointer-events-none" : "opacity-100"}
             sealSlot={<img src="/wedding_seal.png" alt="Sello de cera" className="seal-img" />}
             sender={inviteSender}
-            subtitle={inviteSubtitle || "Con mucho amor"}
+            subtitle={"Con mucho cariño"}
             buttonText="Abrir invitación"
             onOpenComplete={handleOpenComplete}
           />

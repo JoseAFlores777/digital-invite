@@ -5,6 +5,7 @@ import { SwipeableButton } from "react-swipeable-button";
 import ew from "./EnvelopeWelcome.module.scss";
 import { useMusic } from "./MusicProvider";
 import CustomBtn from "@/components/CustomBtn";
+import WeddingHeader from "@/components/WeddingHeader";
 
 export type EnvelopeWelcomeProps = {
   sealText?: string;
@@ -65,19 +66,20 @@ export default function EnvelopeWelcome({
 
   return (
     <main
-      className={`min-h-screen bg-white text-[color:var(--color-dusty-900)] overflow-hidden transition-opacity duration-500 ${className}`}
+      className={`min-h-screen bg-white text-[color:var(--color-dusty-800)] overflow-hidden transition-opacity duration-500 ${className}`}
       style={{
         minHeight: "100dvh",
       }}
     >
       <div id="sobre-boda" className={`${ew.envelope} ${ew.envelopeFull} ${isOpening ? ew.opening : ""}`}>
-        <div className={`${ew.body} ${ew.paperTexture}`} />
-        <div className={ew.mouth} aria-hidden />
-        <div className={ew.seal} aria-hidden>
-          {sealSlot ? sealSlot : <span className={ew.sealText}>{sealText}</span>}
-        </div>
-        <div className={ew.overlay} aria-hidden={false}>
-          <div className="flex flex-col justify-between items-center gap-20 min-h-[40vh] py-6 px-4">
+        {/*<div className={`${ew.body} ${ew.paperTexture}`} />*/}
+        {/*<div className={ew.mouth} aria-hidden />*/}
+        {/*<div className={ew.seal} aria-hidden>*/}
+        {/*  {sealSlot ? sealSlot : <span className={ew.sealText}>{sealText}</span>}*/}
+        {/*</div>*/}
+        <div className={"mt-20 flex flex-col justify-between items-center"} aria-hidden={false}>
+          <WeddingHeader title="Boda Clarisa & José" size={"lg"}/>
+          <div className="flex flex-col justify-between items-center gap-15 min-h-[40vh] py-6 px-4">
             <div className="text-center">
               <p className="sans-font text-base font-semibold tracking-wide" style={{ color: "var(--color-dusty-900)" }}>Invitación Especial para</p>
               <p className="display-font text-2xl md:text-3xl tracking-wide mt-1" style={{ color: "var(--color-dusty-900)" }}>{sender}</p>
@@ -91,7 +93,7 @@ export default function EnvelopeWelcome({
                 name="invite-swipe"
                 onSuccess={handleOpen}
                 text={buttonText}
-                text_unlocked="¡Nos vemos adentro!"
+                text_unlocked=""
                 height={56}
                 autoWidth
                 background_color="#c8d6e4"
@@ -118,7 +120,7 @@ export default function EnvelopeWelcome({
                 />
               ) : null}
             </div>
-          <div className="text-center mt-4">
+          <div className="text-center">
             <p className="max-w-md mx-auto italic text-[13px]" style={{ color: "var(--color-dusty-800)" }}>
               Reconócelo en todos tus caminos, y él enderezará tus veredas.
               <span className="block not-italic mt-1 text-[12px]" style={{ color: "var(--color-dusty-700)" }}>
