@@ -89,6 +89,11 @@ export async function getWeddingById(weddingId: string): Promise<WeddingGenerali
           fields: fieldsToReturn,
           filter: { id: { _eq: weddingId } },
           limit: 1,
+          deep: {
+            web_photos: {
+              _filter: { status: { _eq: "published" } },
+            },
+          },
         })
       )
     )

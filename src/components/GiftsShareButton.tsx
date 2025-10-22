@@ -14,10 +14,13 @@ type Props = {
 export default function GiftsShareButton({ className = "", shareHref, finalGifts, label = "Compartir esta información", icon = "mdi:whatsapp" }: Props) {
   // If shareHref is not provided, compute it on the client after mount to avoid SSR mismatch
   const [clientHref, setClientHref] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+
     if (shareHref) return; // nothing to compute
-    if (typeof window === "undefined") return; // SSR: skip rendering to avoid hydration mismatch
+    if (typeof window === "undefined") return; // SSR path safeguards
 
     try {
       let giftsUrlStr: string;
@@ -41,9 +44,9 @@ export default function GiftsShareButton({ className = "", shareHref, finalGifts
   }, [shareHref, finalGifts]);
 
   // If no SSR-provided href, avoid rendering on the server to prevent hydration mismatch
-  if (!shareHref && typeof window === "undefined") return null;
+  if (!shareHref && !mounted) return null;
 
-  const href = shareHref || clientHref || "#";
+  const href = (shareHref || clientHref || "#") as string;
 
   return (
     <a

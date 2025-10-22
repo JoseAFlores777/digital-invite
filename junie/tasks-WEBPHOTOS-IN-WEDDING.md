@@ -6,7 +6,8 @@
 4. Update weddings.service.ts to include web_photos in WeddingGeneralities type. [done]
 5. Update fields selection in weddings.service.ts to fetch web_photos fields. [done]
 6. Build/Type-check project locally to validate changes. [done]
-7. Smoke test getWeddingById to ensure web_photos are returned. [pending]
+7. Smoke test getWeddingById to ensure web_photos are returned. [done]
+8. Filter web_photos by status == 'published' using deep filter in Directus query. [done]
 
 Notes:
 - No external dependencies added.

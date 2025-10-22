@@ -153,12 +153,12 @@ export default function Gift({ hideCopy = false, shareHref, finalGifts }: { hide
             <Icon icon="lucide:gift" className="w-12 h-12 text-[color:var(--color-dusty-600)]" />
           </div>
           <h2 className="display-font text-3xl md:text-4xl mb-3">Mesa de Regalos</h2>
-            {!( !shareHref && typeof window === "undefined" ) && (
+            {(shareHref || (mounted && clientHref)) && (
               <div className="flex justify-center mb-6">
                 <CustomBtn
-                    className={"animate-pulse"}
+                  className={"animate-pulse"}
                   key="share-info"
-                  href={shareHref || clientHref || "#"}
+                  href={(shareHref || clientHref) as string}
                   target="_blank"
                   rel="noopener noreferrer"
                   label="Compartir esta información"

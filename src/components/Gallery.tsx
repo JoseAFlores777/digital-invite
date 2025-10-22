@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import PhotoSwipeLightbox from "photoswipe/lightbox";
 import "photoswipe/style.css";
 import { fetchWeddingGeneralities } from "@/lib/api/solicitudes";
+import CustomBtn from "@/components/CustomBtn";
 
 export default function Gallery() {
   const root = useRef<HTMLDivElement>(null);
@@ -15,6 +16,13 @@ export default function Gallery() {
     width: number;
     height: number;
   }[]>([]);
+
+  const collapsedMax = 400; // px
+  const fadeHeight = 56; // px
+  const [expanded, setExpanded] = useState(false);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const [maxHeight, setMaxHeight] = useState<number>(collapsedMax);
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -51,7 +59,6 @@ export default function Gallery() {
           return { id, largeURL, originalURL, thumbnailURL, width: 1600, height: 1067 };
         });
 
-        // Measure natural sizes to preserve aspect ratio in PhotoSwipe
         const measured = await Promise.all(
           prelim.map(async (it) => {
             const { w, h } = await loadNaturalSize(it.originalURL);
@@ -69,6 +76,7 @@ export default function Gallery() {
     };
   }, []);
 
+  // Lightbox
   useEffect(() => {
     if (!root.current) return;
     const galleryId = "engagement-gallery";
@@ -87,7 +95,60 @@ export default function Gallery() {
     };
   }, [images.length]);
 
+  // Measure overflow for collapse/expand
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+
+    const checkOverflow = () => {
+      const overflows = el.scrollHeight > collapsedMax + 4;
+      setIsOverflowing(overflows);
+      setMaxHeight(expanded ? el.scrollHeight : collapsedMax);
+    };
+
+    checkOverflow();
+
+    const ro = new ResizeObserver(() => checkOverflow());
+    ro.observe(el);
+
+    const imgs = Array.from(el.querySelectorAll("img"));
+    const offs: Array<() => void> = [];
+    imgs.forEach((img) => {
+      const handler = () => checkOverflow();
+      if (!img.complete) {
+        img.addEventListener("load", handler, { once: true });
+        img.addEventListener("error", handler, { once: true });
+        offs.push(() => {
+          img.removeEventListener("load", handler);
+          img.removeEventListener("error", handler);
+        });
+      }
+    });
+
+    return () => {
+      ro.disconnect();
+      offs.forEach((fn) => fn());
+    };
+  }, [expanded]);
+
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+    if (expanded) {
+      setMaxHeight(el.scrollHeight);
+    } else {
+      setMaxHeight(collapsedMax);
+    }
+  }, [expanded]);
+
+  const containerStyles = useMemo<React.CSSProperties>(() => ({
+    maxHeight: `${maxHeight}px`,
+    transition: "max-height 400ms ease",
+    overflow: "hidden",
+  }), [maxHeight]);
+
   const galleryID = "engagement-gallery";
+  const showFade = isOverflowing && !expanded;
 
   return (
     <section id="galeria" ref={root} className="bg-white">
@@ -98,34 +159,59 @@ export default function Gallery() {
           <p className="text-neutral-700 max-w-2xl mx-auto mt-4">Fotos de nuestro compromiso</p>
         </div>
 
-        {/* Grid inspired by PhotoMasonry.tsx (no pinned scroll; responsive masonry-like) */}
-        <div id={galleryID} className="pswp-gallery grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
-          {images.map((image, index) => (
-            <a
-              key={`${galleryID}-${index}`}
-              href={image.largeURL}
-              data-pswp-width={image.width}
-              data-pswp-height={image.height}
-              target="_blank"
-              rel="noreferrer"
-              className={[
-                "group relative block overflow-hidden rounded-xl border border-neutral-200 bg-white",
-                // Vary spans a bit like PhotoMasonry
-                index % 7 === 0 ? "col-span-2 row-span-2" : "",
-                index % 9 === 0 ? "col-span-2 row-span-2" : "",
-              ].join(" ")}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={image.thumbnailURL}
-                alt=""
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                loading="lazy"
-                decoding="async"
-              />
-            </a>
-          ))}
+        <div className="relative">
+          <div ref={contentRef} style={containerStyles} aria-hidden={false}>
+            <div id={galleryID} className="pswp-gallery grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
+              {images.map((image, index) => (
+                <a
+                  key={`${galleryID}-${index}`}
+                  href={image.largeURL}
+                  data-pswp-width={image.width}
+                  data-pswp-height={image.height}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={[
+                    "group relative block overflow-hidden rounded-xl border border-neutral-200 bg-white",
+                    index % 7 === 0 ? "col-span-2 row-span-2" : "",
+                    index % 9 === 0 ? "col-span-2 row-span-2" : "",
+                  ].join(" ")}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={image.thumbnailURL}
+                    alt=""
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                    loading={index < 6 ? "eager" : "lazy"}
+                    decoding="async"
+                  />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {showFade && (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 bottom-0"
+              style={{
+                height: `${fadeHeight}px`,
+                background: "linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 80%)",
+              }}
+            />
+          )}
         </div>
+
+        {isOverflowing && (
+          <div className="mt-3 flex w-full justify-center">
+            <CustomBtn
+              onClick={() => setExpanded((v) => !v)}
+              ariaExpanded={expanded}
+              variant="outline"
+              size="md"
+              label={expanded ? "Ver menos" : "Ver más"}
+            />
+          </div>
+        )}
       </div>
     </section>
   );

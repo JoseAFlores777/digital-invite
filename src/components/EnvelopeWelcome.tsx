@@ -111,7 +111,7 @@ export default function EnvelopeWelcome({
                   target="_blank"
                   rel="noopener noreferrer"
                   label="Ir a mesa de regalos"
-                  icon="quill:link-out"
+                  icon="normal-emoji:🎁"
                   variant="outline"
                   ariaLabel="Compartir enlace de regalos por WhatsApp: Mesa de regalos"
                   size={"lg"}

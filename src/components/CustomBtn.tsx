@@ -25,6 +25,7 @@ type BaseProps = {
   size?: CustomBtnSize; // tamaño del botón
   shine?: boolean; // activa efecto de ShineBorder (borde animado)
   ariaLabel?: string;
+  ariaExpanded?: boolean;
   disabled?: boolean;
   children?: React.ReactNode; // opcional para contenido totalmente custom
 };
@@ -96,6 +97,7 @@ function CustomBtn(props: CustomBtnProps) {
     size = "md",
     shine = false,
     ariaLabel,
+    ariaExpanded,
     disabled,
     children,
     // discriminated
@@ -115,16 +117,27 @@ function CustomBtn(props: CustomBtnProps) {
   };
   const sizeClasses = sizeMap[size] || sizeMap.md;
 
+  const isEmoji = (s?: string) => !!s && s.startsWith("normal-emoji:");
+  const emojiText = isEmoji(icon) ? (icon as string).slice("normal-emoji:".length) : null;
+
+  const renderLeftIcon = () => {
+    if (!icon || iconPosition !== "left") return null;
+    if (emojiText) return <span className={cn(sizeClasses.icon, "inline-block")} aria-hidden>{emojiText}</span>;
+    return <Icon icon={icon} className={sizeClasses.icon} aria-hidden />;
+  };
+
+  const renderRightIcon = () => {
+    if (!icon || iconPosition !== "right") return null;
+    if (emojiText) return <span className={cn(sizeClasses.icon, "inline-block")} aria-hidden>{emojiText}</span>;
+    return <Icon icon={icon} className={sizeClasses.icon} aria-hidden />;
+  };
+
   const content = (
     <span className={cn("inline-flex items-center gap-2", disabled ? "opacity-60" : undefined)}>
-      {icon && iconPosition === "left" ? (
-        <Icon icon={icon} className={sizeClasses.icon} aria-hidden />
-      ) : null}
+      {renderLeftIcon()}
       {label ? <span className={cn("truncate", sizeClasses.label)}>{label}</span> : null}
       {children}
-      {icon && iconPosition === "right" ? (
-        <Icon icon={icon} className={sizeClasses.icon} aria-hidden />
-      ) : null}
+      {renderRightIcon()}
     </span>
   );
 
@@ -145,6 +158,7 @@ function CustomBtn(props: CustomBtnProps) {
           target={target}
           rel={aRel}
           aria-label={ariaLabel || label}
+          aria-expanded={ariaExpanded}
           className={commonClasses}
           onClick={undefined}
         >
@@ -159,6 +173,7 @@ function CustomBtn(props: CustomBtnProps) {
       <button
         type={type}
         aria-label={ariaLabel || label}
+        aria-expanded={ariaExpanded}
         className={commonClasses}
         onClick={onClick}
         disabled={disabled}
