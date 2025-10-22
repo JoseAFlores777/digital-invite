@@ -85,7 +85,7 @@ export default function Countdown() {
         aria-live="polite"
         aria-atomic="true"
       >
-        <span key={value} data-anim="tick">{String(value).padStart(2, "0")}</span>
+        <span key={value} data-anim="tick" suppressHydrationWarning>{String(value).padStart(2, "0")}</span>
       </div>
       <span className="mt-2 text-xs uppercase tracking-wide text-neutral-500">{label}</span>
     </div>
