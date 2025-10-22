@@ -88,7 +88,7 @@ export default function EnvelopeWelcome({
         {/*<div className={ew.seal} aria-hidden>*/}
         {/*  {sealSlot ? sealSlot : <span className={ew.sealText}>{sealText}</span>}*/}
         {/*</div>*/}
-        <div className={"mt-20 flex flex-col justify-between items-center"} aria-hidden={false}>
+        <div className={"flex flex-col justify-between items-center"} aria-hidden={false}>
           <WeddingHeader title="Boda Clarisa & José" size={"lg"}/>
           <div className="flex flex-col justify-between items-center gap-15 min-h-[40vh] py-6 px-4">
             <div className="text-center">
@@ -116,7 +116,7 @@ export default function EnvelopeWelcome({
                 disabled={isOpening}
               />
             </div>
-            <div className="mt-4 flex justify-center gap-3 flex-wrap">
+            <div aria-hidden={isOpening} className={`mt-4 flex justify-center gap-3 flex-wrap transition-opacity duration-500 ${isOpening ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
               {shareHref ? (
                 <CustomBtn
                   key="envelope-gifts-link"

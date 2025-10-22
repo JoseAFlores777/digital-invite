@@ -96,6 +96,7 @@ export async function getWeddingById(weddingId: string): Promise<WeddingGenerali
           deep: {
             web_photos: {
               _filter: { status: { _eq: "published" } },
+              _limit: -1,
             },
           },
         })

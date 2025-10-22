@@ -139,7 +139,7 @@ export default function WeddingHeader({
       }
       style={isSecondary ? { backgroundColor: "var(--color-dusty-500)" } : undefined}
     >
-      <div className={"flex items-center justify-center " + cfg.logoMarginBottom}>
+      <div className={"mt-20 flex items-center justify-center " + cfg.logoMarginBottom}>
         <span
           aria-hidden
           style={{
