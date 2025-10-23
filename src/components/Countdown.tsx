@@ -5,7 +5,7 @@ import { useCountdown } from "@/hooks/useCountdown";
 import { useIsReducedMotion } from "@/hooks/useIsReducedMotion";
 import { useGsapContext, gsap } from "@/hooks/useGsapContext";
 import AnilloScrollSequence from "@/components/AnilloScrollSequence";
-import { fetchWeddingGeneralities } from "@/lib/api/solicitudes";
+import { useWeddingData } from "@/store/wedding";
 import LiveStreamButton from "@/components/LiveStreamButton";
 import { Icon } from "@iconify/react";
 
@@ -15,29 +15,19 @@ export default function Countdown() {
   const [targetISO, setTargetISO] = useState<string>("2025-12-21T16:30:00");
   const [liveUrl, setLiveUrl] = useState<string>("");
 
+  const { data } = useWeddingData();
   useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const wg = await fetchWeddingGeneralities("");
-        if (!active || !wg) return;
-        const date: string = wg?.wedding?.date || ""; // yyyy-MM-dd
-        const start: string = wg?.wedding?.start_time || ""; // HH:mm[:ss]
-        const live: string = (wg?.wedding?.live_url as string) || (wg?.live_url as string) || "";
-        setLiveUrl(live);
-        if (date) {
-          const [h = "00", m = "00"] = (start || "00:00").split(":");
-          const iso = `${date}T${h.padStart(2, "0")}:${m.padStart(2, "0")}:00`;
-          setTargetISO(iso);
-        }
-      } catch {
-        // keep fallback targetISO
-      }
-    })();
-    return () => {
-      active = false;
-    };
-  }, []);
+    const wg: any = data;
+    const date: string = wg?.wedding?.date || "";
+    const start: string = wg?.wedding?.start_time || "";
+    const live: string = (wg?.wedding?.live_url as string) || (wg?.live_url as string) || "";
+    setLiveUrl(live || "");
+    if (date) {
+      const [h = "00", m = "00"] = (start || "00:00").split(":");
+      const iso = `${date}T${h.padStart(2, "0")}:${m.padStart(2, "0")}:00`;
+      setTargetISO(iso);
+    }
+  }, [data]);
 
   const { days, hours, minutes, seconds, finished } = useCountdown(targetISO);
 

@@ -2,26 +2,18 @@
 
 import React, { useEffect, useState } from "react";
 import LiveStreamButton from "@/components/LiveStreamButton";
-import { fetchWeddingGeneralities } from "@/lib/api/solicitudes";
+import { useWeddingData } from "@/store/wedding";
 import { Icon } from "@iconify/react";
 
 export default function GiftsLiveButton() {
   const [liveUrl, setLiveUrl] = useState<string>("");
 
+  const { data } = useWeddingData();
   useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const wg = await fetchWeddingGeneralities("");
-        if (!active || !wg) return;
-        const live: string = (wg?.wedding?.live_url as string) || (wg?.live_url as string) || "";
-        setLiveUrl(live);
-      } catch {}
-    })();
-    return () => {
-      active = false;
-    };
-  }, []);
+    const wg: any = data;
+    const live: string = (wg?.wedding?.live_url as string) || (wg?.live_url as string) || "";
+    setLiveUrl(live || "");
+  }, [data]);
 
   if (!liveUrl) return null;
 

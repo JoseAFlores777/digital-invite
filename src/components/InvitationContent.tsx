@@ -20,6 +20,7 @@ import PanelPinStack from "./PanelPinStack";
 import BiblicalVerse_1 from "@/components/biblical-verse_1";
 import PerspectiveZoom, {ZoomItemConfig} from "@/components/PerspectiveZoom";
 import { Icon } from "@iconify/react";
+import { useWeddingData } from "@/store/wedding";
 
 export default function InvitationContent({ inviteCode }: { inviteCode?: string }) {
     const FALLBACK_DESKTOP: ZoomItemConfig[] = [
@@ -86,51 +87,45 @@ export default function InvitationContent({ inviteCode }: { inviteCode?: string 
         return () => mql.removeEventListener("change", update);
     }, []);
 
+    const { data } = useWeddingData();
     React.useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const weddingId = params.get("wedding_id") || process.env.NEXT_PUBLIC_WEDDING_ID || "";
-        const url = weddingId ? `/api/wedding-generalities?wedding_id=${encodeURIComponent(weddingId)}` : "/api/wedding-generalities";
-        fetch(url)
-            .then(r => r.ok ? r.json() : Promise.reject())
-            .then(data => {
-                const base: string | undefined = data?.directus_url || undefined;
-                const photos: any[] = data?.wedding?.web_photos || [];
-                if (!base || !Array.isArray(photos) || photos.length === 0) return;
+        const wg: any = data;
+        const base: string | undefined = wg?.directus_url || undefined;
+        const photos: any[] = wg?.wedding?.web_photos || [];
+        if (!base || !Array.isArray(photos) || photos.length === 0) return;
 
-                const buildSrc = (asset?: string | null) => (asset ? `${base}/assets/${asset}` : "");
+        const buildSrc = (asset?: string | null) => (asset ? `${base}/assets/${asset}` : "");
 
-                const filtered = (Array.isArray(photos) ? photos : []).filter((p: any) => String(p?.type || "").toLowerCase() === "collage");
-                const sortPhotos = [...filtered].sort((a, b) => {
-                    const sa = a?.sort ?? 0;
-                    const sb = b?.sort ?? 0;
-                    return sa - sb;
-                });
+        const filtered = (Array.isArray(photos) ? photos : []).filter((p: any) => String(p?.type || "").toLowerCase() === "collage");
+        const sortPhotos = [...filtered].sort((a, b) => {
+            const sa = a?.sort ?? 0;
+            const sb = b?.sort ?? 0;
+            return sa - sb;
+        });
 
-                const mapDesktop: ZoomItemConfig[] = sortPhotos.map((p) => ({
-                    src: buildSrc(p?.asset),
-                    layer: p?.layer ?? undefined,
-                    x: p?.xposition ?? undefined,
-                    y: p?.yposition ?? undefined,
-                    width: p?.width ?? undefined,
-                    initialOpacity: p?.initialOpacity ?? undefined,
-                    zIndex: p?.zIndex ?? undefined,
-                })).filter(it => !!it.src);
+        const mapDesktop: ZoomItemConfig[] = sortPhotos.map((p) => ({
+            src: buildSrc(p?.asset),
+            layer: p?.layer ?? undefined,
+            x: p?.xposition ?? undefined,
+            y: p?.yposition ?? undefined,
+            width: p?.width ?? undefined,
+            initialOpacity: p?.initialOpacity ?? undefined,
+            zIndex: p?.zIndex ?? undefined,
+        })).filter(it => !!it.src);
 
-                const mapMobile: ZoomItemConfig[] = sortPhotos.map((p) => ({
-                    src: buildSrc(p?.asset),
-                    layer: (p?.layer_m ?? p?.layer) ?? undefined,
-                    x: (p?.xposition_m ?? p?.xposition) ?? undefined,
-                    y: (p?.yposition_m ?? p?.yposition) ?? undefined,
-                    width: (p?.width_m ?? p?.width) ?? undefined,
-                    initialOpacity: (p?.initialOpacity_m ?? p?.initialOpacity) ?? undefined,
-                    zIndex: (p?.zIndex_m ?? p?.zIndex) ?? undefined,
-                })).filter(it => !!it.src);
+        const mapMobile: ZoomItemConfig[] = sortPhotos.map((p) => ({
+            src: buildSrc(p?.asset),
+            layer: (p?.layer_m ?? p?.layer) ?? undefined,
+            x: (p?.xposition_m ?? p?.xposition) ?? undefined,
+            y: (p?.yposition_m ?? p?.yposition) ?? undefined,
+            width: (p?.width_m ?? p?.width) ?? undefined,
+            initialOpacity: (p?.initialOpacity_m ?? p?.initialOpacity) ?? undefined,
+            zIndex: (p?.zIndex_m ?? p?.zIndex) ?? undefined,
+        })).filter(it => !!it.src);
 
-                if (mapDesktop.length) setDesktopItems(mapDesktop);
-                if (mapMobile.length) setMobileItems(mapMobile);
-            })
-            .catch(() => void 0);
-    }, []);
+        if (mapDesktop.length) setDesktopItems(mapDesktop);
+        if (mapMobile.length) setMobileItems(mapMobile);
+    }, [data]);
 
     React.useEffect(() => {
         const mql = window.matchMedia("(max-width: 640px)");

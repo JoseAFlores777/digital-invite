@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "@iconify/react";
 import { useGsapContext, gsap } from "@/hooks/useGsapContext";
-import { fetchWeddingGeneralities } from "@/lib/api/solicitudes";
+import { useWeddingData } from "@/store/wedding";
 import CalendarAddButton from "@/components/CalendarAddButton";
 
 type EventItem = {
@@ -27,27 +27,19 @@ export default function Itinerary() {
   const [eventTz, setEventTz] = useState("");
   const [coupleName, setCoupleName] = useState("");
 
+  const { data } = useWeddingData();
   useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const wg = await fetchWeddingGeneralities("");
-        if (!active || !wg) return;
-        setVenueName(wg?.location?.venue_name || "Casablanca Le Decor");
-        setAddress(wg?.location?.address || "Local en Santa Lucia, Honduras");
-        setWazeLink(wg?.location?.waze_link || "");
-        setGoogleMapsLink(wg?.location?.google_maps_link || "");
-        setEventDateStr(wg?.wedding?.date || "");
-        setEventStartTimeStr(wg?.wedding?.start_time || "");
-        setEventEndTimeStr(wg?.wedding?.end_time || "");
-        setEventTz(wg?.wedding?.timezone || "");
-        setCoupleName(wg?.wedding?.couple?.name || "");
-      } catch {}
-    })();
-    return () => {
-      active = false;
-    };
-  }, []);
+    const wg: any = data;
+    setVenueName(wg?.location?.venue_name || "Casablanca Le Decor");
+    setAddress(wg?.location?.address || "Local en Santa Lucia, Honduras");
+    setWazeLink(wg?.location?.waze_link || "");
+    setGoogleMapsLink(wg?.location?.google_maps_link || "");
+    setEventDateStr(wg?.wedding?.date || "");
+    setEventStartTimeStr(wg?.wedding?.start_time || "");
+    setEventEndTimeStr(wg?.wedding?.end_time || "");
+    setEventTz(wg?.wedding?.timezone || "");
+    setCoupleName(wg?.wedding?.couple?.name || "");
+  }, [data]);
 
   const timeRange = useMemo(() => {
     try {

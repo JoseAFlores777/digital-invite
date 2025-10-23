@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { ViewTransitions } from "next-view-transitions";
 import "./globals.scss";
-import {bodySans, display, displaySerif, sans, script} from './fonts'
 
 export const metadata: Metadata = {
   title: "Invitación de boda – Clarisa & José",
@@ -45,7 +44,12 @@ export default function RootLayout({
   return (
     <ViewTransitions>
       <html lang="es">
-        <body className={`${display.variable} ${sans.variable} ${script.variable} ${displaySerif.variable} ${bodySans.variable} bg-background text-foreground`}>
+        <head>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+          <link href="https://fonts.googleapis.com/css2?family=Forum:wght@400&family=Pinyon+Script&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        </head>
+        <body className="bg-background text-foreground">
           {children}
         </body>
       </html>

@@ -3,27 +3,22 @@
 import React from "react";
 import { Icon } from "@iconify/react";
 import CustomBtn from "@/components/CustomBtn";
+import { useWeddingData } from "@/store/wedding";
 
 export default function SharedAlbum() {
   const [albumUrl, setAlbumUrl] = React.useState<string | null>(null);
   const [tutorialUrl, setTutorialUrl] = React.useState<string | null>(null);
   const [loaded, setLoaded] = React.useState(false);
 
+  const { data, loading } = useWeddingData();
   React.useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const weddingId = params.get("wedding_id") || process.env.NEXT_PUBLIC_WEDDING_ID || "";
-    const url = weddingId ? `/api/wedding-generalities?wedding_id=${encodeURIComponent(weddingId)}` : "/api/wedding-generalities";
-    fetch(url)
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((data) => {
-        const a = data?.wedding?.shared_album_url || null;
-        const t = data?.wedding?.shared_album_tutorial_url || null;
-        setAlbumUrl(a);
-        setTutorialUrl(t);
-      })
-      .catch(() => void 0)
-      .finally(() => setLoaded(true));
-  }, []);
+    const wg: any = data;
+    const a = wg?.wedding?.shared_album_url || null;
+    const t = wg?.wedding?.shared_album_tutorial_url || null;
+    setAlbumUrl(a);
+    setTutorialUrl(t);
+    setLoaded(true);
+  }, [data]);
 
   if (!loaded) return null;
   if (!albumUrl && !tutorialUrl) return null;

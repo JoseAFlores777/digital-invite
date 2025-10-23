@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { fetchWeddingGeneralities } from "@/lib/api/solicitudes";
+import { useWeddingData } from "@/store/wedding";
 
 type WeddingHeaderProps = {
   title?: string;
@@ -27,57 +27,47 @@ export default function WeddingHeader({
   const searchParams = useSearchParams();
   const weddingId = (searchParams?.get("wedding_id") || process.env.NEXT_PUBLIC_WEDDING_ID || process.env.DIRECTUS_WEDDING_ID || "") as string;
 
+  const { data } = useWeddingData(weddingId);
   useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const wg = await fetchWeddingGeneralities(weddingId);
-        if (!active || !wg) return;
-        const date: string = wg?.wedding?.date || "";
-        const start: string = wg?.wedding?.start_time || "";
-        const timeZone: string | undefined = wg?.wedding?.timezone || undefined;
-        console.log({ date, start, timeZone})
-        if (date) {
-          const [h = "00", m = "00"] = (start || "00:00").split(":");
-          const iso = `${date}T${h.padStart(2, "0")}:${m.padStart(2, "0")}:00`;
-          const d = new Date(iso);
-          const fmtDate = new Intl.DateTimeFormat("es-ES", {
-            weekday: "long",
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
-            ...(isValidIanaTimeZone(timeZone) ? { timeZone: timeZone as string } : {}),
-          }).format(d);
+    const wg: any = data;
+    const date: string = wg?.wedding?.date || "";
+    const start: string = wg?.wedding?.start_time || "";
+    const timeZone: string | undefined = wg?.wedding?.timezone || undefined;
+    if (date) {
+      const [h = "00", m = "00"] = (start || "00:00").split(":");
+      const iso = `${date}T${h.padStart(2, "0")}:${m.padStart(2, "0")}:00`;
+      const d = new Date(iso);
+      const fmtDate = new Intl.DateTimeFormat("es-ES", {
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        ...(isValidIanaTimeZone(timeZone) ? { timeZone: timeZone as string } : {}),
+      }).format(d);
 
-          const timeParts = new Intl.DateTimeFormat("es-ES", {
-            hour: "numeric",
-            hour12: true,
-            ...(isValidIanaTimeZone(timeZone) ? { timeZone: timeZone as string } : {}),
-          }).formatToParts(d);
-          const hourStr = timeParts.find(p => p.type === "hour")?.value ?? "";
-          let dayPeriod = timeParts.find(p => p.type === "dayPeriod")?.value ?? "";
-          dayPeriod = dayPeriod.toLowerCase();
+      const timeParts = new Intl.DateTimeFormat("es-ES", {
+        hour: "numeric",
+        hour12: true,
+        ...(isValidIanaTimeZone(timeZone) ? { timeZone: timeZone as string } : {}),
+      }).formatToParts(d);
+      const hourStr = timeParts.find(p => p.type === "hour")?.value ?? "";
+      let dayPeriod = timeParts.find(p => p.type === "dayPeriod")?.value ?? "";
+      dayPeriod = dayPeriod.toLowerCase();
 
-          const tzParts = new Intl.DateTimeFormat("es-ES", {
-            timeZoneName: "shortOffset",
-            ...(isValidIanaTimeZone(timeZone) ? { timeZone: timeZone as string } : {}),
-          }).formatToParts(d);
-          const tzName = tzParts.find(p => p.type === "timeZoneName")?.value ?? "";
+      const tzParts = new Intl.DateTimeFormat("es-ES", {
+        timeZoneName: "shortOffset",
+        ...(isValidIanaTimeZone(timeZone) ? { timeZone: timeZone as string } : {}),
+      }).formatToParts(d);
+      const tzName = tzParts.find(p => p.type === "timeZoneName")?.value ?? "";
 
-          const fmtTime = hourStr ? `${hourStr} ${dayPeriod}`.trim() : "";
-          const label = fmtTime
-            ? `${fmtDate} — ${fmtTime}${tzName ? ` ${tzName}` : ""}`
-            : `${fmtDate}${tzName ? ` — ${tzName}` : ""}`;
+      const fmtTime = hourStr ? `${hourStr} ${dayPeriod}`.trim() : "";
+      const label = fmtTime
+        ? `${fmtDate} — ${fmtTime}${tzName ? ` ${tzName}` : ""}`
+        : `${fmtDate}${tzName ? ` — ${tzName}` : ""}`;
 
-          console.log({ label })
-          setDateLabel(label);
-        }
-      } catch {}
-    })();
-    return () => {
-      active = false;
-    };
-  }, [weddingId]);
+      setDateLabel(label);
+    }
+  }, [data, weddingId]);
 
   const isSecondary = backgroundVariant === "secondary";
   const effectiveLogoColor = isSecondary ? "#ffffff" : logoColor;

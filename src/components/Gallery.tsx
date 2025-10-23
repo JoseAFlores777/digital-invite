@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import Image from "next/image";
+import NextImage from "next/image";
 import PhotoSwipeLightbox from "photoswipe/lightbox";
 import "photoswipe/style.css";
-import { fetchWeddingGeneralities } from "@/lib/api/solicitudes";
+import { useWeddingData } from "@/store/wedding";
 import CustomBtn from "@/components/CustomBtn";
 
 export default function Gallery() {
@@ -25,12 +25,13 @@ export default function Gallery() {
   const [maxHeight, setMaxHeight] = useState<number>(collapsedMax);
   const contentRef = useRef<HTMLDivElement | null>(null);
 
+  const { data } = useWeddingData();
   useEffect(() => {
     let active = true;
 
     const loadNaturalSize = (url: string) =>
       new Promise<{ w: number; h: number }>((resolve) => {
-        const img = new Image();
+        const img = new window.Image();
         img.loading = "eager";
         img.decoding = "async" as any;
         img.onload = () => {
@@ -42,40 +43,43 @@ export default function Gallery() {
         img.src = url;
       });
 
-    (async () => {
-      try {
-        const wg = await fetchWeddingGeneralities("");
-        if (!active || !wg) return;
-        const baseUrl: string = (wg?.directus_url as string) || process.env.NEXT_PUBLIC_DIRECTUS_URL || "";
-        const list: any[] = Array.isArray(wg?.wedding?.web_photos) ? wg.wedding.web_photos : (Array.isArray(wg?.web_photos) ? wg.web_photos : []);
-        const galleryList = (list || []).filter((p: any) => String(p?.type || "").toLowerCase() === "gallery");
-        const ids: string[] = galleryList
-          .map((p: any) => String(p?.asset || "").trim())
-          .filter((id: string) => !!id);
+    const wg: any = data;
+    try {
+      const baseUrl: string = (wg?.directus_url as string) || process.env.NEXT_PUBLIC_DIRECTUS_URL || "";
+      const list: any[] = Array.isArray(wg?.wedding?.web_photos) ? wg.wedding.web_photos : (Array.isArray(wg?.web_photos) ? wg.web_photos : []);
+      const galleryList = (list || []).filter((p: any) => String(p?.type || "").toLowerCase() === "gallery");
+      const ids: string[] = galleryList
+        .map((p: any) => String(p?.asset || "").trim())
+        .filter((id: string) => !!id);
 
-        const prelim = ids.map((id) => {
-          const originalURL = baseUrl ? `${baseUrl}/assets/${id}` : `/api/directus/assets/${id}`;
-          const largeURL = baseUrl ? `${baseUrl}/assets/${id}?format=webp&quality=85&width=1600` : `/api/directus/assets/${id}?w=1600`;
-          const thumbnailURL = baseUrl ? `${baseUrl}/assets/${id}?format=webp&quality=70&width=400` : `/api/directus/assets/${id}?w=400`;
-          return { id, largeURL, originalURL, thumbnailURL, width: 1600, height: 1067 };
-        });
-
-        const measured = await Promise.all(
-          prelim.map(async (it) => {
-            const { w, h } = await loadNaturalSize(it.originalURL);
-            return { ...it, width: w, height: h };
-          })
-        );
-
-        if (active) setImages(measured);
-      } catch {
+      if (!baseUrl) {
         if (active) setImages([]);
+        return;
       }
-    })();
-    return () => {
-      active = false;
-    };
-  }, []);
+
+      const prelim = ids.map((id) => {
+        const originalURL = `${baseUrl}/assets/${id}`;
+        const largeURL = `${baseUrl}/assets/${id}?format=webp&quality=85&width=1600`;
+        const thumbnailURL = `${baseUrl}/assets/${id}?format=webp&quality=70&width=400`;
+        return { id, largeURL, originalURL, thumbnailURL, width: 1600, height: 1067 };
+      });
+
+      Promise.all(
+        prelim.map(async (it) => {
+          const { w, h } = await loadNaturalSize(it.originalURL);
+          return { ...it, width: w, height: h };
+        })
+      ).then((measured) => {
+        if (active) setImages(measured);
+      }).catch(() => {
+        if (active) setImages([]);
+      });
+    } catch {
+      if (active) setImages([]);
+    }
+
+    return () => { active = false; };
+  }, [data]);
 
   // Lightbox
   useEffect(() => {
@@ -160,6 +164,7 @@ export default function Gallery() {
           <p className="text-neutral-700 max-w-2xl mx-auto mt-4">Fotos de nuestro compromiso</p>
         </div>
 
+
         <div className="relative">
           <div ref={contentRef} style={containerStyles} aria-hidden={false}>
             <div id={galleryID} className="pswp-gallery grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
@@ -177,14 +182,15 @@ export default function Gallery() {
                     index % 9 === 0 ? "col-span-2 row-span-2" : "",
                   ].join(" ")}
                 >
-                  <Image
-                    src={image.thumbnailURL}
-                    alt=""
-                    fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                    priority={index < 6}
-                  />
+                  <div className="relative w-full aspect-square">
+                    <NextImage
+                      src={image.thumbnailURL}
+                      alt=""
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                      priority={index < 6}
+                    />
+                  </div>
                 </a>
               ))}
             </div>

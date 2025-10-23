@@ -147,30 +147,20 @@ export default function Home() {
   useEffect(() => {
     if (inviteError) return; // skip if invalid
     let active = true;
-    const weddingId = process.env.NEXT_PUBLIC_WEDDING_ID;
-    // const invitationsUrl = weddingId
-    //   ? `/api/wedding-invitations?wedding_id=${encodeURIComponent(weddingId)}`
-    //   : "/api/wedding-invitations";
-    const weddingUrl = weddingId
-      ? `/api/wedding-generalities?wedding_id=${encodeURIComponent(weddingId)}`
-      : "/api/wedding-generalities";
 
     Promise.all([
       fetch("/api/digital-guests").then((r) => r.json()).catch(() => ({ guests: [] })),
-     // fetch(invitationsUrl).then((r) => r.json()).catch(() => ({ invitations: [] })),
-      fetch(weddingUrl).then((r) => r.json()).catch(() => ({ wedding: null })),
+      // Invitations can be re-enabled later if needed
     ])
-      .then(([guestsRes, invitationsRes, weddingRes]) => {
+      .then(([guestsRes]) => {
         if (!active) return;
         setDigitalGuests(Array.isArray(guestsRes?.guests) ? guestsRes.guests : []);
-        setInvitations(Array.isArray(invitationsRes?.invitations) ? invitationsRes.invitations : []);
-        setWedding(weddingRes?.wedding ?? null);
+        setInvitations([]);
       })
       .catch(() => {
         if (!active) return;
         setDigitalGuests([]);
         setInvitations([]);
-        setWedding(null);
       });
 
     return () => {

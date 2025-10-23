@@ -22,7 +22,7 @@ export default function EnvelopeWelcome({
   sealSlot,
   sender = "De: Clari & José",
   subtitle = "Con mucho amor",
-  buttonText = "Abrir",
+  buttonText = "Abrir Invitación",
   onOpenComplete,
   className = "",
 }: EnvelopeWelcomeProps) {
