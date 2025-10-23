@@ -77,7 +77,7 @@ export default function EnvelopeWelcome({
 
   return (
     <main
-      className={`min-h-screen bg-white text-[color:var(--color-dusty-800)] overflow-hidden transition-opacity duration-500 ${className}`}
+      className={`min-h-screen bg-white text-[color:var(--color-dusty-800)] overflow-x-hidden overflow-y-auto transition-opacity duration-500 ${className}`}
       style={{
         minHeight: "100dvh",
       }}
@@ -144,7 +144,7 @@ export default function EnvelopeWelcome({
                 />
               ) : null}
             </div>
-          <div className="text-center">
+          <div className="text-center pb-3">
             <p className="max-w-md mx-auto italic text-[13px]" style={{ color: "var(--color-dusty-800)" }}>
               Reconócelo en todos tus caminos, y él enderezará tus veredas.
               <span className="block not-italic mt-1 text-[12px]" style={{ color: "var(--color-dusty-700)" }}>

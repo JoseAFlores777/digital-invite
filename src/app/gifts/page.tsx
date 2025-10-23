@@ -8,8 +8,20 @@ import GiftsShareButton from "@/components/GiftsShareButton";
 import { headers } from "next/headers";
 
 export const metadata: Metadata = {
-  title: "Regalos | Invitación de boda",
-  description: "Opciones de regalo para la boda",
+  title: "Mesa de regalos – Clarisa & José",
+  description: "Comparte un detalle con los novios. Opciones seguras de regalo para la boda de Clarisa y José.",
+  alternates: { canonical: "/gifts" },
+  openGraph: {
+    title: "Mesa de regalos – Clarisa & José",
+    description: "Comparte un detalle con los novios. Opciones seguras de regalo para la boda de Clarisa y José.",
+    url: "/gifts",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Mesa de regalos – Clarisa & José",
+    description: "Opciones seguras de regalo para la boda de Clarisa y José.",
+  },
 };
 
 export default async function GiftsPage({

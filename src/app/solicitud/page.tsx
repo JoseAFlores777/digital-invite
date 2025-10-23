@@ -1,5 +1,23 @@
 import React from "react";
+import type { Metadata } from "next";
 import SolicitudManager from "@/components/SolicitudManager";
+
+export const metadata: Metadata = {
+  title: "Confirmar invitación – Clarisa & José",
+  description: "Gestiona y confirma tu asistencia a la boda de Clarisa y José.",
+  alternates: { canonical: "/solicitud" },
+  openGraph: {
+    title: "Confirmar invitación – Clarisa & José",
+    description: "Gestiona y confirma tu asistencia a la boda.",
+    url: "/solicitud",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Confirmar invitación – Clarisa & José",
+    description: "Confirma tu invitación a la boda.",
+  },
+};
 
 export default async function SolicitudPage({
   searchParams,

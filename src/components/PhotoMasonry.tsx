@@ -1,6 +1,7 @@
 'use client';
 
 import { useLayoutEffect, useRef } from 'react';
+import Image from 'next/image';
 import s from './PhotoMasonry.module.scss';
 
 import type { ScrollTrigger as ScrollTriggerType } from 'gsap/ScrollTrigger';
@@ -183,12 +184,13 @@ export default function PhotoMasonry({
               key={i}
               className={`${s.box} ${s.feather} relative overflow-hidden col-span-3 row-span-3 ${i % 7 === 0 ? 'col-span-4 row-span-2' : ''} ${i % 9 === 0 ? 'col-span-2 row-span-2' : ''}`}
             >
-              <img
+              <Image
                 src={src}
                 alt={`photo-${i}`}
-                className="h-full w-full object-cover"
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                className="object-cover"
                 loading="lazy"
-                decoding="async"
               />
             </figure>
           ))}

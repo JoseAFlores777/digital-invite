@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
+import Image from "next/image";
 import Loader from "@/components/Loader";
 import EnvelopeWelcome from "@/components/EnvelopeWelcome";
 import InvitationContent from "@/components/InvitationContent";
@@ -125,9 +126,11 @@ export default function Home() {
         const guests = (data?.invitation?.guests ?? []) as InvitationGuest[];
         const code = data.invitation?.code ?? "";
         const invitationName = code.includes("Familia") ? `La ${code}` : code;
+        const invitedCount = Array.isArray(guests) ? guests.filter(g => !!g?.guest?.person).length : 0;
+        const subtitleText = `Invitación para ${invitedCount} ${invitedCount === 1 ? "persona" : "personas"}`;
         if (!cancelled) {
           setInviteSender(invitationName);
-          setInviteSubtitle("Boda Clarisa & José | 13-dic-2025");
+          setInviteSubtitle(subtitleText);
         }
       } catch (e) {
         if (!cancelled) setInviteError("failed_to_fetch");
@@ -209,10 +212,10 @@ export default function Home() {
         ) : envelopeVisible && inviteSender ? (
           <EnvelopeWelcome
             className={envelopeFading ? "opacity-0 pointer-events-none" : "opacity-100"}
-            sealSlot={<img src="/wedding_seal.png" alt="Sello de cera" className="seal-img" />}
+            sealSlot={<Image src="/wedding_seal.png" alt="Sello de cera" width={96} height={96} className="seal-img" />}
             sender={inviteSender}
-            subtitle={"Con mucho cariño"}
-            buttonText="Abrir invitación"
+            subtitle={inviteSubtitle}
+            buttonText="Abrir"
             onOpenComplete={handleOpenComplete}
           />
         ) : null}

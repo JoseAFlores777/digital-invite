@@ -37,7 +37,7 @@ export default function InvitationContent({ inviteCode }: { inviteCode?: string 
 
         { src: "https://picsum.photos/seed/810/600/600", layer: 3, x: "10vw", y: "50%", width: "12vw" },
         { src: "https://picsum.photos/seed/811/600/600", layer: 1, x: "26vw", y: "52%", width: "6vw" },
-        { src: "httpsum.photos/seed/812/600/600", layer: 2, x: "42vw", y: "48%", width: "7.2vw" },
+        { src: "https://picsum.photos/seed/812/600/600", layer: 2, x: "42vw", y: "48%", width: "7.2vw" },
         { src: "https://picsum.photos/seed/813/600/600", layer: 3, x: "58vw", y: "52%", width: "10vw" },
         { src: "https://picsum.photos/seed/814/600/600", layer: 1, x: "74vw", y: "50%", width: "6.2vw" },
 

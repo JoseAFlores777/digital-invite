@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { useGsapContext, gsap } from "@/hooks/useGsapContext";
 import styles from "./PerspectiveZoom.module.scss";
 
@@ -277,14 +278,15 @@ export default function PerspectiveZoom({
                                     pointerEvents: "none",
                                 }}
                             >
-                                <img
+                                <Image
                                     src={it.src}
                                     alt={it.alt ?? ""}
-                                    loading="lazy"
-                                    decoding="async"
+                                    width={1600}
+                                    height={900}
                                     sizes="(min-width:1024px) 10vw, (min-width:768px) 20vw, 40vw"
-                                    style={{ willChange: "transform, opacity", transform: "translate3d(0,0,0)" }}
-                                    {...imageProps}
+                                    style={{ willChange: "transform, opacity", transform: "translate3d(0,0,0)", width: '100%', height: 'auto' }}
+                                    loading="lazy"
+                                    {...(imageProps as any)}
                                 />
                             </div>
                         );

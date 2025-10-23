@@ -27,9 +27,9 @@ export const metadata: Metadata = {
     images: ["/assets/og-cover.svg"],
   },
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-    apple: "/favicon.svg",
+    icon: "/wedding-Logo.svg",
+    shortcut: "/wedding-Logo.svg",
+    apple: "/wedding-Logo.svg",
   },
 };
 

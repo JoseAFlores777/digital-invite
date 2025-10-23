@@ -10,6 +10,21 @@ const nextConfig: NextConfig = {
     // Disable TypeScript errors during builds for Docker
     ignoreBuildErrors: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "boda.joseiz.com",
+        pathname: "/assets/**",
+      },
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+        pathname: "/seed/**",
+      },
+    ],
+    minimumCacheTTL: 60 * 60 * 24 * 30,
+  },
 };
 
 export default nextConfig;

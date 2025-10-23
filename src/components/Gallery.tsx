@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import PhotoSwipeLightbox from "photoswipe/lightbox";
 import "photoswipe/style.css";
 import { fetchWeddingGeneralities } from "@/lib/api/solicitudes";
@@ -176,13 +177,13 @@ export default function Gallery() {
                     index % 9 === 0 ? "col-span-2 row-span-2" : "",
                   ].join(" ")}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={image.thumbnailURL}
                     alt=""
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                    loading={index < 6 ? "eager" : "lazy"}
-                    decoding="async"
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                    priority={index < 6}
                   />
                 </a>
               ))}

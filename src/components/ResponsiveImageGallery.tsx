@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import CustomBtn from "@/components/CustomBtn";
 
 export type GalleryImage = {
@@ -113,12 +114,13 @@ export default function ResponsiveImageGallery({
           <div className={`grid ${columns} ${gap}`}>
             {images.map((img, idx) => (
               <div key={idx} className={`relative aspect-[4/3] ${rounded} overflow-hidden bg-neutral-100`}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={img.src}
                   alt={img.alt ?? ""}
-                  className="h-full w-full object-cover"
-                  loading={idx < 6 ? "eager" : "lazy"}
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  className="object-cover"
+                  priority={idx < 6}
                 />
               </div>
             ))}
