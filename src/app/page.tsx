@@ -116,15 +116,15 @@ export default function Home() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`/api/invitation-by-id?id=${encodeURIComponent(invitationID)}`);
-        if (!res.ok) {
+        const { useInvitationsStore } = await import("@/store/invitations");
+        const inv: any = await useInvitationsStore.getState().get(invitationID);
+        if (!inv) {
           setInviteError("invitation_not_found");
           setDataReady(true);
           return;
         }
-        const data = await res.json();
-        const guests = (data?.invitation?.guests ?? []) as InvitationGuest[];
-        const code = data.invitation?.code ?? "";
+        const guests = (inv?.guests ?? []) as InvitationGuest[];
+        const code = inv?.code ?? "";
         const invitationName = code.includes("Familia") ? `La ${code}` : code;
         const invitedCount = Array.isArray(guests) ? guests.filter(g => !!g?.guest?.person).length : 0;
         const subtitleText = `Invitación para ${invitedCount} ${invitedCount === 1 ? "persona" : "personas"}`;

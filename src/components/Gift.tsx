@@ -70,19 +70,17 @@ export default function Gift({ hideCopy = false, shareHref, finalGifts }: { hide
   useEffect(() => {
     setMounted(true);
 
-    const params = new URLSearchParams(window.location.search);
-    const weddingId = params.get("wedding_id") || process.env.NEXT_PUBLIC_WEDDING_ID || "";
-    const url = weddingId ? `/api/gift-options?wedding_id=${encodeURIComponent(weddingId)}` : "/api/gift-options";
-
-    fetch(url)
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((data) => {
-        const opts = Array.isArray(data?.options) ? data.options : [];
-        const mapped: GiftOption[] = opts.map((o: any) => ({
+    (async () => {
+      try {
+        const { useGiftsStore } = await import("@/store/gifts");
+        const params = new URLSearchParams(window.location.search);
+        const weddingId = params.get("wedding_id") || process.env.NEXT_PUBLIC_WEDDING_ID || "";
+        const optsRaw = await useGiftsStore.getState().get(weddingId || undefined);
+        const mapped: GiftOption[] = (Array.isArray(optsRaw) ? optsRaw : []).map((o: any) => ({
           id: o.id,
           icon: o.icon || "lucide:gift",
           title: o.title || "",
-          details: (o.details && typeof o.details === "object") ? o.details as Record<string, string> : {},
+          details: (o.details && typeof o.details === "object") ? (o.details as Record<string, string>) : {},
           redirectBtn: {
             hide: o.redirectBtn_hide ?? true,
             url: o.redirectBtn_url || undefined,
@@ -91,9 +89,12 @@ export default function Gift({ hideCopy = false, shareHref, finalGifts }: { hide
           },
         }));
         setOptions(mapped);
-      })
-      .catch(() => setOptions([]))
-      .finally(() => setLoading(false));
+      } catch {
+        setOptions([]);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   const copyText = useCallback(async (label: string, value: string, el?: HTMLElement) => {

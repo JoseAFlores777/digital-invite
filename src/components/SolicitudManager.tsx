@@ -180,7 +180,8 @@ export default function SolicitudManager({
 
                 if (wId) {
                     try {
-                        const wg = await fetchWeddingGeneralities(wId);
+                        const { useWeddingStore } = await import("@/store/wedding");
+                        const wg = await useWeddingStore.getState().get(wId);
                         const date = wg?.wedding?.date || null;
                         const start_time = wg?.wedding?.start_time || null;
                         const end_time = wg?.wedding?.end_time || null;
