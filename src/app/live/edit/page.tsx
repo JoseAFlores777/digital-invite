@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, Suspense } from "react";
 import WeddingHeader from "@/components/WeddingHeader";
 import CustomBtn from "@/components/CustomBtn";
 
@@ -122,6 +122,7 @@ export default function LiveEditPage() {
 
   if (authorized === true) {
     return (
+      <Suspense fallback={null}>
       <div className="min-h-screen flex flex-col gap-6 items-center justify-start py-8">
         <WeddingHeader title="Boda Clarisa & José" />
         <div className="w-full max-w-md space-y-4 border rounded-lg p-6 bg-white/60 backdrop-blur">
@@ -156,10 +157,12 @@ export default function LiveEditPage() {
           {copyMsg ? <div className="text-sm text-center text-gray-700">{copyMsg}</div> : null}
         </div>
       </div>
+      </Suspense>
     );
   }
 
   return (
+    <Suspense fallback={null}>
     <div className="min-h-screen flex flex-col gap-2 items-center justify-center ">
       <WeddingHeader title="Boda Clarisa & José" />
       <form onSubmit={onSubmit} className="w-full max-w-sm space-y-4 border rounded-lg p-6 bg-white/60 backdrop-blur">
@@ -184,5 +187,6 @@ export default function LiveEditPage() {
         />
       </form>
     </div>
+    </Suspense>
   );
 }

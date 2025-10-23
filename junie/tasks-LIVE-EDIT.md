@@ -22,3 +22,6 @@ Actualización (botón copiar + CustomBtn):
 7. Agregar botón "Copiar" a la par del input que copie el `live_url` al portapapeles. [impacto: frontend] ✓
 8. Reemplazar botones nativos por `CustomBtn` en toda la pantalla (/live/edit): login, guardar, copiar. [impacto: frontend] ✓
 9. Feedback de acciones: mostrar mensajes breves para "Copiado" y errores de copia/guardado. [impacto: frontend] ✓
+
+Corrección de build (Next.js Suspense):
+10. Envolver el contenido de /live/edit en <Suspense fallback={null}> para cumplir con el requisito de useSearchParams y evitar el prerender error. [impacto: frontend/build] ✓

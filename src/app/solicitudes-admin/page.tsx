@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import AdminInvitationsList from "@/components/AdminInvitationsList";
 import WeddingHeader from "@/components/WeddingHeader";
 
@@ -52,9 +52,14 @@ export default function SolicitudesAdminPage() {
     }
   };
 
-  if (authorized === true) return <AdminInvitationsList />;
+  if (authorized === true) return (
+    <Suspense fallback={null}>
+      <AdminInvitationsList />
+    </Suspense>
+  );
 
   return (
+  <Suspense fallback={null}>
     <div className="min-h-screen flex flex-col gap-2 items-center justify-center ">
         <WeddingHeader title="Boda Clarisa & José" />
       <form onSubmit={onSubmit} className="w-full max-w-sm space-y-4 border rounded-lg p-6 bg-white/60 backdrop-blur">
@@ -78,5 +83,6 @@ export default function SolicitudesAdminPage() {
         </button>
       </form>
     </div>
+  </Suspense>
   );
 }
