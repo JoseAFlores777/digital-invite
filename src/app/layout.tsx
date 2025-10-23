@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ViewTransitions } from "next-view-transitions";
+import Script from "next/script";
 import "./globals.scss";
 
 export const metadata: Metadata = {
@@ -60,6 +61,13 @@ export default function RootLayout({
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
           <link href="https://fonts.googleapis.com/css2?family=Forum:wght@400&family=Pinyon+Script&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+            {process.env.NODE_ENV === "production" && (
+                <Script
+                    src="https://analytics.joseiz.com/script.js"
+                    data-website-id="481224a3-5ba7-41bd-a7c1-e5e113d7ee37"
+                    strategy="afterInteractive"
+                />
+            )}
         </head>
         <body className="bg-background text-foreground">
           {children}
