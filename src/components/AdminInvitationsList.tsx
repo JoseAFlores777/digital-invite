@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import SolicitudManager from "@/components/SolicitudManager";
 import AdminCharts from "@/components/AdminCharts";
 import type { Invitations, Guests } from "@/lib/directus-interfaces";
+import WeddingHeader from "@/components/WeddingHeader";
 
 // Tipos basados en las interfaces de Directus, con compatibilidad hacia los datos de los endpoints actuales
 type Invitation = Pick<Invitations, "id" | "code" | "status" | "guests"> & { guests?: any[] };
@@ -257,7 +258,10 @@ export default function AdminInvitationsList() {
   }
 
   const header = (
-    <div className="px-4 sm:px-6 md:px-8 pt-6 pb-4 border-b border-slate-200">
+      <>
+          <WeddingHeader title="Boda Clarisa & José" />
+
+    <div className="px-4 sm:px-6 md:px-8 pt-6 pb-2 border-b border-slate-200">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-800">Solicitudes — Admin</h2>
@@ -343,6 +347,7 @@ export default function AdminInvitationsList() {
         })()}
       </div>
     </div>
+      </>
   );
 
   useEffect(() => {

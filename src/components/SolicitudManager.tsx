@@ -24,6 +24,7 @@ export type SolicitudManagerProps = {
     showBulkActions?: boolean;
     onChanged?: () => void;
     adminMode?: boolean;
+    infoDisplay?: "tooltip" | "modal";
 };
 
 type UiGuest = {
@@ -84,6 +85,12 @@ const IconX = (p: React.SVGProps<SVGSVGElement>) => (
         <path d="M18 6 6 18M6 6l12 12" />
     </svg>
 );
+const IconBell = (p: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
+        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 7 3 9H3c0-2 3-2 3-9Z" />
+        <path d="M10.3 21a1.7 1.7 0 0 0 3.4 0" />
+    </svg>
+);
 
 export default function SolicitudManager({
     solicitudId,
@@ -95,6 +102,7 @@ export default function SolicitudManager({
     showBulkActions = true,
     onChanged,
     adminMode = false,
+    infoDisplay = "tooltip",
 }: SolicitudManagerProps) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -121,6 +129,9 @@ export default function SolicitudManager({
     const [deadlineIso, setDeadlineIso] = useState<string | null>(null);
     const [editedDeadlineLocal, setEditedDeadlineLocal] = useState<string>("");
     const [savingDeadline, setSavingDeadline] = useState(false);
+    const [showDeadlineTip, setShowDeadlineTip] = useState(false);
+    const [showInfoModal, setShowInfoModal] = useState(false);
+    const tipRef = React.useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         let active = true;
@@ -262,6 +273,28 @@ export default function SolicitudManager({
         if (!deadlineMs) return false;
         return nowMs >= deadlineMs;
     }, [deadlineMs, nowMs]);
+
+    useEffect(() => {
+        const onDown = (e: MouseEvent) => {
+            const t = tipRef.current;
+            if (t && e.target instanceof Node && !t.contains(e.target)) {
+                setShowDeadlineTip(false);
+            }
+        };
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setShowDeadlineTip(false);
+        };
+        if (typeof document !== "undefined") {
+            document.addEventListener("mousedown", onDown);
+            document.addEventListener("keydown", onKey);
+        }
+        return () => {
+            if (typeof document !== "undefined") {
+                document.removeEventListener("mousedown", onDown);
+                document.removeEventListener("keydown", onKey);
+            }
+        };
+    }, []);
 
     const canEdit = useMemo(() => adminMode || !isClosed, [adminMode, isClosed]);
 
@@ -442,20 +475,52 @@ export default function SolicitudManager({
                 {/* Countdown / Notice */}
                 {deadlineMs && (
                     <div className="mt-3">
-                        {!isClosed && timeLeft ? (
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-sky-200 bg-sky-50 text-sky-800 text-sm">
-                                <IconClock className="h-4 w-4" />
-                                <span>Tiempo para confirmar:</span>
-                                <span className="font-medium tabular-nums">
-                                    {timeLeft.days}d {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m {String(timeLeft.seconds).padStart(2, '0')}s
-                                </span>
+                        <div className="inline-flex items-center gap-2">
+                            {!isClosed && timeLeft ? (
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-sky-200 bg-sky-50 text-sky-800 text-sm">
+                                    <IconClock className="h-4 w-4" />
+                                    <span>Tiempo para confirmar:</span>
+                                    <span className="font-medium tabular-nums">
+                                        {timeLeft.days}d {String(timeLeft.hours).padStart(2, '0')}h {String(timeLeft.minutes).padStart(2, '0')}m {String(timeLeft.seconds).padStart(2, '0')}s
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-rose-200 bg-rose-50 text-rose-700 text-sm">
+                                    <IconX className="h-4 w-4" />
+                                    <span>Ya no se puede confirmar: el tiempo ha finalizado.</span>
+                                </div>
+                            )}
+
+                            <div className="relative" ref={tipRef}>
+                                <button
+                                    type="button"
+                                    aria-label="¿Cómo funciona el tiempo de confirmación?"
+                                    aria-expanded={infoDisplay === "tooltip" ? showDeadlineTip : showInfoModal}
+                                    aria-controls={infoDisplay === "tooltip" ? "deadline-tip" : undefined}
+                                    onClick={() => {
+                                        if (infoDisplay === "modal") {
+                                            setShowInfoModal(true);
+                                        } else {
+                                            setShowDeadlineTip((v) => !v);
+                                        }
+                                    }}
+                                    className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 active:scale-[0.98] transition focus:outline-none focus:ring-2 focus:ring-sky-200 animate-pulse"
+                                    title="Más información"
+                                >
+                                    <span className="text-[13px] leading-none">?</span>
+                                </button>
+                                {infoDisplay === "tooltip" && showDeadlineTip && (
+                                    <div
+                                        id="deadline-tip"
+                                        role="tooltip"
+                                        className="absolute z-20 mt-2 w-64 max-w-[80vw] right-0 sm:left-1/2 sm:-translate-x-1/2 rounded-lg border border-slate-200 bg-white shadow-lg p-3 text-sm text-slate-700"
+                                    >
+                                        Confirma tu asistencia antes de que el contador llegue a cero.
+                                        Al terminar, solo se registrarán como confirmados quienes respondieron a tiempo; los demás se considerarán ausentes.
+                                    </div>
+                                )}
                             </div>
-                        ) : (
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-rose-200 bg-rose-50 text-rose-700 text-sm">
-                                <IconX className="h-4 w-4" />
-                                <span>Ya no se puede confirmar: el tiempo ha finalizado.</span>
-                            </div>
-                        )}
+                        </div>
                     </div>
                 )}
 
@@ -477,8 +542,58 @@ export default function SolicitudManager({
                         disabled={!canEdit}
                     >
                         <IconCalendar className="h-4 w-4" />
-                        <span className="whitespace-nowrap">Añadir al calendario</span>
+                        <span className="whitespace-nowrap">Añadir evento al calendario</span>
                     </CalendarAddButton>
+
+                    {deadlineIso && (
+                        <button
+                            type="button"
+                            disabled={!canEdit}
+                            onClick={() => {
+                                try {
+                                    const d = new Date(deadlineIso);
+                                    if (Number.isNaN(d.getTime())) return;
+                                    const pad = (n: number) => String(n).padStart(2, "0");
+                                    const DTSTART_LOCAL = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+                                    const now = new Date();
+                                    const dtstamp = `${now.getUTCFullYear()}${pad(now.getUTCMonth() + 1)}${pad(now.getUTCDate())}T${pad(now.getUTCHours())}${pad(now.getUTCMinutes())}${pad(now.getUTCSeconds())}Z`;
+                                    const confirmUrl = (typeof window !== "undefined") ? `${window.location.origin}/solicitud?invitationID=${solicitudId}` : "";
+                                    const summary = "Recordatorio: Confirmar asistencia a la Boda de Clarisa y José";
+                                    const description = confirmUrl ? `Abre el enlace para confirmar tu asistencia: ${confirmUrl}` : "Confirma tu asistencia desde el enlace de la invitación.";
+                                    const uid = `${solicitudId}-rsvp-${Date.now()}@digital-invite`;
+                                    const lines = [
+                                        "BEGIN:VCALENDAR",
+                                        "VERSION:2.0",
+                                        "PRODID:-//digital-invite//RSVP-Reminder//ES",
+                                        "CALSCALE:GREGORIAN",
+                                        "METHOD:PUBLISH",
+                                        "BEGIN:VEVENT",
+                                        `DTSTART:${DTSTART_LOCAL}`,
+                                        `DTSTAMP:${dtstamp}`,
+                                        `UID:${uid}`,
+                                        `SUMMARY:${summary}`,
+                                        confirmUrl ? `URL:${confirmUrl}` : "",
+                                        `DESCRIPTION:${description}`,
+                                        "END:VEVENT",
+                                        "END:VCALENDAR",
+                                    ].filter(Boolean);
+                                    const blob = new Blob([lines.join("\r\n")], { type: "text/calendar;charset=utf-8" });
+                                    const url = URL.createObjectURL(blob);
+                                    const a = document.createElement("a");
+                                    a.href = url;
+                                    a.download = `Recordatorio-Confirmar-${solicitudId}.ics`;
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
+                                } catch {}
+                            }}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-sm disabled:opacity-50"
+                            title="Agregar recordatorio de confirmación"
+                        >
+                            <IconBell className="h-4 w-4" />
+                            <span className="whitespace-nowrap">Crear recordatorio para confirmar</span>
+                        </button>
+                    )}
 
                     {adminMode && (
                         <div className="inline-flex items-center gap-2 flex-wrap">
@@ -675,6 +790,34 @@ export default function SolicitudManager({
         </div>
     );
 
+    const infoModal = infoDisplay === "modal" && showInfoModal ? (
+        <Modal
+            isOpen={showInfoModal}
+            onRequestClose={() => setShowInfoModal(false)}
+            shouldCloseOnOverlayClick
+            shouldCloseOnEsc
+            preventScroll
+            overlayClassName="fixed inset-0 z-[70] bg-black/40 backdrop-blur-[1px]"
+            className="outline-none w-[92vw] max-w-md mx-auto my-[10vh] rounded-2xl bg-white border border-slate-200 shadow-2xl p-4"
+            contentLabel="Información sobre el tiempo de confirmación"
+            ariaHideApp={false}
+        >
+            <div className="flex items-start justify-between gap-3">
+                <h3 className="text-lg font-semibold text-slate-800">¿Cómo funciona el tiempo de confirmación?</h3>
+                <button
+                    onClick={() => setShowInfoModal(false)}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 text-slate-700 bg-white hover:bg-slate-50"
+                    aria-label="Cerrar"
+                >
+                    ×
+                </button>
+            </div>
+            <div className="mt-3 text-sm text-slate-700">
+                Confirma tu asistencia antes de que el contador llegue a cero. Al terminar, solo se registrarán como confirmados quienes respondieron a tiempo; los demás se considerarán ausentes.
+            </div>
+        </Modal>
+    ) : null;
+
     if (asModal) {
         if (open === false) return null;
         try {
@@ -729,6 +872,7 @@ export default function SolicitudManager({
                 <div className="h-[100vh] overflow-y-auto overscroll-contain px-4 sm:px-6 md:px-8 py-3 sm:h-auto sm:w-auto sm:max-h-[80vh]">
                     <Toaster position="top-right" />
                     {card}
+                    {infoModal}
                 </div>
             </Modal>
         );
@@ -737,6 +881,7 @@ export default function SolicitudManager({
     return (
         <>
             <Toaster position="top-right" />
+            {infoModal}
             <div className="min-h-screen bg-slate-50/60 flex items-center justify-center p-3 sm:p-6">
                 {card}
             </div>

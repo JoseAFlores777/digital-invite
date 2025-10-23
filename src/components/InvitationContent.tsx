@@ -21,6 +21,7 @@ import BiblicalVerse_1 from "@/components/biblical-verse_1";
 import PerspectiveZoom, {ZoomItemConfig} from "@/components/PerspectiveZoom";
 import { Icon } from "@iconify/react";
 import { useWeddingData } from "@/store/wedding";
+import ScrollIdleHintOverlay from "@/components/ScrollIdleHintOverlay";
 
 export default function InvitationContent({ inviteCode }: { inviteCode?: string }) {
     const FALLBACK_DESKTOP: ZoomItemConfig[] = [
@@ -136,9 +137,13 @@ export default function InvitationContent({ inviteCode }: { inviteCode?: string 
     }, []);
 
   return (
-    <main className="bg-[color:var(--color-dusty-50)] text-[color:var(--color-dusty-800)]">
-      {/*/!* 1. Hero *!/*/}
-      <Hero />
+    <ScrollIdleHintOverlay
+      delaysMs={[6000]}
+      size={"sm"}
+    >
+      <main className="bg-[color:var(--color-dusty-50)] text-[color:var(--color-dusty-800)]">
+        {/*/!* 1. Hero *!/*/}
+        <Hero />
       {/*/!* 2. Cuenta regresiva *!/*/}
       <Countdown />
       {/* Banner 1: Panel pin stack */}
@@ -240,5 +245,6 @@ export default function InvitationContent({ inviteCode }: { inviteCode?: string 
       <Gallery />
       <Footer />
     </main>
+    </ScrollIdleHintOverlay>
   );
 }

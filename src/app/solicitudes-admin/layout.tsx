@@ -14,6 +14,11 @@ export const metadata: Metadata = {
     },
   },
   alternates: { canonical: "/solicitudes-admin" },
+  icons: {
+    icon: "/wedding-Logo.svg",
+    shortcut: "/wedding-Logo.svg",
+    apple: "/wedding-Logo.svg",
+  },
 };
 
 export default function SolicitudesAdminLayout({ children }: { children: React.ReactNode }) {

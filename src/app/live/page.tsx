@@ -22,6 +22,11 @@ export const metadata: Metadata = {
     title: "Boda en vivo – Clarisa & José",
     description: "Transmisión en vivo y momentos especiales de la boda.",
   },
+  icons: {
+    icon: "/wedding-Logo.svg",
+    shortcut: "/wedding-Logo.svg",
+    apple: "/wedding-Logo.svg",
+  },
 };
 
 export default function LivePage() {

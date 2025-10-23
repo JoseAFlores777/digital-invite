@@ -22,6 +22,11 @@ export const metadata: Metadata = {
     title: "Mesa de regalos – Clarisa & José",
     description: "Opciones seguras de regalo para la boda de Clarisa y José.",
   },
+  icons: {
+    icon: "/wedding-Logo.svg",
+    shortcut: "/wedding-Logo.svg",
+    apple: "/wedding-Logo.svg",
+  },
 };
 
 export default async function GiftsPage({

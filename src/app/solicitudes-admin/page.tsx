@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import AdminInvitationsList from "@/components/AdminInvitationsList";
+import WeddingHeader from "@/components/WeddingHeader";
 
 export default function SolicitudesAdminPage() {
   const [authorized, setAuthorized] = useState<boolean | null>(null);
@@ -54,7 +55,8 @@ export default function SolicitudesAdminPage() {
   if (authorized === true) return <AdminInvitationsList />;
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex flex-col gap-2 items-center justify-center ">
+        <WeddingHeader title="Boda Clarisa & José" />
       <form onSubmit={onSubmit} className="w-full max-w-sm space-y-4 border rounded-lg p-6 bg-white/60 backdrop-blur">
         <h1 className="text-lg font-semibold">Acceso requerido</h1>
         <p className="text-sm text-gray-600">Ingresa la contraseña para ver solicitudes.</p>

@@ -1,6 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import SolicitudManager from "@/components/SolicitudManager";
+import WeddingHeader from "@/components/WeddingHeader";
 
 export const metadata: Metadata = {
   title: "Confirmar invitación – Clarisa & José",
@@ -16,6 +17,11 @@ export const metadata: Metadata = {
     card: "summary",
     title: "Confirmar invitación – Clarisa & José",
     description: "Confirma tu invitación a la boda.",
+  },
+  icons: {
+    icon: "/wedding-Logo.svg",
+    shortcut: "/wedding-Logo.svg",
+    apple: "/wedding-Logo.svg",
   },
 };
 
@@ -40,5 +46,8 @@ export default async function SolicitudPage({
     );
   }
 
-  return <SolicitudManager solicitudId={solicitudId} />;
+  return <>
+      <WeddingHeader title="Boda Clarisa & José" />
+      <SolicitudManager solicitudId={solicitudId}/>
+  </>;
 }
