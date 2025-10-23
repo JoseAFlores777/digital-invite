@@ -52,7 +52,7 @@ export default function AnilloScrollSequence({
     const lastSizeRef = React.useRef({ w: 0, h: 0 });
 
     const currentFrame = (i: number) =>
-        pathPattern ? pathPattern(i) : `/images/anillo/anillo-${i + 1}.jpg`;
+        pathPattern ? pathPattern(i) : `/images/anillos/anillo-${i + 1}.webp`;
 
     const DPR = () => Math.max(1, Math.floor(window.devicePixelRatio || 1));
     const isReady = (img?: HTMLImageElement | null) =>

@@ -80,7 +80,7 @@ export default function Hero({ fadeTo = "#ffffff" }: { fadeTo?: string }) {
             <div className="absolute inset-0" aria-hidden="true" data-anim="hero-bg">
                 <Image
                     data-hero-zoom
-                    src="/images/IMG_0150.JPG"
+                    src="/images/IMG_0150.webp"
                     alt=""
                     fill
                     sizes="100vw"

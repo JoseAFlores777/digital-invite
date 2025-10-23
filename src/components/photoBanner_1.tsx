@@ -73,7 +73,7 @@ const ORIGIN_CSS: Record<PhotoZoomAnchor, string> = {
                                           speed = 2, // 1 -> escala final 2; 2 -> 3; etc.
                                           maxScale = 3,
                                           easing = 1,
-                                          src = "/images/IMG_0150.JPG",
+                                          src = "/images/IMG_0150.webp",
                                           alt = "",
                                           tint = "rgb(23 44 60 / 0.35)", // wedgewood-1400/35 aprox
                                           fadeTo = "#ffffff",
@@ -152,7 +152,7 @@ const ORIGIN_CSS: Record<PhotoZoomAnchor, string> = {
             >
                 <Image
                     data-hero-zoom
-                    src={src || "/images/IMG_0150.JPG"}
+                    src={src || "/images/IMG_0150.webp"}
                     alt={alt || ""}
                     fill
                     sizes="100vw"

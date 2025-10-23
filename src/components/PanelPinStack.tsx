@@ -13,7 +13,7 @@ export default function PanelPinStack() {
                 <div
                     className="sticky top-0 h-screen w-full">
                     <PhotoBanner1
-                        src="/images/Etapas/hermanos.png"
+                        src="/images/Etapas/hermanos.webp"
                         anchor={PhotoZoomAnchor.Center}
                         priority
                         imageFilter={"grayscale(100%)"}
@@ -24,7 +24,7 @@ export default function PanelPinStack() {
                 <div
                     className="sticky top-0 h-screen w-full">
                     <PhotoBanner1
-                        src="/images/Etapas/amigos.png"
+                        src="/images/Etapas/amigos.webp"
                         imageFilter={"grayscale(100%)"}
                         imageOpacity={0.5}
                         projection={getBannerTitle('Amigos...')}
@@ -33,7 +33,7 @@ export default function PanelPinStack() {
                 <div
                     className="sticky top-0 h-screen w-full">
                     <PhotoBanner1
-                        src="/images/Etapas/novios.jpeg"
+                        src="/images/Etapas/novios.webp"
                         imageFilter={"grayscale(100%)"}
                         imageOpacity={0.5}
                         projection={getBannerTitle('Novios...')}
@@ -42,7 +42,7 @@ export default function PanelPinStack() {
                 <div
                     className="sticky top-0 h-screen w-full">
                     <PhotoBanner1
-                        src="/images/Etapas/prometidos.JPG"
+                        src="/images/Etapas/prometidos.webp"
                         imageFilter={"grayscale(100%)"}
                         imageOpacity={0.7}
                         projection={getBannerTitle('Prometidos...')}
