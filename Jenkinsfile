@@ -50,7 +50,7 @@ pipeline {
             if [ ! -s "$CI_ENV_FILE" ]; then
               echo "[ERROR] Secret file vacío o inexistente: $CI_ENV_FILE" >&2
               exit 1
-            end
+            fi
             awk 'BEGIN{OFS="="} /^[[:space:]]*#/ || /^[[:space:]]*$/ {next} {
                  line=$0; pos=index(line, "="); if (pos==0) next
                  key=substr(line,1,pos-1); val=substr(line,pos+1)
@@ -201,15 +201,19 @@ pipeline {
           ]]
         ]
         def payloadJson = groovy.json.JsonOutput.toJson(payloadObj)
-        // Escape seguro para bash (comillas simples)
+        // Escape para comillas simples
         def payloadEsc = payloadJson.replace("'", "'\\''")
 
         try {
           withCredentials([string(credentialsId: env.SLACK_WEBHOOK_CREDENTIAL_ID, variable: 'SLACK_WEBHOOK_URL')]) {
-            sh """
-              set -eu
-              curl -sS -X POST -H 'Content-type: application/json' --data '${payloadEsc}' "$SLACK_WEBHOOK_URL" >/dev/null || true
-            """
+            // Evitar interpolación Groovy: payload y webhook via ENV + sh con comillas simples
+            withEnv(["SLACK_PAYLOAD=${payloadEsc}"]) {
+              sh '''#!/bin/bash
+set -eu
+curl -sS -X POST -H 'Content-type: application/json' \
+  --data "$SLACK_PAYLOAD" "$SLACK_WEBHOOK_URL" >/dev/null || true
+'''
+            }
             echo "[SLACK] Notificado por webhook."
           }
         } catch (e) {
