@@ -48,8 +48,9 @@ export default function SharedAlbum() {
               label="Abrir álbum de fotos"
               icon="mdi:open-in-new"
               variant="outline"
-              size="md"
-              className="w-full md:w-auto"
+              size="xl"
+              className="w-full md:w-auto animate-pulse"
+              shine
             />
           )}
           {tutorialUrl && (
@@ -61,7 +62,7 @@ export default function SharedAlbum() {
               label="Ver cómo subir fotos"
               icon="mdi:help-circle-outline"
               variant="outline"
-              size="md"
+              size="xl"
               className="w-full md:w-auto"
               shine
             />

@@ -2,6 +2,7 @@
 
 import React, { useRef } from "react";
 import { useGsapContext, gsap } from "@/hooks/useGsapContext";
+import CustomBtn from "@/components/CustomBtn";
 
 export default function RSVP() {
   const root = useRef<HTMLDivElement>(null);
@@ -30,7 +31,18 @@ export default function RSVP() {
       <div className="max-w-3xl mx-auto px-6 py-16 md:py-20 lg:py-28 text-center">
         <h2 className="display-font text-3xl md:text-4xl mb-3">Confirma tu asistencia</h2>
         <p className=" mb-6">Nos encantará contar contigo. Por favor confirma tu asistencia.</p>
-        <button className="btn btn-primary bg-[color:var(--color-dusty-800)]" onClick={openSolicitudModal} data-anim="rsvp-btn">Confirmar asistencia</button>
+
+          <CustomBtn
+              key="shared-album-open"
+              onClick={openSolicitudModal}
+              target="_blank"
+              label="Confirmar asistencia"
+              icon="material-symbols:fact-check-outline-rounded"
+              variant="outline"
+              size="xl"
+              className="w-full md:w-auto animate-pulse"
+              shine
+          />
       </div>
     </section>
   );

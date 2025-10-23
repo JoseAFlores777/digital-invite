@@ -5,6 +5,7 @@ import { Icon } from "@iconify/react";
 import { useGsapContext, gsap } from "@/hooks/useGsapContext";
 import { useWeddingData } from "@/store/wedding";
 import CalendarAddButton from "@/components/CalendarAddButton";
+import CustomBtn from "@/components/CustomBtn";
 
 type EventItem = {
   icon: string;
@@ -113,12 +114,12 @@ export default function Itinerary() {
                   <Icon icon={event.icon} className="w-8 h-8 text-[color:var(--color-dusty-700)]" />
                 </div>
 
-                <h3 className="display-font text-2xl">{event.title}</h3>
+                <h3 className="display-font text-xl md:text-2xl">{event.title}</h3>
 
                 {event.time && (
-                  <div className="flex items-center gap-2 text-neutral-900 mt-4 mb-6">
+                  <div className="flex items-center gap-2 text-neutral-900 mt-3 mb-5">
                     <Icon icon="solar:clock-circle-bold" className="w-4 h-4" />
-                    <span className="text-lg leading-none">{event.time}</span>
+                    <span className="text-sm leading-none">{event.time}</span>
                   </div>
                 )}
 
@@ -136,26 +137,26 @@ export default function Itinerary() {
                   </div>
                 </div>
 
-                <div className="w-full pt-4 border-t border-neutral-200 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 sm:justify-between">
+                <div className="w-full pt-4 border-t border-neutral-200 flex flex-col sm:flex-row sm:items-stretch gap-2 sm:gap-3">
                   {googleMapsLink && (
-                    <button
-                      type="button"
-                      className="flex-1 min-w-0 w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-neutral-300 bg-white hover:bg-neutral-50 text-sm"
-                      onClick={() => window.open(googleMapsLink, "_blank")}
-                    >
-                      <Icon icon="solar:map-point-bold" className="w-4 h-4" />
-                      <span className="truncate">Google Maps</span>
-                    </button>
+                    <CustomBtn
+                      onClick={() => window.open(googleMapsLink as string, "_blank")}
+                      label="Google Maps"
+                      icon="solar:map-point-bold"
+                      variant="outline"
+                      size="md"
+                      className="flex-1 min-w-0 w-full"
+                    />
                   )}
                   {wazeLink && (
-                    <button
-                      type="button"
-                      className="flex-1 min-w-0 w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-neutral-300 bg-white hover:bg-neutral-50 text-sm"
-                      onClick={() => window.open(wazeLink, "_blank")}
-                    >
-                      <Icon icon="mdi:waze" className="w-4 h-4" />
-                      <span className="truncate">Waze</span>
-                    </button>
+                    <CustomBtn
+                      onClick={() => window.open(wazeLink as string, "_blank")}
+                      label="Waze"
+                      icon="mdi:waze"
+                      variant="outline"
+                      size="md"
+                      className="flex-1 min-w-0 w-full"
+                    />
                   )}
                   <CalendarAddButton
                     date={eventDateStr}
@@ -167,10 +168,10 @@ export default function Itinerary() {
                     address={address}
                     googleMapsLink={googleMapsLink}
                     wazeLink={wazeLink}
-                    className="flex-1 min-w-0 w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-neutral-300 bg-white hover:bg-neutral-50 text-sm"
+                    className="flex-1 min-w-0 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 bg-white text-[color:var(--color-dusty-900)] border border-neutral-300 hover:bg-neutral-50"
                   >
-                    <Icon icon="solar:calendar-bold" className="w-4 h-4" />
-                    <span className="truncate">Añadir al calendario</span>
+                    <Icon icon="solar:calendar-bold" className="w-5 h-5" />
+                    <span className="truncate text-sm">Añadir al calendario</span>
                   </CalendarAddButton>
                 </div>
               </div>

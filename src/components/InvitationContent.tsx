@@ -23,7 +23,7 @@ import { Icon } from "@iconify/react";
 import { useWeddingData } from "@/store/wedding";
 import ScrollIdleHintOverlay from "@/components/ScrollIdleHintOverlay";
 
-export default function InvitationContent({ inviteCode }: { inviteCode?: string }) {
+export default function InvitationContent({ inviteCode, invitedCount }: { inviteCode?: string; invitedCount?: number }) {
     const FALLBACK_DESKTOP: ZoomItemConfig[] = [
         { src: "/images/history/layer_3/layer_3-1.webp", layer: 3, x: "12vw", y: "18%", width: "10vw" },
         { src: "/images/history/layer_2/layer_2-1.webp", layer: 2, x: "26vw", y: "12%", width: "8.5vw" },
@@ -136,10 +136,16 @@ export default function InvitationContent({ inviteCode }: { inviteCode?: string 
         return () => mql.removeEventListener("change", update);
     }, []);
 
+  const galleryRef = React.useRef<HTMLDivElement | null>(null);
+  const verbSeaSean = (invitedCount ?? 2) === 1 ? "sea" : "sean";
+
   return (
     <ScrollIdleHintOverlay
       delaysMs={[6000]}
       size={"sm"}
+      endTolerancePx={0}
+      showAgainOffsetPx={120}
+      suppressWhenInViewRef={galleryRef as any}
     >
       <main className="bg-[color:var(--color-dusty-50)] text-[color:var(--color-dusty-800)]">
         {/*/!* 1. Hero *!/*/}
@@ -207,7 +213,7 @@ export default function InvitationContent({ inviteCode }: { inviteCode?: string 
                         <br />
                         <strong>{inviteCode ?? ""}</strong>
                         <br />
-                        sean parte de esta celebración.
+                        {verbSeaSean} parte de esta celebración.
                     </p>
                 ),
             ]}
@@ -242,7 +248,9 @@ export default function InvitationContent({ inviteCode }: { inviteCode?: string 
       {/*<MapEmbed />*/}
       {/*/!* 12. Cierre *!/*/}
       {/* Galería */}
-      <Gallery />
+      <div ref={galleryRef}>
+        <Gallery />
+      </div>
       <Footer />
     </main>
     </ScrollIdleHintOverlay>

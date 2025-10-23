@@ -5,6 +5,26 @@ import Image from "next/image";
 
 export default function Hero({ fadeTo = "#ffffff" }: { fadeTo?: string }) {
     const sectionRef = React.useRef<HTMLElement | null>(null);
+    const [tapCount, setTapCount] = React.useState(0);
+    const tapTimer = React.useRef<number | null>(null);
+
+    const handleTap = React.useCallback(() => {
+        setTapCount((prev) => {
+            const next = prev + 1;
+            if (tapTimer.current) window.clearTimeout(tapTimer.current);
+            tapTimer.current = window.setTimeout(() => {
+                setTapCount(0);
+                tapTimer.current = null;
+            }, 800);
+            if (next >= 7) {
+                if (tapTimer.current) { window.clearTimeout(tapTimer.current); tapTimer.current = null; }
+                setTapCount(0);
+                window.location.href = "https://youtu.be/s0_ksYbZXgg";
+                return 0;
+            }
+            return next;
+        });
+    }, []);
 
     React.useEffect(() => {
         const section = sectionRef.current;
@@ -70,12 +90,20 @@ export default function Hero({ fadeTo = "#ffffff" }: { fadeTo?: string }) {
         };
     }, []);
 
+    React.useEffect(() => {
+        return () => {
+            if (tapTimer.current) window.clearTimeout(tapTimer.current);
+            tapTimer.current = null;
+        };
+    }, []);
+
     return (
         <section
             ref={sectionRef}
             id="inicio"
             className="relative overflow-hidden bg-white min-h-[100dvh]"
             style={{ "--fade-to": fadeTo } as React.CSSProperties}
+            onClick={handleTap}
         >
             <div className="absolute inset-0" aria-hidden="true" data-anim="hero-bg">
                 <Image

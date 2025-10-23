@@ -136,6 +136,8 @@ export default function EnvelopeWelcome({
                     variant="outline"
                     ariaLabel="Compartir enlace de regalos por WhatsApp: Mesa de regalos"
                     size={"lg"}
+                    className={"animate-pulse"}
+                    shine
                   />
                 ) : null}
                 {confirmHref ? (

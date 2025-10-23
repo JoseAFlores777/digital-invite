@@ -19,6 +19,8 @@ export type ScrollIdleHintOverlayProps = {
     isModalOpen?: boolean;
     endTolerancePx?: number;
     showAgainOffsetPx?: number;
+    /** Suprime mientras este elemento esté visible en viewport (sección específica). */
+    suppressWhenInViewRef?: React.RefObject<HTMLElement>;
 };
 
 export default function ScrollIdleHintOverlay({
@@ -32,6 +34,7 @@ export default function ScrollIdleHintOverlay({
                                                   isModalOpen,
                                                   endTolerancePx = 8,
                                                   showAgainOffsetPx = 64,
+                                                  suppressWhenInViewRef,
                                               }: ScrollIdleHintOverlayProps) {
     const [visible, setVisible] = React.useState(false);
     const [isTouch, setIsTouch] = React.useState(false);
@@ -122,8 +125,20 @@ export default function ScrollIdleHintOverlay({
 
     const computeSuppressed = React.useCallback(() => {
         updateEndSuppression(endTolerancePx, showAgainOffsetPx);
-        return detectModalOpen() || endSuppressedRef.current;
-    }, [detectModalOpen, updateEndSuppression, endTolerancePx, showAgainOffsetPx]);
+        let inViewSuppressed = false;
+        if (suppressWhenInViewRef?.current && typeof window !== "undefined") {
+            const el = suppressWhenInViewRef.current;
+            const r = el.getBoundingClientRect();
+            const vh = window.innerHeight || document.documentElement.clientHeight || 0;
+            const vw = window.innerWidth || document.documentElement.clientWidth || 0;
+            if (vw > 0 && vh > 0) {
+                const verticallyIn = r.top < vh && r.bottom > 0;
+                const horizontallyIn = r.left < vw && r.right > 0;
+                inViewSuppressed = verticallyIn && horizontallyIn;
+            }
+        }
+        return detectModalOpen() || endSuppressedRef.current || inViewSuppressed;
+    }, [detectModalOpen, updateEndSuppression, endTolerancePx, showAgainOffsetPx, suppressWhenInViewRef]);
 
     // Detectar touch
     React.useEffect(() => {

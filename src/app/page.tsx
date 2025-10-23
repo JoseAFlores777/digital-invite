@@ -31,6 +31,7 @@ export default function Home() {
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [inviteSender, setInviteSender] = useState<string | undefined>(undefined);
   const [inviteSubtitle, setInviteSubtitle] = useState<string | undefined>(undefined);
+  const [invitedCount, setInvitedCount] = useState<number>(0);
   const loaderFadeTimeoutRef = useRef<number | undefined>(undefined);
   const envelopeTimeoutRef = useRef<number | undefined>(undefined);
 
@@ -126,11 +127,12 @@ export default function Home() {
         const guests = (inv?.guests ?? []) as InvitationGuest[];
         const code = inv?.code ?? "";
         const invitationName = code.includes("Familia") ? `La ${code}` : code;
-        const invitedCount = Array.isArray(guests) ? guests.filter(g => !!g?.guest?.person).length : 0;
-        const subtitleText = `Invitación para ${invitedCount} ${invitedCount === 1 ? "persona" : "personas"}`;
+        const count = Array.isArray(guests) ? guests.filter(g => !!g?.guest?.person).length : 0;
+        const subtitleText = `Invitación para ${count} ${count === 1 ? "persona" : "personas"}`;
         if (!cancelled) {
           setInviteSender(invitationName);
           setInviteSubtitle(subtitleText);
+          setInvitedCount(count);
         }
       } catch (e) {
         if (!cancelled) setInviteError("failed_to_fetch");
@@ -205,13 +207,13 @@ export default function Home() {
             sealSlot={<Image src="/wedding_seal.png" alt="Sello de cera" width={96} height={96} className="seal-img" />}
             sender={inviteSender}
             subtitle={inviteSubtitle}
-            buttonText="Abrir"
+            buttonText="Invitación"
             onOpenComplete={handleOpenComplete}
           />
         ) : null}
         {invitationMounted ? (
           <div className={`transition-opacity duration-700 ${invitationVisible ? "opacity-100" : "opacity-0"}`}>
-            <InvitationContent inviteCode={inviteSender || undefined} />
+            <InvitationContent inviteCode={inviteSender || undefined} invitedCount={invitedCount} />
             {invitationVisible ? <MusicControls /> : null}
           </div>
         ) : null}
