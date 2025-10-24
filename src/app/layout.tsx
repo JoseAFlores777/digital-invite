@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     url: "/",
     siteName: "Invitación Clarisa & José",
     images: [
-      { url: "/assets/og-cover.svg", width: 1200, height: 630, alt: "Invitación Clarisa & José" },
+      { url: "/images/IMG_0150.webp", width: 1200, height: 630, alt: "Invitación Clarisa & José" },
     ],
     locale: "es_ES",
     type: "website",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: "Clarisa & José — Invitación de boda",
     description:
       "Acompáñanos en nuestra celebración. Detalles, itinerario, RSVP y más.",
-    images: ["/assets/og-cover.svg"],
+    images: ["/images/IMG_0150.webp"],
   },
   icons: {
     icon: [
