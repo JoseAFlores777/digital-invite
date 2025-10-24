@@ -5,8 +5,8 @@ import "./globals.scss";
 
 export const metadata: Metadata = {
   title: "Invitación de boda – Clarisa & José",
-  description: "Invitación de boda con animaciones sutiles GSAP, detalles del evento y RSVP.",
-  metadataBase: new URL("https://example.com"),
+  description: "Invitación de boda, detalles del evento y RSVP.",
+  metadataBase: new URL("https://invite.joseiz.com"),
   openGraph: {
     title: "Clarisa & José — Invitación de boda",
     description:
