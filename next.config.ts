@@ -25,6 +25,15 @@ const nextConfig: NextConfig = {
     ],
     minimumCacheTTL: 60 * 60 * 24 * 30,
   },
+  async redirects() {
+    return [
+      {
+        source: "/favicon.ico",
+        destination: "/favicon/favicon.ico",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
