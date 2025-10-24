@@ -137,7 +137,7 @@ export default function InvitationContent({ inviteCode, invitedCount }: { invite
     }, []);
 
   const galleryRef = React.useRef<HTMLDivElement | null>(null);
-  const verbSeaSean = (invitedCount ?? 2) === 1 ? "sea" : "sean";
+  const verbSeaSean = (invitedCount ?? 2) === 1 ? "sea" : "sea";
 
   return (
     <ScrollIdleHintOverlay
