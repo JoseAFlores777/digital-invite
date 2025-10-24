@@ -82,7 +82,6 @@ export default function EnvelopeWelcome({
           size="sm"
           enableOnDesktop          // importante si pruebas en desktop
           suppressWhenModal={false} // ponlo en true si quieres que el “modal” lo suprima
-          debug                    // logs en consola
       >
       <main
         className={`min-h-screen bg-white text-[color:var(--color-dusty-800)] overflow-x-hidden overflow-y-auto transition-opacity duration-500 ${className}`}
