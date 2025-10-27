@@ -137,43 +137,51 @@ export default function Itinerary() {
                   </div>
                 </div>
 
-                <div className="w-full pt-4 border-t border-neutral-200 flex flex-col sm:flex-row sm:items-stretch gap-2 sm:gap-3">
-                  {googleMapsLink && (
-                    <CustomBtn
-                      onClick={() => window.open(googleMapsLink as string, "_blank")}
-                      label="Google Maps"
-                      icon="solar:map-point-bold"
-                      variant="outline"
-                      size="md"
-                      className="flex-1 min-w-0 w-full"
-                    />
-                  )}
-                  {wazeLink && (
-                    <CustomBtn
-                      onClick={() => window.open(wazeLink as string, "_blank")}
-                      label="Waze"
-                      icon="mdi:waze"
-                      variant="outline"
-                      size="md"
-                      className="flex-1 min-w-0 w-full"
-                    />
-                  )}
-                  <CalendarAddButton
-                    date={eventDateStr}
-                    startTime={eventStartTimeStr}
-                    endTime={eventEndTimeStr}
-                    timezone={eventTz}
-                    coupleName={coupleName}
-                    venueName={venueName}
-                    address={address}
-                    googleMapsLink={googleMapsLink}
-                    wazeLink={wazeLink}
-                    className="flex-1 min-w-0 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 bg-white text-[color:var(--color-dusty-900)] border border-neutral-300 hover:bg-neutral-50"
-                  >
-                    <Icon icon="solar:calendar-bold" className="w-5 h-5" />
-                    <span className="truncate text-sm">Añadir al calendario</span>
-                  </CalendarAddButton>
-                </div>
+                  <div className="w-full pt-4 border-t border-neutral-200 flex flex-col sm:flex-row sm:items-stretch gap-2 sm:gap-3">
+                      {googleMapsLink && (
+                        <div className="flex-1 min-w-0">
+                          <CustomBtn
+                            onClick={() => window.open(googleMapsLink as string, "_blank")}
+                            label="Google Maps"
+                            icon="solar:map-point-bold"
+                            variant="outline"
+                            size="md"
+                            fullWidth
+                            className="w-full"
+                          />
+                        </div>
+                      )}
+                      {wazeLink && (
+                        <div className="flex-1 min-w-0">
+                          <CustomBtn
+                            onClick={() => window.open(wazeLink as string, "_blank")}
+                            label="Waze"
+                            icon="mdi:waze"
+                            variant="outline"
+                            size="md"
+                            fullWidth
+                            className="w-full"
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <CalendarAddButton
+                          date={eventDateStr}
+                          startTime={eventStartTimeStr}
+                          endTime={eventEndTimeStr}
+                          timezone={eventTz}
+                          coupleName={coupleName}
+                          venueName={venueName}
+                          address={address}
+                          googleMapsLink={googleMapsLink}
+                          wazeLink={wazeLink}
+                          className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 bg-white text-[color:var(--color-dusty-900)] border border-neutral-300 hover:bg-neutral-50"
+                        >
+                          <Icon icon="solar:calendar-bold" className="w-5 h-5" />
+                          <span className="truncate text-sm">Añadir al calendario</span>
+                        </CalendarAddButton>
+                      </div>
+                  </div>
               </div>
             </div>
           ))}

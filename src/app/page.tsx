@@ -25,8 +25,6 @@ export default function Home() {
   const [invitationMounted, setInvitationMounted] = useState(false);
   const [invitationVisible, setInvitationVisible] = useState(false);
   const [showSolicitudModal, setShowSolicitudModal] = useState(false);
-  const [, setDigitalGuests] = useState<any[]>([]);
-  const [, setInvitations] = useState<any[]>([]);
   const [, setWedding] = useState<any | null>(null);
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [inviteSender, setInviteSender] = useState<string | undefined>(undefined);
@@ -145,30 +143,6 @@ export default function Home() {
     };
   }, []);
 
-  // Keep loading of supplemental data (optional) after invite validation
-  useEffect(() => {
-    if (inviteError) return; // skip if invalid
-    let active = true;
-
-    Promise.all([
-      fetch("/api/digital-guests").then((r) => r.json()).catch(() => ({ guests: [] })),
-      // Invitations can be re-enabled later if needed
-    ])
-      .then(([guestsRes]) => {
-        if (!active) return;
-        setDigitalGuests(Array.isArray(guestsRes?.guests) ? guestsRes.guests : []);
-        setInvitations([]);
-      })
-      .catch(() => {
-        if (!active) return;
-        setDigitalGuests([]);
-        setInvitations([]);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [inviteError]);
 
   useEffect(() => {
     if (!invitationVisible) return;

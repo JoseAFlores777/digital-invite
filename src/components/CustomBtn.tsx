@@ -28,6 +28,7 @@ type BaseProps = {
   ariaExpanded?: boolean;
   disabled?: boolean;
   children?: React.ReactNode; // opcional para contenido totalmente custom
+  fullWidth?: boolean; // si true, el wrapper y el control ocupan el ancho completo
 };
 
 type AnchorProps = {
@@ -70,9 +71,9 @@ function variantClasses(variant: CustomBtnVariant = "primary") {
   }
 }
 
-function Wrapper({ children, shine }: { children: React.ReactNode; shine?: boolean }) {
+function Wrapper({ children, shine, fullWidth }: { children: React.ReactNode; shine?: boolean; fullWidth?: boolean }) {
   return (
-    <span className="relative overflow-hidden inline-block rounded-xl">
+    <span className={cn("relative overflow-hidden rounded-xl", fullWidth ? "block w-full" : "inline-block") }>
       {shine ? (
         <ShineBorder
           aria-hidden
@@ -100,6 +101,7 @@ function CustomBtn(props: CustomBtnProps) {
     ariaExpanded,
     disabled,
     children,
+    fullWidth,
     // discriminated
     href,
     onClick,
@@ -145,6 +147,7 @@ function CustomBtn(props: CustomBtnProps) {
     "relative z-10 inline-flex select-none items-center justify-center rounded-xl font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
     sizeClasses.container,
     variantClasses(variant),
+    fullWidth ? "w-full" : undefined,
     disabled ? "pointer-events-none cursor-not-allowed" : "cursor-pointer",
     className
   );
@@ -152,7 +155,7 @@ function CustomBtn(props: CustomBtnProps) {
   if (href) {
     const aRel = rel ?? (target === "_blank" ? "noopener noreferrer" : undefined);
     return (
-      <Wrapper shine={shine}>
+      <Wrapper shine={shine} fullWidth={fullWidth}>
         <a
           href={href}
           target={target}
@@ -169,7 +172,7 @@ function CustomBtn(props: CustomBtnProps) {
   }
 
   return (
-    <Wrapper shine={shine}>
+    <Wrapper shine={shine} fullWidth={fullWidth}>
       <button
         type={type}
         aria-label={ariaLabel || label}
