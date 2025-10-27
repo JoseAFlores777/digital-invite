@@ -157,18 +157,17 @@ export default function Gift({ hideCopy = false, shareHref, finalGifts }: { hide
           <h2 className="display-font text-3xl md:text-4xl mb-3">Mesa de Regalos</h2>
             {(shareHref || (mounted && clientHref)) && (
               <div className="flex justify-center mb-6">
-                <CustomBtn
-                  className={"animate-pulse"}
-                  key="share-info"
-                  href={(shareHref || clientHref) as string}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  label="Compartir esta información"
-                  icon="mdi:whatsapp"
-                  variant="outline"
-                  size={"lg"}
-                  shine={true}
-                />
+                {/*<CustomBtn*/}
+                {/*  className={"animate-pulse"}*/}
+                {/*  key="share-info"*/}
+                {/*  href={(shareHref || clientHref) as string}*/}
+                {/*  target="_blank"*/}
+                {/*  rel="noopener noreferrer"*/}
+                {/*  label="Compartir esta información"*/}
+                {/*  icon="mdi:whatsapp"*/}
+                {/*  variant="outline"*/}
+                {/*  size={"lg"}*/}
+                {/*/>*/}
               </div>
             )}
           <p className="text-neutral-700 max-w-2xl mx-auto">
