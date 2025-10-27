@@ -6,6 +6,7 @@ import Modal from "react-modal";
 import { Icon } from "@iconify/react";
 import toast, { Toaster } from "react-hot-toast";
 import CustomBtn from "@/components/CustomBtn";
+import { useWeddingData } from "@/store/wedding";
 
 type GiftOption = {
   id: string | number;
@@ -165,6 +166,8 @@ export default function Gift({ hideCopy = false, shareHref, finalGifts }: { hide
                   label="Compartir esta información"
                   icon="mdi:whatsapp"
                   variant="outline"
+                  size={"lg"}
+                  shine={true}
                 />
               </div>
             )}
@@ -251,6 +254,12 @@ type DialogProps = {
 };
 
 function GiftDialog({ option, open, onClose, onCopy, iconRef, showCopy = true, copiedKey }: DialogProps) {
+  const { data } = useWeddingData();
+  const wg: any = data as any;
+  const giftNotificationLink: string = (wg?.wedding?.gift_notification_link as string)
+    || (wg?.gift_notification_link as string)
+    || (wg?.generalities?.gift_notification_link as string)
+    || "";
   React.useEffect(() => {
     try {
       if (typeof window !== "undefined") {
@@ -309,39 +318,74 @@ function GiftDialog({ option, open, onClose, onCopy, iconRef, showCopy = true, c
       <div className="grid gap-3">
         {Object.entries(option.details).map(([label, value]) => (
           <div key={label} className="flex items-start justify-between gap-3">
-            <div>
+            <div className="flex-1 min-w-0 max-w-[80%]">
               <p className="text-sm font-medium text-[color:var(--color-dusty-900)]">{label}:</p>
-              <p className="font-mono text-sm text-[color:var(--color-dusty-800)] break-all">{value}</p>
+              <p className="font-mono text-sm text-[color:var(--color-dusty-800)] break-words whitespace-pre-wrap">{value}</p>
             </div>
             {showCopy && (
-              <CustomBtn
-                key={`copy-${label}`}
-                onClick={(e) => onCopy(label, value, (e.currentTarget.querySelector('[data-copy-icon]') as HTMLElement | null) || undefined)}
-                ariaLabel={`${copiedKey === label ? "Copiado" : "Copiar"} ${label}`}
-                className="self-center inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs !px-3.5 !py-1.5"
-                variant="outline"
-                icon={copiedKey === label ? "lucide:check" : "lucide:copy"}
-                size="sm"
-              >
-              </CustomBtn>
+              <div className="shrink-0">
+                <CustomBtn
+                  key={`copy-${label}`}
+                  onClick={(e) =>
+                    onCopy(
+                      label,
+                      value,
+                      (e.currentTarget.querySelector('[data-copy-icon]') as HTMLElement | null) || undefined
+                    )
+                  }
+                  ariaLabel={`${copiedKey === label ? "Copiado" : "Copiar"} ${label}`}
+                  className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs !px-3.5 !py-1.5"
+                  variant="outline"
+                  icon={copiedKey === label ? "lucide:check" : "lucide:copy"}
+                  size="sm"
+                />
+              </div>
             )}
           </div>
         ))}
       </div>
-      {option.redirectBtn && option.redirectBtn.hide !== true && option.redirectBtn.url ? (
+      {(giftNotificationLink || (option.redirectBtn && option.redirectBtn.hide !== true && option.redirectBtn.url)) ? (
         <div className="mt-5 pt-4 border-t border-[color:var(--color-dusty-200)]">
-          <CustomBtn
-            key={`redirect-${option.id}`}
-            href={option.redirectBtn.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full"
-            label={option.redirectBtn.label ?? "Abrir enlace"}
-            icon={option.redirectBtn.icon}
-            variant="outline"
-            size="md"
-            shine={true}
-          />
+          {option.redirectBtn && option.redirectBtn.hide !== true && option.redirectBtn.url ? (
+            <CustomBtn
+              key={`redirect-${option.id}`}
+              href={option.redirectBtn.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full"
+              label={option.redirectBtn.label ?? "Abrir enlace"}
+              icon={option.redirectBtn.icon}
+              variant="outline"
+              size="md"
+              shine={true}
+              fullWidth
+            />
+          ) : null}
+
+          {option.redirectBtn && option.redirectBtn.hide !== true && option.redirectBtn.url && giftNotificationLink ? (
+            <div className="my-3 h-px bg-[color:var(--color-dusty-200)]"></div>
+          ) : null}
+
+          {giftNotificationLink ? (
+            <>
+              <CustomBtn
+                key={`notify-${option.id}`}
+                href={giftNotificationLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full animate-pulse"
+                label="Avísanos sobre tu regalo"
+                icon="mdi:bell-outline"
+                variant="outline"
+                size="md"
+                shine={true}
+                fullWidth
+              />
+              <p className="text-center text-neutral-600 mb-2">
+                Este botón te permite avisarnos que ya enviaste tu regalo para poder confirmarlo y agradecerte con todo nuestro cariño 🙏.
+              </p>
+            </>
+          ) : null}
         </div>
       ) : null}
     </Modal>
